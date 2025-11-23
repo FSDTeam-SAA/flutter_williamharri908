@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-
 
 import 'app/splash_view.dart';
 import 'src/core/routing/route_names.dart';
@@ -27,7 +25,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-
       debugShowCheckedModeBanner: false,
 
       title: 'williamharri',
@@ -35,6 +32,7 @@ class MyApp extends StatelessWidget {
       //initialRoute: RouteHelper.getInitialRoute(),
       theme: AppTheme().lightTheme,
       darkTheme: AppTheme().darkTheme,
+      themeMode: ThemeMode.dark,
 
       onGenerateRoute: (settings) {
         switch (settings.name) {
@@ -46,10 +44,12 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const SignUpView());
           case RouteNames.terms:
             return MaterialPageRoute(
-                builder: (_) => const TermsConditionView());
+              builder: (_) => const TermsConditionView(),
+            );
           case RouteNames.forgotPassword:
             return MaterialPageRoute(
-                builder: (_) => const ForgotPasswordView());
+              builder: (_) => const ForgotPasswordView(),
+            );
           case RouteNames.resetPassword:
             return MaterialPageRoute(builder: (_) => const ResetPasswordView());
 

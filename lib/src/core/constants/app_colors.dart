@@ -81,12 +81,12 @@ class AppColors {
   final Color errorColor;
 
   AppColors._internalLight()
-    : textColor = Colors.white,
+    : textColor = Colors.black,
       invertTextColor = Colors.white,
       grey = Color.fromARGB(255, 162, 158, 158),
       tileColor = Color(0xFFB0E0CF),
       softGrey = Color.fromARGB(255, 233, 233, 233),
-      backgroundColor = Colors.black,
+      backgroundColor = Colors.white,
       iconColor = Colors.white,
       buttonContentColor = Colors.white,
       activeButtonContentColor = Colors.white,

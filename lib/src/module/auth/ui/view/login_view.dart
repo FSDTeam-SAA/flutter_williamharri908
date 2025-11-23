@@ -4,12 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
+import 'package:williamharri/src/module/account/ui/terms_condition_view.dart';
 import '../../../../core/base/reactive_ui/save_button.dart';
 import '../../../../core/common/textfields/email_textfield.dart';
 import '../../../../core/common/textfields/password_textfield.dart';
 import '../../../../core/constants/assets.dart';
 
 import '../../../../core/routing/route_names.dart';
+import '../../../profile/ui/view/profile_view.dart';
 import '../../controller/login_controller.dart';
 
 class LoginView extends StatelessWidget {
@@ -88,6 +90,7 @@ class LoginView extends StatelessWidget {
               doneText: "Successful",
               loadingText: "Signing Up...",
               onSave: (processNotifier) async {
+                Get.to(ProfileView());
                 // await signInController.signup(SnackbarNotifier(context: context));
               },
               onDone: () {},
