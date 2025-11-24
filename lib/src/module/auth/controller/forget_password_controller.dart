@@ -4,7 +4,7 @@ import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
 import 'package:williamharri/src/module/auth/model/forget_password_model.dart';
 import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
-import '../ui/view/otp_code_view.dart';
+import 'package:williamharri/src/module/auth/ui/view/reset_otp-code_view.dart';
 
 class ForgetPasswordController extends GetxController {
   final AuthRepo authRepo = Get.find<AuthRepo>();
@@ -48,7 +48,7 @@ class ForgetPasswordController extends GetxController {
       errorSnackbarNotifier: snackbarNotifier,
       onSuccess: (_) {
         // snackbarNotifier.showSuccess("OTP sent to your email");
-        Get.to(() => OtpCodeView(email: _email));
+        Get.to(() => ResetOtpCodeView(email: _email));
       },
     );
   }

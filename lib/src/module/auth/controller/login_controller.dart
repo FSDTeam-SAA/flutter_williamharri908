@@ -90,12 +90,13 @@ class LoginController extends GetxController {
       lr.fold(
         (error) {
           // Handle errors
-          // snackbarNotifier.showError(error.message ?? 'Login failed');
+          processStatusNotifier.setError();
+          snackbarNotifier.notifyError(message: error.uiMessage);
+          isLoading.value = false;
         },
         (success) {
           // Handle success
-          // snackbarNotifier.showSuccess(success.message ?? 'Login successful');
-
+          processStatusNotifier.setSuccess(message: success.message);
           // Navigate to dashboard/home
           Get.offAllNamed(RouteNames.appground);
         },

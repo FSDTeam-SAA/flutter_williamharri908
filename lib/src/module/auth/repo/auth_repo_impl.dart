@@ -124,17 +124,16 @@ final class AuthRepoImpl extends AuthRepo {
   }
 
   @override
-FutureRequest<Success> verifyCode(VerifyOtpParam param) async {
-  return await asyncTryCatch(
-    tryFunc: () async {
-      final response = await appPigeon.post(
-        ApiEndpoints.verifyCode, // your backend route
-        data: param.toJson(),
-      );
-      final body = response.data;
-      return Success(message: body['message'] ?? 'Code verified');
-    },
-  );
-}
-
+  FutureRequest<Success> verifyCode(VerifyOtpParam param) async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        final response = await appPigeon.post(
+          ApiEndpoints.verifyCode, // your backend route
+          data: param.toJson(),
+        );
+        final body = response.data;
+        return Success(message: body['message'] ?? 'Code verified');
+      },
+    );
+  }
 }

@@ -1,60 +1,68 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
-// import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
-// import 'package:williamharri/src/core/utils/utils.dart';
-// import 'package:williamharri/src/module/auth/model/resate_password_model.dart';
-// import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
+import 'package:get/get.dart';
+import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
+import 'package:williamharri/src/core/utils/utils.dart';
+import 'package:williamharri/src/module/auth/model/resate_password_model.dart';
+import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 
-// class CreateNewPasswordController extends GetxController {
-//   final String email;
-//   final String otp;
-//   CreateNewPasswordController({required this.email, required this.otp});
-//   final ProcessStatusNotifier processNotifier = ProcessStatusNotifier(
-//     initialStatus: DisabledStatus()
-//   );
+class CreateNewPasswordController extends GetxController {
+  final String email;
+  final String otp;
 
-//   String _newPassword = '';
-//   String get newPassword => _newPassword;
-//   set newPassword(String value) {
-//     _newPassword = value;
-//     debugPrint("New Password: $_newPassword");
-//     debugPrint("Confirm Password: $_confirmPassword");
+  CreateNewPasswordController({
+    required this.email,
+    required this.otp,
+  });
 
-//   }
+  final processNotifier =
+      ProcessStatusNotifier(initialStatus: DisabledStatus());
 
-//   String _confirmPassword = '';
-//   String get confirmPassword => _confirmPassword;
-//   set confirmPassword(String value) {
-//     _confirmPassword = value;
-//     debugPrint("Confirm Password: $_confirmPassword");
-//     debugPrint("New Password: $_newPassword");
+  String _newPassword = "";
+  String _confirmPassword = "";
 
-//   }
+  bool get matchOk =>
+      _newPassword.isNotEmpty &&
+      _confirmPassword.isNotEmpty &&
+      _newPassword == _confirmPassword;
 
+  set newPassword(String value) {
+    _newPassword = value.trim();
+  }
 
-//   void resetPassword(SnackbarNotifier? snackbarNotifier) async {
-//     if (matchOk.value) {
-//       processNotifier.setEnabled();
-//     } else {
-//       processNotifier.setDisabled();
-//     }
+  set confirmPassword(String value) {
+    _confirmPassword = value.trim();
+  }
 
-//     await Get.find<AuthRepo>()
-//         .createNewPassword(
-//           ResatePasswordModel(
-//             email: email,
-//             password: newPassword,
-//             otp: otp,
-//           ),
-//         )
-//         .then((lr) {
-//           handleFold(
-//             either: lr,
-//             processStatusNotifier: processNotifier,
-//             successSnackbarNotifier: snackbarNotifier,
-//             errorSnackbarNotifier: snackbarNotifier,
-//           );
-//         });
-//   }
-// }
+  void validatePasswords() {
+    if (matchOk) {
+      processNotifier.setEnabled();
+    } else {
+      processNotifier.setDisabled();
+    }
+  }
+
+  Future<void> resetPassword(SnackbarNotifier snackbarNotifier) async {
+    if (!matchOk) {
+      // snackbarNotifier.showError("Passwords do not match!");
+      return;
+    }
+
+    processNotifier.setLoading();
+
+    final result = await Get.find<AuthRepo>().createNewPassword(
+      ResatePasswordModel(
+        email: email,
+        password: _newPassword,
+        otp: otp,
+      ),
+    );
+
+    handleFold(
+      either: result,
+      processStatusNotifier: processNotifier,
+      successSnackbarNotifier: snackbarNotifier,
+      errorSnackbarNotifier: snackbarNotifier,
+      onSuccess: (_) {},
+    );
+  }
+}

@@ -46,6 +46,7 @@ dependencies:
   google_fonts: ^6.3.2
   get: ^4.7.2
   pinput: ^6.0.0
+  shared_preferences: ^2.2.2
 
 
 dev_dependencies:

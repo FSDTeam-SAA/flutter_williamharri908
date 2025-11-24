@@ -7,7 +7,6 @@ import 'package:williamharri/src/core/utils/utils.dart';
 import 'package:williamharri/src/module/auth/model/verify_otp_param.dart';
 import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 import 'package:williamharri/src/module/auth/ui/view/login_view.dart';
-import '../ui/view/reset_password_view.dart';
 
 abstract class EmailVerifyOtpController extends ChangeNotifier {
   final AuthRepo authInterface = Get.find<AuthRepo>();
@@ -59,8 +58,8 @@ class VerifyAccountViewController extends EmailVerifyOtpController {
       processStatusNotifier: prcessNotifier,
       successSnackbarNotifier: snackbarNotifier,
       onSuccess: (_) {
-        // snackbarNotifier.showSuccess("User verified successfully!");
-        Get.to(() => LoginView()); // Navigate to Reset Password
+        snackbarNotifier.notifySuccess(message: "Account verified successfully!");
+        Get.to(() => LoginView());
       },
     );
   }
