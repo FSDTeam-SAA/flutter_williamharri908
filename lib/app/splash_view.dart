@@ -1,10 +1,7 @@
 import 'dart:async';
-
-
 import 'package:flutter/material.dart';
-
+import 'package:williamharri/src/module/auth/ui/view/login_view.dart';
 import '../src/core/constants/assets.dart';
-import '../src/core/routing/route_names.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -19,8 +16,12 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(seconds: 5), () {
-      Navigator.pushReplacementNamed(context, RouteNames.login);
+    timer = Timer(const Duration(seconds: 1), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
+      // Navigator.pushReplacementNamed(context, RouteNames.login);
     });
   }
 
@@ -34,13 +35,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset(
-          Assets.appLogo,
-          width: 200,
-          height: 200,
-        ),
-      ),
+      body: Center(child: Image.asset(Assets.appLogo, width: 200, height: 200)),
     );
   }
 }

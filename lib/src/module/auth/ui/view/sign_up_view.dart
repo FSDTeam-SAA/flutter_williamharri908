@@ -8,7 +8,6 @@ import '../../../../core/common/textfields/password_textfield.dart';
 import '../../../../core/common/textfields/textfield_prefix_icon.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/assets.dart';
-import '../../../../core/notifiers/snackbar_notifier.dart';
 import '../../../../core/routing/route_names.dart';
 import '../../../../core/utils/helpers/validation.dart';
 import '../../controller/signup_controller.dart';
@@ -85,53 +84,39 @@ class _SignUpViewState extends State<SignUpView> {
                     },
                   ),
                   NameTextfield(
-                    prefiexIcon: TextfieldPrefixIcon(
-                      assetName: Assets.location,
-                    ),
-                    labelText: "Ener Address",
-                    hintText: "Enter Address",
-
-                    onChanged: (value) {},
+                    prefiexIcon: TextfieldPrefixIcon(assetName: Assets.user),
+                    labelText: "Name",
+                    hintText: "Enter Your Name",
+                    onChanged: signupController.setFullName,
                     validationCheck: (value) {
-                      if (value.isEmpty) return "Please enter phone number";
+                      if (value.isEmpty) return "Please enter your name";
                       return null;
                     },
                   ),
 
                   EmailTextfield(
-                    onChanged: (value) {
-                      signupController.setEmail(value);
-                    },
+                    onChanged: signupController.setEmail,
                     validationCheck: (value) {
                       if (value.isEmpty) return "Please enter email!";
-                      if (!value.contains("@")) return "Invalid email!";
                       if (!isValidEmail(value)) return "Not a valid email!";
                       return null;
                     },
-                    labelText: "Email",
-                    hintText: "Enter Your Email",
-                    maxLines: 1,
                   ),
 
                   PasswordTextfield(
-                    labelText: "Password",
-                    hintText: "Enter Your Password",
-                    onChanged: (value) {},
+                    onChanged: signupController.setPassword,
                     validationCheck: (value) {
                       if (value.isEmpty) return "Please enter password!";
-                      if (value.length < 6) return "Password too short!";
-                      if (!isStrongPassword(value)) return "Password too weak!";
                       return null;
                     },
                   ),
 
                   PasswordTextfield(
-                    labelText: "Confirm Password",
-                    hintText: "Enter Your Password",
-                    onChanged: (value) {},
+                    onChanged: signupController.setConfirmPassword,
                     validationCheck: (value) {
-                      if (value.isEmpty) return "Please enter password";
-                      if (value.length < 6) return "Password too short";
+                      if (value.isEmpty) return "Please confirm password!";
+                      if (value != signupController.password.value)
+                        return "Passwords do not match!";
                       return null;
                     },
                   ),
@@ -179,12 +164,12 @@ class _SignUpViewState extends State<SignUpView> {
               RSaveButton(
                 height: 52,
                 key: UniqueKey(),
-                buttonStatusNotifier: signupController.stn,
+                buttonStatusNotifier: signupController.processNotifier,
                 saveText: "Sign Up",
                 doneText: "Successful",
                 loadingText: "Signing Up...",
                 onSave: (processNotifier) async {
-                  signupController.signup(SnackbarNotifier(context: context));
+                  signupController.signup();
                 },
                 onDone: () {},
               ),

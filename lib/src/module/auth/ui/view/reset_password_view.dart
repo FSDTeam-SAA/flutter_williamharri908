@@ -6,20 +6,18 @@ import '../../../../core/base/reactive_ui/save_button.dart';
 import '../../../../core/common/textfields/password_textfield.dart';
 
 import '../../../../core/constants/assets.dart';
-import '../../controller/login_controller.dart';
-import 'otp_code_view.dart';
+import '../../controller/login_controller_x.dart';
 
 class ResetPasswordView extends StatelessWidget {
   const ResetPasswordView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final SignInController signInController = Get.put(SignInController());
+    final SignInControllerx signInController = Get.put(SignInControllerx());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
-        /// title: const Text("Create New Password"),
         centerTitle: true,
       ),
       body: Padding(

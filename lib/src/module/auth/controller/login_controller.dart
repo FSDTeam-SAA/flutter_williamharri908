@@ -1,79 +1,107 @@
-
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
+import 'package:williamharri/src/core/routing/route_names.dart';
+import 'package:williamharri/src/core/utils/helpers/validation.dart';
+import 'package:williamharri/src/module/auth/model/login_request_params.dart';
+import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 
-import '../../../core/base/reactive_ui/process_notifier.dart';
-import '../../../core/notifiers/snackbar_notifier.dart';
-import '../../../core/routing/route_names.dart';
+class LoginController extends GetxController {
+  // UI Notifiers
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: DisabledStatus(),
+  );
+  final SnackbarNotifier snackbarNotifier;
 
-class SignInController extends GetxController {
-  String email = "";
-  String password = "";
-  String name = "";
-  String confirmPassword = "";
+  final formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final isPasswordVisible = false.obs;
+  final keepSignedIn = false.obs;
+  final isLoading = false.obs;
 
-  final ProcessStatusNotifier stn =
-      ProcessStatusNotifier(initialStatus: EnabledStatus());
+  String _email = '';
+  String get email => _email;
 
-  void setEmail(String email) {
-    this.email = email;
-    update();
-  }
+  String _password = '';
+  String get password => _password;
 
-  void setName(String name) {
-    this.name = name;
-    update();
-  }
+  LoginController(this.snackbarNotifier);
 
-  void setPassword(String password) {
-    this.password = password;
-    update();
-  }
-
-  void setConfirmPassword(String confirmPassword) {
-    this.confirmPassword = confirmPassword;
-    update();
-  }
-
-  Future<void> signup(SnackbarNotifier? snackbarNotifier) async {
-    stn.setLoading();
-    snackbarNotifier?.notify(
-      message: "Signing up",
+  /// ← This is where onInit goes
+  @override
+  void onInit() {
+    super.onInit();
+    emailController.addListener(() => email = emailController.text.trim());
+    passwordController.addListener(
+      () => password = passwordController.text.trim(),
     );
-
-    Future.delayed(Duration(seconds: 2), () {
-      stn.setError();
-      snackbarNotifier?.notifyError(
-        message: "Sign up failed!!",
-      );
-    });
   }
 
-  Future<void> forgot(SnackbarNotifier? snackbarNotifier) async {
-    stn.setLoading();
-    snackbarNotifier?.notify(
-      message: "Sending OTP...",
-    );
-
-    Future.delayed(Duration(seconds: 2), () {
-      stn.setError();
-      snackbarNotifier?.notifyError(
-        message: "Sending OTP failed!!",
-      );
-    });
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 
-  Future<void> resetPassword(SnackbarNotifier? snackbarNotifier) async {
-    stn.setLoading();
-    snackbarNotifier?.notify(
-      message: "resetting password...",
-    );
+  set email(String value) {
+    if (value != _email) {
+      _email = value;
+      canLogin();
+    }
+  }
 
-    Future.delayed(Duration(seconds: 2), () {
-      stn.setError();
-      snackbarNotifier?.notifyError(
-        message: "reset password failed!!",
+  set password(String value) {
+    if (value != _password) {
+      _password = value;
+      canLogin();
+    }
+  }
+
+  void canLogin() {
+    if (_email.isNotEmpty && isValidEmail(_email) && _password.isNotEmpty) {
+      processStatusNotifier.setEnabled();
+    } else {
+      processStatusNotifier.setDisabled();
+    }
+  }
+
+  void togglePasswordVisibility() {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  }
+
+  void toggleKeepSignedIn(bool value) {
+    keepSignedIn.value = value;
+  }
+
+  Future<void> login({required VoidCallback needVerifyAccount}) async {
+    if (!formKey.currentState!.validate()) return;
+
+    isLoading.value = true;
+    processStatusNotifier.setLoading();
+
+    try {
+      final lr = await Get.find<AuthRepo>().login(
+        LoginRequestParams(email: email, password: password),
       );
-      Get.toNamed(RouteNames.resetPassword);
-    });
+
+      lr.fold(
+        (error) {
+          // Handle errors
+          // snackbarNotifier.showError(error.message ?? 'Login failed');
+        },
+        (success) {
+          // Handle success
+          // snackbarNotifier.showSuccess(success.message ?? 'Login successful');
+
+          // Navigate to dashboard/home
+          Get.offAllNamed(RouteNames.appground);
+        },
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
