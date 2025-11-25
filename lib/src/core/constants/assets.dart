@@ -23,6 +23,14 @@ class Assets {
   static const String lock = '$_iconAssets/lock.png';
   static const String user = '$_iconAssets/user.png';
   static const String phone = '$_iconAssets/phone.png';
+
+  // -------------- Profile icons -------------
+
+  static const String profileInfo = '$_iconAssets/credit.png';
+  static const String logOut = '$_iconAssets/logOut.png';
+  static const String term = '$_iconAssets/term.png';
+  static const String edit = '$_iconAssets/edit.png';
+
   static const String google = '$_iconAssets/google.png';
   static const String person = '$_iconAssets/person.png';
   static const String location = '$_iconAssets/location.png';
@@ -32,7 +40,7 @@ class Assets {
   static const String date = '$_iconAssets/date.svg';
   static const String message = '$_iconAssets/message.svg';
   static const String profile = '$_iconAssets/profile.svg';
-  static const String edit = '$_iconAssets/edit.svg';
+
   static const String carOwner = '$_iconAssets/car_owner.png';
   static const String carWasher = '$_iconAssets/car_washer.png';
   static const history = "$_iconAssets/history.png";
@@ -41,9 +49,9 @@ class Assets {
   static const faq = "$_iconAssets/faq.png";
   static const support = "$_iconAssets/live_support.png";
   static const share = "$_iconAssets/share_a_friend.png";
-  static const logout = "$_iconAssets/logout.png";
+
   static const availableCoupon = "$_iconAssets/available_coupon.png";
-  static const shieldOff = "$_iconAssets/shield-off.png";
+
   static const legalDoc = "$_iconAssets/legal_doc.png";
   static const lockBlack = "$_iconAssets/lock_black.png";
   static const calender = "$_iconAssets/calender.png";
@@ -55,14 +63,9 @@ class Assets {
   static const messagePng = "$_iconAssets/message.png";
   static const send = "$_iconAssets/send.png";
 
-
-
-
-
-//========= select service Images 
+  //========= select service Images
 
   static const String driver = '$_imageAssets/driver.png';
   static const String nurse = '$_imageAssets/nurse.png';
   static const String pharmacist = '$_imageAssets/pharmacist.png';
-
 }

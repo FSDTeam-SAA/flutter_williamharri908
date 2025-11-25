@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-
       debugShowCheckedModeBanner: false,
 
       title: 'williamharri',
@@ -40,6 +39,7 @@ class _MyAppState extends State<MyApp> {
       //initialRoute: RouteHelper.getInitialRoute(),
       theme: AppTheme().lightTheme,
       darkTheme: AppTheme().darkTheme,
+      themeMode: ThemeMode.dark,
 
       onGenerateRoute: (settings) {
         switch (settings.name) {

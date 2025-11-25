@@ -29,7 +29,7 @@ class DAppBarTheme {
     backgroundColor: AppColors.dark().tileColor,
     surfaceTintColor: AppColors.dark().dividerColor,
     systemOverlayStyle: SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
       statusBarColor: AppColors.light().primaryColor,
       statusBarIconBrightness: Brightness.light,
     ),
