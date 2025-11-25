@@ -82,7 +82,8 @@ class ProfileView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: InkWell(
                 onTap: () {
-                  Get.snackbar("Logout", "Successfully Logout");
+                  //Get.snackbar("Logout", "Successfully Logout")
+                  showLogoutDialog();
                 },
                 child: Container(
                   height: 44,
@@ -133,3 +134,45 @@ class ProfileView extends StatelessWidget {
     );
   }
 }
+void showLogoutDialog() {
+  Get.defaultDialog(
+    backgroundColor: Colors.white,
+    title: "Logout",
+    middleText: "Are you sure you want to logout?",
+    titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.black),
+    middleTextStyle: TextStyle(fontSize: 16,color: Colors.black),
+    barrierDismissible: true,
+    radius: 10,
+    contentPadding: EdgeInsets.all(20),
+    cancel: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white, // Cancel button background color
+        foregroundColor: Colors.black, // Cancel button text color
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Colors.grey), // Optional border
+        ),
+      ),
+      onPressed: () {
+        Get.back(); // close dialog
+      },
+      child: Text("Cancel"),
+    ),
+    confirm: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orange, // Logout button background color
+        foregroundColor: Colors.white, // Logout button text color
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      onPressed: () {
+        Get.back(); // close dialog
+        print("User logged out");
+        // এখানে তোমার logout logic call করো
+      },
+      child: Text("Logout"),
+    ),
+  );
+}
+

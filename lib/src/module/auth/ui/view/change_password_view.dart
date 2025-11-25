@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:williamharri/src/core/common/textfields/s_textfield.dart';
 
 import '../../../../core/base/reactive_ui/save_button.dart';
+import '../../../../core/notifiers/snackbar_notifier.dart';
+import '../../controller/signup_controller.dart';
 
 class ChangePasswordView extends StatelessWidget {
   const ChangePasswordView({super.key});
@@ -9,7 +12,7 @@ class ChangePasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = TextEditingController();
-
+    final SignupController signupController = SignupController();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -36,7 +39,7 @@ class ChangePasswordView extends StatelessWidget {
               //  isPassword: true,
             ),
 
-            RSaveButton(
+         /*   RSaveButton(
               height: 52,
               key: UniqueKey(),
               //  buttonStatusNotifier: signInController.stn,
@@ -48,6 +51,18 @@ class ChangePasswordView extends StatelessWidget {
                 // await signInController .resetPassword(SnackbarNotifier(context: context));
               },
               onDone: () {},
+            ),*/
+            RSaveButton(
+              height: 52,
+              key: UniqueKey(),
+              buttonStatusNotifier: signupController.stn,
+              saveText: "Save",
+              doneText: "Successful",
+              loadingText: "Signing Up...",
+              onSave: (processNotifier) async {
+                signupController.signup(SnackbarNotifier(context: context));
+              },
+              onDone: () {},
             ),
           ],
         ),
@@ -55,3 +70,4 @@ class ChangePasswordView extends StatelessWidget {
     );
   }
 }
+
