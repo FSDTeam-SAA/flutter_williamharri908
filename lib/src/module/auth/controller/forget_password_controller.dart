@@ -29,7 +29,7 @@ class ForgetPasswordController extends GetxController {
 
   Future<void> sendOtp() async {
     if (_email.isEmpty) {
-      // snackbarNotifier.showError("Please enter email");
+      snackbarNotifier.notifyError(message: "Please enter email");
       return;
     }
 
@@ -47,7 +47,7 @@ class ForgetPasswordController extends GetxController {
       successSnackbarNotifier: snackbarNotifier,
       errorSnackbarNotifier: snackbarNotifier,
       onSuccess: (_) {
-        // snackbarNotifier.showSuccess("OTP sent to your email");
+        snackbarNotifier.notifySuccess(message: "OTP sent successfully!");
         Get.to(() => ResetOtpCodeView(email: _email));
       },
     );

@@ -49,7 +49,7 @@ class ResetPasswordOtpController extends ChangeNotifier {
       processStatusNotifier: processNotifier,
       successSnackbarNotifier: snackbarNotifier,
       onSuccess: (_) {
-        // snackbarNotifier.showSuccess("OTP verified successfully!");
+        snackbarNotifier.notifySuccess(message: "OTP verified successfully!");
         Get.to(() => ResetPasswordView(email: email, otp: otp,));
       },
     );

@@ -72,13 +72,14 @@ class SignupController extends GetxController {
     successSnackbarNotifier: snackbarNotifier,
     onError: (failure) {
       buttonNotifier?.setError();
+      snackbarNotifier?.notifyError(message: failure.uiMessage);
     },
     onSuccess: (success) {
       buttonNotifier?.setSuccess();
 
       // Navigate to OTP screen if needed
       Get.to(() => OtpCodeView(email: email.value,));
-
+      snackbarNotifier?.notifySuccess(message: success.message);
       onDone?.call();
     },
   );

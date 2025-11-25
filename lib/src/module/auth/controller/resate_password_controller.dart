@@ -43,7 +43,9 @@ class CreateNewPasswordController extends GetxController {
 
   Future<void> resetPassword(SnackbarNotifier snackbarNotifier) async {
     if (!matchOk) {
-      // snackbarNotifier.showError("Passwords do not match!");
+      snackbarNotifier.notifyError(
+        message: "Passwords do not match",
+      );
       return;
     }
 
