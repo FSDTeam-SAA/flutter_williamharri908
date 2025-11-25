@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Bottom profile menu button
 Widget profileBottom({
   required String name,
   required String image,
@@ -18,20 +19,21 @@ Widget profileBottom({
         child: Row(
           children: [
             Image.asset(image, height: 20, width: 20, color: Colors.black),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.black,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: Colors.black, size: 16),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.black, size: 16),
                 ],
               ),
             ),
@@ -42,6 +44,7 @@ Widget profileBottom({
   );
 }
 
+/// Show profile info (NOT editable)
 Widget personalInfoShow({required String type, required String data}) {
   return Column(
     children: [
@@ -51,12 +54,12 @@ Widget personalInfoShow({required String type, required String data}) {
           children: [
             Text(
               type,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             ),
-            Spacer(),
+            const Spacer(),
             Text(
               data,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             ),
           ],
         ),
@@ -66,16 +69,35 @@ Widget personalInfoShow({required String type, required String data}) {
   );
 }
 
-Widget profileEditInfoShow({required String type, required String data}) {
+/// Editable profile field (Except Email)
+Widget profileEditInfoShow({
+  required String type,
+  required String data,
+  bool isEditable = true,
+  TextEditingController? controller,
+}) {
+  final TextEditingController textController =
+      controller ?? TextEditingController(text: data);
+
   return Padding(
     padding: const EdgeInsets.only(top: 15),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
       children: [
-        Text(type, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+        Text(
+          type,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        ),
 
-        Text(data, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+        const SizedBox(height: 4),
+
+        TextField(
+          controller: textController,
+          enabled: isEditable,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          // decoration: InputDecorahhh
+        ),
+
         Container(height: 1, color: Colors.white),
       ],
     ),

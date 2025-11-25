@@ -17,6 +17,13 @@ base class ApiEndpoints {
 
   // ---------------------- USER -----------------------------
   /// ### get
+  static String getuserbyId(String id) => _User.getuserbyId(id);
+
+  /// ### patch
+  static const String updateUser = _User.updateUser;
+
+  /// ### patch
+  static const String uploadProfileImage = _User.uploadProfileImage;
 
   // ---------------------- Message -----------------------------
 
@@ -52,15 +59,20 @@ class _Auth {
 }
 
 
+//--------------------------user-----------------------
+class _User {
+  static const String _userRoute = '${ApiEndpoints.baseUrl}/users';
+  static String getuserbyId(String id) => '$_userRoute/me';
+  static const String updateUser = '$_userRoute/me';
+  static const String uploadProfileImage = '$_userRoute/me/avatar';
+}
+
+
 
 // ---------------------- Notification -----------------------------
 class _Notification {
   static const String _notificationRoute =
       '${ApiEndpoints.baseUrl}/notification';
-}
-
-class _User {
-  static const String _userRoute = '${ApiEndpoints.baseUrl}/user';
 }
 
 // ---------------------- MESSAGE -----------------------------
