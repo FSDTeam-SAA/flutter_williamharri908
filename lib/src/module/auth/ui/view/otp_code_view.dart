@@ -29,7 +29,7 @@ class _OtpCodeViewState extends State<OtpCodeView> {
 
     controller = VerifyAccountViewController(
       email: widget.email,
-      snackbarNotifier: SnackbarNotifier(context: context),
+      snackbarNotifier: SnackbarNotifier(),
     );
   }
 

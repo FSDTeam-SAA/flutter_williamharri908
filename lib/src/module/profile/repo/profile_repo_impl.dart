@@ -31,7 +31,7 @@ final class ProfileRepoImpl extends ProfileRepo {
         final message = response.data["message"]?.toString() ?? "Success";
 
         debugPrint(
-          "PROFILE MODEL CREATED: ${profileModel.name} (${profileModel.email})",
+          "PROFILE MODEL CREATED: ${profileModel.username} (${profileModel.email})",
         );
 
         return Success(data: profileModel, message: message);

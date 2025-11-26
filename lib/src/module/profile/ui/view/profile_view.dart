@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/base/component/image_cache/smart_network_image.dart';
+import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../account/ui/terms_condition_view.dart';
 import '../../../auth/ui/view/change_password_view.dart';
@@ -11,6 +13,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ProfileController>();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -22,26 +25,34 @@ class ProfileView extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundImage: AssetImage(Assets.profile),
                   radius: 35,
                   backgroundColor: Colors.white,
+                  child: SmartNetworkImage.circle(
+                    imageUrl:
+                        controller.profile.value?.avatarUrl ??
+                        Icon(Icons.person).toString(),
+                    diameter: 70,
+                  ),
                 ),
+
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Sarvesh Shrestha",
+                      controller.profile.value?.username ?? "Unknown",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      "Nepal",
+                      controller.profile.value?.address ?? "Unknown",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
+                        // color: Colors.amber,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -80,7 +91,9 @@ class ProfileView extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   //Get.snackbar("Logout", "Successfully Logout")
-                  showLogoutDialog(onConfirm: () { print("User logged out"); });
+                  showLogoutDialog(
+                    onConfirm: () => Get.find<ProfileController>().logoutUser(),
+                  );
                 },
                 child: Container(
                   height: 44,
@@ -131,20 +144,18 @@ class ProfileView extends StatelessWidget {
     );
   }
 }
+
 void showLogoutDialog({required VoidCallback onConfirm}) {
   Get.defaultDialog(
     backgroundColor: Colors.white,
     title: "Logout",
     middleText: "Are you sure you want to logout?",
     titleStyle: const TextStyle(
-      fontSize: 18, 
-      fontWeight: FontWeight.bold, 
-      color: Colors.black
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
     ),
-    middleTextStyle: const TextStyle(
-      fontSize: 16, 
-      color: Colors.black
-    ),
+    middleTextStyle: const TextStyle(fontSize: 16, color: Colors.black),
     barrierDismissible: true,
     radius: 16,
     contentPadding: const EdgeInsets.all(20),
@@ -153,13 +164,11 @@ void showLogoutDialog({required VoidCallback onConfirm}) {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         side: const BorderSide(color: Colors.grey),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
       ),
       onPressed: () {
-        Get.back(); // close dialog
+        Get.back();
       },
       child: const Text("Cancel"),
     ),
@@ -167,14 +176,12 @@ void showLogoutDialog({required VoidCallback onConfirm}) {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
       ),
       onPressed: () {
-        Get.back(); // close dialog
-        onConfirm(); // trigger logout action
+        Get.back();
+        onConfirm();
       },
       child: const Text("Logout"),
     ),

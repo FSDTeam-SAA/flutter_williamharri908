@@ -66,7 +66,7 @@ class ResetPasswordView extends StatelessWidget {
               doneText: "Successful",
               loadingText: "Please wait...",
               onSave: (_) async {
-                controller.resetPassword(SnackbarNotifier(context: context));
+                controller.resetPassword(SnackbarNotifier());
               },
               onDone: () {
                 Get.offAllNamed('/login');

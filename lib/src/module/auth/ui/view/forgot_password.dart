@@ -13,7 +13,7 @@ class ForgotPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ForgetPasswordController controller = Get.put(
-      ForgetPasswordController(snackbarNotifier: SnackbarNotifier(context: context)),
+      ForgetPasswordController(snackbarNotifier: SnackbarNotifier()),
     );
 
     return Scaffold(

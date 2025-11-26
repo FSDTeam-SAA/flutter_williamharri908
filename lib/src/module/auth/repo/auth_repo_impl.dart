@@ -3,6 +3,7 @@ import 'package:williamharri/src/core/base/api_handler/request.dart';
 import 'package:williamharri/src/core/base/api_handler/success.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
+import 'package:williamharri/src/module/auth/model/change_password_model.dart';
 import 'package:williamharri/src/module/auth/model/resate_password_model.dart';
 import 'package:williamharri/src/module/auth/model/forget_password_model.dart';
 import 'package:williamharri/src/module/auth/model/login_request_params.dart';
@@ -135,5 +136,20 @@ final class AuthRepoImpl extends AuthRepo {
         return Success(message: body['message'] ?? 'Code verified');
       },
     );
+  }
+  
+  @override
+  FutureRequest<Success> changePassword(ChangePasswordModel param) async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        final response = await appPigeon.post(
+          ApiEndpoints.changePassword, // your backend route
+          data: param.toJson(),
+        );
+        final body = response.data;
+        return Success(message: body['message'] ?? 'Password changed');
+      },
+    );
+    
   }
 }

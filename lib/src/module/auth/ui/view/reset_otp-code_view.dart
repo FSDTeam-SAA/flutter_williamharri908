@@ -29,7 +29,7 @@ class _OtpCodeViewState extends State<ResetOtpCodeView> {
 
     controller = ResetPasswordOtpController(
       email: widget.email,
-      snackbarNotifier: SnackbarNotifier(context: context),
+      snackbarNotifier: SnackbarNotifier(),
     );
   }
 

@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import 'package:williamharri/app/app_manager.dart';
+import 'package:williamharri/src/core/routing/route_names.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
+import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
 
@@ -33,9 +35,38 @@ class ProfileController extends GetxController {
         (failure) => print("Error: $failure"),
         (success) {
           profile.value = success.data;
-          print("PROFILE LOADED: ${profile.value?.name}");
+          print("PROFILE LOADED: ${profile.value?.username}");
         },
       );
     }
   }
+
+  Future<void> logoutUser() async {
+  isLoading.value = true;
+
+  final result = await Get.find<AuthRepo>().logout();
+
+  result.fold(
+    (failure) {
+      isLoading.value = false;
+      Get.snackbar("Error", failure.uiMessage);
+    },
+    (success) async {
+      isLoading.value = false;
+
+      // Clear all saved auth data
+      // await Get.find<AppManager>().logout(); 
+
+      // Go to Login screen
+      Get.offAllNamed(RouteNames.login);
+
+      Get.snackbar(
+        "Success", 
+        success.message,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    },
+  );
+}
+
 }
