@@ -31,6 +31,10 @@ class Assets {
   static const String term = '$_iconAssets/term.png';
   static const String edit = '$_iconAssets/edit.png';
 
+static const String delete = '$_iconAssets/delete.png';
+
+  static const String addJobs = '$_iconAssets/addJob.png';
+
   static const String google = '$_iconAssets/google.png';
   static const String person = '$_iconAssets/person.png';
   static const String location = '$_iconAssets/location.png';
