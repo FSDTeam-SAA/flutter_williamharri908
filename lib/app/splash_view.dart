@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:williamharri/src/module/auth/ui/view/login_view.dart';
 import '../src/core/constants/assets.dart';
 
 class SplashView extends StatefulWidget {
@@ -17,10 +16,10 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
     timer = Timer(const Duration(milliseconds: 1000), () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginView()),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => LoginView()),
+      // );
     });
   }
 

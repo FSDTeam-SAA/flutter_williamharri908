@@ -27,6 +27,10 @@ base class ApiEndpoints {
   /// ### patch
   static const String uploadProfileImage = _User.uploadProfileImage;
 
+  //Get
+
+  static const String staffList = _User.staffList;
+
   // ---------------------- jobs -----------------------------
   //get
   static const String jobList = _Jobs.jobList;
@@ -95,6 +99,7 @@ class _User {
   static String getuserbyId(String id) => '$_userRoute/me';
   static const String updateUser = '$_userRoute/me';
   static const String uploadProfileImage = '$_userRoute/me/avatar';
+  static const String staffList = '$_userRoute/staff';
 }
 
 // ---------------------- Notification -----------------------------

@@ -38,13 +38,31 @@ final class ProfileRepoImpl extends ProfileRepo {
       },
     );
   }
-  
+
   @override
   FutureRequest<Success> logout() async {
     return await asyncTryCatch(
       tryFunc: () async {
         await appPigeon.logOut();
         return Success(message: "Logout Successfull");
+      },
+    );
+  }
+
+  @override
+  FutureRequest<Success<List<ProfileModel>>> staffList() async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        final response = await appPigeon.get(ApiEndpoints.staffList);
+
+        final list = (response.data["data"]["results"] as List)
+            .map((e) => ProfileModel.fromMap(e))
+            .toList();
+
+        return Success<List<ProfileModel>>(
+          data: list,
+          message: response.data["message"] ?? "Success",
+        );
       },
     );
   }

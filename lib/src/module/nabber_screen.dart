@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/module/home/ui/screen/home_screen_ui.dart';
+import 'package:williamharri/src/module/home/ui/screen/staff_my_jobs.dart';
 import 'package:williamharri/src/module/profile/ui/view/profile_view.dart';
 
 class AppGround extends StatefulWidget {
@@ -15,7 +16,7 @@ class _AppGroundState extends State<AppGround> {
 
   final List<Widget> _pages = [
     const HomeScreenView(),
-    const Scaffold(body: Center(child: Text('My Jobs Page'))),
+    const StaffMyJobs(),
     const ProfileView(),
   ];
 
