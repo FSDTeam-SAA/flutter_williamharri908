@@ -1,3 +1,5 @@
+import 'package:williamharri/src/module/nabber_screen.dart';
+
 class RouteNames {
   //static const home = '/';
   static const splash = '/';
@@ -5,7 +7,7 @@ class RouteNames {
   static const signup = '/signup';
   static const forgotPassword = '/forgot_password';
   static const resetPassword = '/reset_password';
-  static const home = '/home';
+  static const appground = '/AppGround';
   static const profile = '/profile';
   static const terms = '/terms';
 }

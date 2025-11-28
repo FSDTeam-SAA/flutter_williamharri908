@@ -27,8 +27,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: Colors.black,
+      ),
       child: TextField(
         controller: widget.controller,
         obscureText: widget.isPassword ? _obscure : false,
@@ -37,7 +41,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           hintText: widget.hintText,
           hintStyle: const TextStyle(
             fontSize: 14,
-            color: Color(0xFF929292),
+            color: Colors.white,
             fontWeight: FontWeight.w400,
           ),
           prefixIcon: widget.prefixIcon != null
