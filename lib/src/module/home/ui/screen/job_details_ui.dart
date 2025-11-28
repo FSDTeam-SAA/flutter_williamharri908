@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/module/home/controller/job_controller.dart';
-import 'package:williamharri/src/module/home/controller/staff_all_jobs.controller.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/screen/rams_documents.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
@@ -14,8 +12,8 @@ class JobDetailsUi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
-    final jobController = Get.find<JobController>();
-    final staffJobController = Get.find<StaffJobController>();
+    // final jobController = Get.find<JobController>();
+    // final staffJobController = Get.find<StaffJobController>();
 
     return Scaffold(
       appBar: AppBar(
@@ -193,7 +191,9 @@ class JobDetailsUi extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Get.to(() => RamsDocumentScreen());
+                      // Get.to(() => RamsDocumentScreen());
+                      Get.to(() => RamsDocumentScreen(job: job));
+
                     },
                     child: const Text("Accept",
                         style: TextStyle(color: Colors.white)),

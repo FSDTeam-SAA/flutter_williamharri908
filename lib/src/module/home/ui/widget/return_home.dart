@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/nabber_screen.dart';
 
-class ScaffoldInstalledScreen extends StatelessWidget {
-  const ScaffoldInstalledScreen({super.key});
+class ReturnHomeScreen extends StatelessWidget {
+  const ReturnHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

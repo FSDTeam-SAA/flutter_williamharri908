@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
+import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
-import 'package:williamharri/src/module/home/repo/job_repo.dart';
 
-class JobController extends GetxController {
-  JobController({required this.jobRepo});
+class MyScaffoldJobController extends GetxController {
+  MyScaffoldJobController({required this.submitRepo});
 
-  final JobRepo jobRepo;
+  final SubmitRepo submitRepo;
 
   RxList<JobModel> jobs = <JobModel>[].obs;
   RxBool isLoading = false.obs;
@@ -19,7 +19,7 @@ class JobController extends GetxController {
   Future<void> fetchJobs() async {
     isLoading.value = true;
 
-    final result = await jobRepo.getJobs();
+    final result = await submitRepo.myScaffoldList();
 
     result.fold(
       (failure) {

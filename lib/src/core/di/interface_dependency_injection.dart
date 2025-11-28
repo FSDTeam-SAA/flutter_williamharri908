@@ -1,5 +1,8 @@
 import 'package:get/get.dart';
 import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
+import 'package:williamharri/src/module/assignment/controller/submit_controller.dart';
+import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
+import 'package:williamharri/src/module/assignment/repo/submit_repo_impl.dart';
 import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 import 'package:williamharri/src/module/auth/repo/auth_repo_impl.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
@@ -44,5 +47,11 @@ void initInterfaces() {
     fenix: true,
   );
   Get.lazyPut(() => StaffController(repo: Get.find()));
+
+  Get.lazyPut<SubmitRepo>(() => SubmitRepoImpl(appPigeon: Get.find()), fenix: true);
+  Get.lazyPut<RamsDocumentController>(
+    () => RamsDocumentController(repo: Get.find<SubmitRepo>()),
+    fenix: true,
+  );
 
 }

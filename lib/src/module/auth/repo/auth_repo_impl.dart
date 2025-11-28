@@ -150,6 +150,5 @@ final class AuthRepoImpl extends AuthRepo {
         return Success(message: body['message'] ?? 'Password changed');
       },
     );
-    
   }
 }

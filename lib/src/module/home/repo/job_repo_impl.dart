@@ -9,7 +9,7 @@ base class JobRepoImpl extends JobRepo {
   final AppPigeon appPigeon;
 
   @override
-FutureRequest<List<JobModel>> getJobs(JobModel param) async {
+FutureRequest<List<JobModel>> getJobs() async {
   return await asyncTryCatch(
     tryFunc: () async {
       final response = await appPigeon.get(ApiEndpoints.jobList);
@@ -25,7 +25,7 @@ FutureRequest<List<JobModel>> getJobs(JobModel param) async {
 }
 
   @override
-  FutureRequest<List<JobModel>> getStaffJobs(JobModel param) async {
+  FutureRequest<List<JobModel>> getStaffJobs() async {
     return await asyncTryCatch(
     tryFunc: () async {
       final response = await appPigeon.get(ApiEndpoints.listAssignedJobsStaffView);

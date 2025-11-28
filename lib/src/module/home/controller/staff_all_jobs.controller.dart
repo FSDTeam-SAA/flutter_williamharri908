@@ -19,27 +19,7 @@ class StaffJobController extends GetxController {
   Future<void> fetchJobs() async {
     isLoading.value = true;
 
-    final result = await jobRepo.getStaffJobs(
-      JobModel(
-        id: '',
-        companyName: '',
-        title: '',
-        location: '',
-        description: '',
-        price: 0,
-        photos: [],
-        status: '',
-        isDeleted: false,
-        postedBy: '',
-        assignedTo: [],
-        scaffoldStatus: '',
-        targetDate: '',
-        methodStatementUrl: '',
-        riskAssessmentUrl: '',
-        createdAt: '',
-        updatedAt: '',
-      ),
-    );
+    final result = await jobRepo.getStaffJobs();
 
     result.fold(
       (failure) {

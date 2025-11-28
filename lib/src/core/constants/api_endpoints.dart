@@ -20,47 +20,38 @@ base class ApiEndpoints {
   // ---------------------- USER -----------------------------
   /// ### get
   static String getuserbyId(String id) => _User.getuserbyId(id);
-
   /// ### patch
   static const String updateUser = _User.updateUser;
-
   /// ### patch
   static const String uploadProfileImage = _User.uploadProfileImage;
-
   //Get
-
   static const String staffList = _User.staffList;
 
   // ---------------------- jobs -----------------------------
   //get
   static const String jobList = _Jobs.jobList;
-
   static String getJobs(String id) => _Jobs.getJobs(id);
-
   //post
   static const String createJob = _Jobs.createJob;
-
   //patch
   static String updateJob(String id) => _Jobs.updateJob(id);
-
   //patch
   static String updateJobStatus(String id) => _Jobs.updateJobStatus(id);
-
   //patch
   static String updateJobAssignment(String id) => _Jobs.updateJobAssignment(id);
-
   //delete
   static String deleteJob(String id) => _Jobs.deleteJob(id);
-
   //get
   static String listJobApplications(String id) => _Jobs.listJobApplications(id);
-
   //get
   static const String listAssignedJobsStaffView =
       _Jobs.listAssignedJobsStaffView;
-
   //get
   static const String scaffoldOverviewManager = _Jobs.scaffoldOverviewManager;
+
+  //---------------------------applications--------------------------
+  static const String submitScaffold = _Application.application;
+  static const String myScaffoldList = _Application.myScaffoldList;
 }
 
 class _RemoteServer {
@@ -117,5 +108,15 @@ class _Jobs {
   static String listJobApplications(String id) =>
       '$_jobsRoute/$id/applications';
   static const String listAssignedJobsStaffView = '$_jobsRoute/assigned/me';
-  static const String scaffoldOverviewManager = '$_jobsRoute/scaffolds/overview';
+  static const String scaffoldOverviewManager =
+      '$_jobsRoute/scaffolds/overview';
+}
+
+// ---------------------- applications -------------------------------------
+class _Application {
+  static const String _applicationRoute =
+      '${ApiEndpoints.baseUrl}/applications';
+  static const String application = '$_applicationRoute/';
+  static const String myScaffoldList = '$_applicationRoute/mine';
+
 }
