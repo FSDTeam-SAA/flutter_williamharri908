@@ -46,7 +46,12 @@ dependencies:
   google_fonts: ^6.3.2
   get: ^4.7.2
   pinput: ^6.0.0
+
+  #Akon
   shared_preferences: ^2.2.2
+  file_picker: ^8.0.0
+  open_filex: ^4.4.0
+  flutter_cached_pdfview: ^0.4.3
 
 
 dev_dependencies:

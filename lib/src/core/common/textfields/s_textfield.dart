@@ -31,7 +31,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       height: 50,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        color: Colors.white,
+        color: Colors.black,
       ),
       child: TextField(
         controller: widget.controller,
@@ -41,7 +41,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           hintText: widget.hintText,
           hintStyle: const TextStyle(
             fontSize: 14,
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.w400,
           ),
           prefixIcon: widget.prefixIcon != null

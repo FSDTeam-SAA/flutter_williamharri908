@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:williamharri/src/module/auth/ui/view/login_view.dart';
 import '../src/core/constants/assets.dart';
 
 class SplashView extends StatefulWidget {
@@ -16,12 +15,11 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(seconds: 1), () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginView()),
-      );
-      // Navigator.pushReplacementNamed(context, RouteNames.login);
+    timer = Timer(const Duration(milliseconds: 1000), () {
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => LoginView()),
+      // );
     });
   }
 
@@ -39,3 +37,34 @@ class _SplashViewState extends State<SplashView> {
     );
   }
 }
+
+
+
+// // BEST & CLEANEST VERSION
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:williamharri/app/app_manager.dart';
+// import 'package:williamharri/src/core/constants/assets.dart';
+
+// class SplashView extends StatelessWidget {
+//   const SplashView({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // This line triggers AppManager → auto routing
+//     Get.find<AppManager>();
+
+//     return Scaffold(
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             Image.asset(Assets.appLogo, width: 200, height: 200),
+//             const SizedBox(height: 40),
+//             const CircularProgressIndicator(color: Colors.white),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

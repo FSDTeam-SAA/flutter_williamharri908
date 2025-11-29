@@ -1,17 +1,20 @@
 
-import '../utils/utils.dart';
-import 'package:flutter/material.dart';
 
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SnackbarNotifier {
+  BuildContext get _ctx => Get.context!;
 
-  BuildContext context;
-  SnackbarNotifier({required this.context});
-
-  notifySuccess({String? message}) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void notifySuccess({String? message}) {
+    ScaffoldMessenger.of(_ctx).showSnackBar(
       SnackBar(
-        content: Text(message ?? "Success", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular),
+        content: Text(
+          message ?? "Success",
+          maxLines: 3,
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color.fromARGB(255, 20, 26, 35),
         behavior: SnackBarBehavior.floating,
         showCloseIcon: true,
@@ -19,10 +22,14 @@ class SnackbarNotifier {
     );
   }
 
-  notify({String? message}) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void notify({String? message}) {
+    ScaffoldMessenger.of(_ctx).showSnackBar(
       SnackBar(
-        content: Text(message ?? "", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular),
+        content: Text(
+          message ?? "",
+          maxLines: 3,
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color.fromARGB(255, 46, 58, 64),
         behavior: SnackBarBehavior.floating,
         showCloseIcon: true,
@@ -30,20 +37,69 @@ class SnackbarNotifier {
     );
   }
 
-  notifyError({String? message}) {
-    if(context.mounted && context.owner != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message ?? "Error", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular,),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.red,
-        showCloseIcon: true,
-      ),
-    );
+  void notifyError({String? message}) {
+    if (_ctx.mounted) {
+      ScaffoldMessenger.of(_ctx).showSnackBar(
+        SnackBar(
+          content: Text(
+            message ?? "Error",
+            maxLines: 3,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          showCloseIcon: true,
+        ),
+      );
     }
   }
-
 }
+
+// import '../utils/utils.dart';
+// import 'package:flutter/material.dart';
+
+
+// class SnackbarNotifier {
+
+//   BuildContext context;
+//   SnackbarNotifier({required this.context});
+
+//   notifySuccess({String? message}) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(message ?? "Success", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular),
+//         backgroundColor: const Color.fromARGB(255, 20, 26, 35),
+//         behavior: SnackBarBehavior.floating,
+//         showCloseIcon: true,
+//       ),
+//     );
+//   }
+
+//   notify({String? message}) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(message ?? "", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular),
+//         backgroundColor: const Color.fromARGB(255, 46, 58, 64),
+//         behavior: SnackBarBehavior.floating,
+//         showCloseIcon: true,
+//       ),
+//     );
+//   }
+
+//   notifyError({String? message}) {
+//     if(context.mounted && context.owner != null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(message ?? "Error", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular,),
+//         behavior: SnackBarBehavior.floating,
+//         backgroundColor: Colors.red,
+//         showCloseIcon: true,
+//       ),
+//     );
+//     }
+//   }
+
+// }
 
 // class _AnimatedSnackbar extends StatefulWidget {
 //   final NotificationType type;
