@@ -468,9 +468,15 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    ..._photos.map(
-                          (file) => _photoItem(FileImage(file)),
-                    ),
+                    for (int i = 0; i < _photos.length; i++)
+                      _removablePhotoItem(
+                        image: FileImage(_photos[i]),
+                        onRemove: () {
+                          setState(() {
+                            _photos.removeAt(i);
+                          });
+                        },
+                      ),
                     GestureDetector(
                       onTap: _addPhoto,
                       child: _addPhotoButton(),
@@ -478,6 +484,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   ],
                 ),
               ),
+
 
               const SizedBox(height: 30),
 
@@ -621,4 +628,47 @@ class _EditJobScreenState extends State<EditJobScreen> {
       onChanged: (value) => controller.selectStaff(value),
     );
   }
+}
+
+Widget _removablePhotoItem({
+  required ImageProvider image,
+  required VoidCallback onRemove,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 10),
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: Image(
+            image: image,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Positioned(
+          top: -6,
+          right: -6,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.close,
+                size: 14,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
