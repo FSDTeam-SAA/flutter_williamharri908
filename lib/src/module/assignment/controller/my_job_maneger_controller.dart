@@ -40,7 +40,7 @@ import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.d
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 
 class MyJobManagerController extends GetxController {
-  final SubmitRepo submitRepo;
+  final ApplicationRepo submitRepo;
 
   MyJobManagerController({required this.submitRepo});
 

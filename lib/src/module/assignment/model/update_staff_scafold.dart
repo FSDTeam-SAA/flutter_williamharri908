@@ -1,27 +1,58 @@
-class UpdateStaffScafold {
-  final String description;
-  final List<String> photos;
-  final String signatureUrl;
+import 'dart:io';
 
-  UpdateStaffScafold({
+import 'package:dio/dio.dart';
+
+class UpdateStaffScafoldParam {
+  final String jobId;
+  final String? description;
+  final List<File> photos;
+  final File? signature;
+
+  UpdateStaffScafoldParam({
+    required this.jobId,
     required this.description,
     required this.photos,
-    required this.signatureUrl,
+    required this.signature,
   });
 
-  factory UpdateStaffScafold.fromJson(Map<String, dynamic> json) {
-    return UpdateStaffScafold(
-      description: json['description'] ?? "",
-      photos: List<String>.from(json['photos'] ?? []),
-      signatureUrl: json['signatureUrl'] ?? "",
-    );
+  //   factory UpdateStaffScafoldParam.fromJson(Map<String, dynamic> json) {
+  //     return UpdateStaffScafoldParam(
+  //       jobId: json['jobId'] ?? "",
+  //       description: json['description'] ?? "",
+  //       photos: List<String>.from(json['photos'] ?? []),
+  //       signatureUrl: json['signatureUrl'] ?? "",
+  //     );
+  //   }
+
+  Future<FormData> toFormData() async {
+    final formData = FormData();
+    formData.fields.addAll([
+      if (description != null) MapEntry('description', description ?? ''),
+    ]);
+    for (var photo in photos) {
+      formData.files.add(
+        MapEntry(
+          'photos',
+          await MultipartFile.fromFile(
+            photo.path,
+            filename: photo.path.split('/').last,
+          ),
+        ),
+      );
+    }
+
+    if (signature != null) {
+      formData.files.add(
+        MapEntry(
+          'signature',
+          await MultipartFile.fromFile(
+            signature!.path,
+            filename: signature!.path.split('/').last,
+          ),
+        ),
+      );
+    }
+    return formData;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'description': description,
-      'photos': photos,
-      'signatureUrl': signatureUrl,
-    };
-  }
 }

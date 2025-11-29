@@ -1,5 +1,9 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
+import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
 class JobDetailsScreen extends StatelessWidget {
   final JobModelManager job;
@@ -79,6 +83,7 @@ class JobDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -99,13 +104,21 @@ class JobDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildPhotoCard(String url) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: NetworkImage(url),
-          fit: BoxFit.cover,
-          colorFilter: const ColorFilter.mode(Colors.black45, BlendMode.darken),
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => FullImageViewScreen(imageUrl: url));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          image: DecorationImage(
+            image: NetworkImage(url),
+            fit: BoxFit.cover,
+            colorFilter: const ColorFilter.mode(
+              Colors.black45,
+              BlendMode.darken,
+            ),
+          ),
         ),
       ),
     );

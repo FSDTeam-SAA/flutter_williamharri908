@@ -18,12 +18,12 @@ class StaffMyJobs extends StatelessWidget {
 
     // Manager Controller
     final managerController = Get.put(
-      MyJobManagerController(submitRepo: Get.find<SubmitRepo>()),
+      MyJobManagerController(submitRepo: Get.find<ApplicationRepo>()),
     );
 
     // Staff Controller
     final staffController = Get.put(
-      MyScaffoldJobController(submitRepo: Get.find<SubmitRepo>()),
+      MyScaffoldJobController(submitRepo: Get.find<ApplicationRepo>()),
     );
 
     return Scaffold(

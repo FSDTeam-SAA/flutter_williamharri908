@@ -1,82 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:get/get.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
+import 'package:williamharri/src/module/home/controller/staff_upload_scaffold_controller.dart';
+import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
-class StaffScaffoldJobDetails extends StatefulWidget {
+class StaffScaffoldJobDetails extends StatelessWidget {
   final GetMyScaffoldModel job;
 
   const StaffScaffoldJobDetails({super.key, required this.job});
 
   @override
-  State<StaffScaffoldJobDetails> createState() =>
-      _StaffScaffoldJobDetailsState();
-}
-
-class _StaffScaffoldJobDetailsState extends State<StaffScaffoldJobDetails> {
-  bool isEdit = false;
-  late TextEditingController descController;
-
-  final List<File> newlyAddedPhotos = [];
-  File? newSignatureFile;
-
-  final ImagePicker _picker = ImagePicker();
-
-  @override
-  void initState() {
-    super.initState();
-    descController = TextEditingController(text: widget.job.description);
-  }
-
-  @override
-  void dispose() {
-    descController.dispose();
-    super.dispose();
-  }
-
-  bool _isNetworkUrl(String path) =>
-      path.startsWith('http://') || path.startsWith('https://');
-
-  bool _isValidLocalFile(String path) => File(path).existsSync();
-
-  /// Pick MULTIPLE photos
-  Future<void> pickMultiplePhotos() async {
-    final List<XFile>? pickedFiles = await _picker.pickMultiImage(
-      imageQuality: 85,
-    );
-
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      setState(() {
-        newlyAddedPhotos.addAll(pickedFiles.map((e) => File(e.path)));
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("${pickedFiles.length} photo(s) added"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
-  }
-
-  /// Pick signature (single)
-  Future<void> pickSignature() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-    );
-    if (image != null) {
-      setState(() => newSignatureFile = File(image.path));
-    }
-  }
-
-  void removeNewPhoto(int index) =>
-      setState(() => newlyAddedPhotos.removeAt(index));
-
-  void clearNewSignature() => setState(() => newSignatureFile = null);
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.put(StaffScaffoldJobDetailsController(job));
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -87,249 +24,264 @@ class _StaffScaffoldJobDetailsState extends State<StaffScaffoldJobDetails> {
           "Job Details",
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
+
         actions: [
-          IconButton(
-            onPressed: () => setState(() => isEdit = !isEdit),
-            icon: Icon(
-              isEdit ? Icons.close : Icons.edit_note,
-              color: Colors.white,
+          Obx(
+            () => IconButton(
+              onPressed: () => controller.isEdit.toggle(),
+              icon: Icon(
+                controller.isEdit.value ? Icons.close : Icons.edit_note,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title & Company
-            Text(
-              widget.job.job.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.job.job.companyName,
-              style: const TextStyle(color: Colors.white70),
-            ),
 
-            const SizedBox(height: 20),
-
-            // Description
-            const Text(
-              "Description",
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-            const SizedBox(height: 10),
-            isEdit
-                ? TextField(
-                    controller: descController,
-                    maxLines: 6,
-                    style: const TextStyle(color: Colors.white70),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white12,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white24),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  )
-                : Text(
-                    descController.text.isEmpty
-                        ? "No description"
-                        : descController.text,
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-
-            const SizedBox(height: 30),
-
-            // PHOTOS
-            const Text(
-              "Photos",
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-
-            SizedBox(
-              height: 190,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: widget.job.photos.length + newlyAddedPhotos.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  // Existing photos from server
-                  if (index < widget.job.photos.length) {
-                    final String path = widget.job.photos[index];
-                    return _buildImageItem(
-                      url: _isNetworkUrl(path) ? path : null,
-                      localFile: _isNetworkUrl(path)
-                          ? null
-                          : (_isValidLocalFile(path) ? File(path) : null),
-                      onRemove: isEdit
-                          ? () => setState(
-                              () => widget.job.photos.removeAt(index),
-                            )
-                          : null,
-                    );
-                  }
-
-                  // Newly added photos
-                  final int newIndex = index - widget.job.photos.length;
-                  return _buildImageItem(
-                    localFile: newlyAddedPhotos[newIndex],
-                    onRemove: isEdit ? () => removeNewPhoto(newIndex) : null,
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // SIGNATURE
-            const Text(
-              "Signature",
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-            Center(child: _buildSignatureWidget()),
-
-            const SizedBox(height: 40),
-
-            // ACTION BUTTONS (only in edit mode)
-            if (isEdit)
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: pickMultiplePhotos,
-                      icon: const Icon(
-                        Icons.photo_library_outlined,
-                        color: Color(0xFFF99B07),
-                      ),
-                      label: const Text(
-                        "Add Photos",
-                        style: TextStyle(
-                          color: Color(0xFFF99B07),
-                          fontSize: 16,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        side: const BorderSide(
-                          color: Color(0xFFF99B07),
-                          width: 2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: pickSignature,
-                      icon: const Icon(Icons.draw, color: Color(0xFFF99B07)),
-                      label: const Text(
-                        "Signature",
-                        style: TextStyle(
-                          color: Color(0xFFF99B07),
-                          fontSize: 16,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        side: const BorderSide(
-                          color: Color(0xFFF99B07),
-                          width: 2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-            if (isEdit) const SizedBox(height: 20),
-
-            // SAVE BUTTON
-            if (isEdit)
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Upload images here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Saved successfully!"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    setState(() => isEdit = false);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF99B07),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+      body: Obx(
+        () => SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title & Company
+              Text(
+                job.job.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 8),
+
+              Text(
+                job.job.companyName,
+                style: const TextStyle(color: Colors.white70),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Description
+              const Text(
+                "Description",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+
+              controller.isEdit.value
+                  ? TextField(
+                      controller: controller.descController,
+                      maxLines: 6,
+                      style: const TextStyle(color: Colors.white70),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white12,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white24),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    )
+                  : Text(
+                      controller.descController.text.isEmpty
+                          ? "No description"
+                          : controller.descController.text,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+
+              const SizedBox(height: 30),
+
+              // Photos
+              const Text(
+                "Photos",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(height: 12),
+
+              SizedBox(
+                height: 190,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount:
+                      job.photos.length + controller.newlyAddedPhotos.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    // Existing photos
+                    if (index < job.photos.length) {
+                      final path = job.photos[index];
+
+                      return _photoItem(
+                        controller,
+                        url: controller.isNetworkUrl(path) ? path : null,
+                        local: controller.isNetworkUrl(path)
+                            ? null
+                            : (controller.isValidLocalFile(path)
+                                  ? File(path)
+                                  : null),
+                        onRemove: controller.isEdit.value
+                            ? () => controller.removeExistingPhoto(index)
+                            : null,
+                      );
+                    }
+
+                    // Newly added photos
+                    final newIndex = index - job.photos.length;
+                    return _photoItem(
+                      controller,
+                      local: controller.newlyAddedPhotos[newIndex],
+                      onRemove: controller.isEdit.value
+                          ? () => controller.removeNewPhoto(newIndex)
+                          : null,
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Signature
+              const Text(
+                "Signature",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(height: 12),
+
+              Center(child: _signatureWidget(controller)),
+
+              const SizedBox(height: 40),
+
+              // Edit Mode Buttons
+              if (controller.isEdit.value)
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: controller.pickMultiplePhotos,
+                        icon: const Icon(
+                          Icons.photo_library_outlined,
+                          color: Color(0xFFF99B07),
+                        ),
+                        label: const Text(
+                          "Add Photos",
+                          style: TextStyle(
+                            color: Color(0xFFF99B07),
+                            fontSize: 16,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          side: const BorderSide(
+                            color: Color(0xFFF99B07),
+                            width: 2,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: controller.pickSignature,
+                        icon: const Icon(Icons.draw, color: Color(0xFFF99B07)),
+                        label: const Text(
+                          "Signature",
+                          style: TextStyle(
+                            color: Color(0xFFF99B07),
+                            fontSize: 16,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          side: const BorderSide(
+                            color: Color(0xFFF99B07),
+                            width: 2,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+              const SizedBox(height: 20),
+
+              if (controller.isEdit.value)
+                SizedBox(
+                  width: double.infinity,
+                  height: 58,
+                  child: ElevatedButton(
+                    onPressed: controller.saveChanges,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF99B07),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      "Save Changes",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+Widget _photoItem(
+  StaffScaffoldJobDetailsController controller, {
+  String? url,
+  File? local,
+  VoidCallback? onRemove,
+}) {
+  final imagePath = local?.path ?? url;
 
-  Widget _buildImageItem({
-    String? url,
-    File? localFile,
-    VoidCallback? onRemove,
-  }) {
-    return Stack(
-      children: [
-        ClipRRect(
+  return Stack(
+    children: [
+      GestureDetector(
+        onTap: () {
+          if (imagePath != null) {
+            Get.to(() => FullImageViewScreen(imageUrl: imagePath));
+          }
+        },
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: SizedBox(
             width: 160,
             height: 160,
-            child: localFile != null
-                ? Image.file(localFile, fit: BoxFit.cover)
+            child: local != null
+                ? Image.file(local, fit: BoxFit.cover)
                 : (url != null
                       ? Image.network(
                           url,
                           fit: BoxFit.cover,
                           loadingBuilder: (_, child, progress) =>
                               progress == null
-                              ? child
-                              : const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Color(0xFFF99B07),
-                                  ),
-                                ),
+                                  ? child
+                                  : const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFFF99B07),
+                                      ),
+                                    ),
                           errorBuilder: (_, __, ___) => Container(
-                            color: Colors.red[900],
+                            color: Colors.transparent,
                             child: const Icon(
                               Icons.broken_image,
                               color: Colors.white,
@@ -342,61 +294,74 @@ class _StaffScaffoldJobDetailsState extends State<StaffScaffoldJobDetails> {
                         )),
           ),
         ),
-        if (onRemove != null)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: GestureDetector(
-              onTap: onRemove,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 20),
+      ),
+      if (onRemove != null)
+        Positioned(
+          top: 8,
+          right: 8,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+                shape: BoxShape.circle,
               ),
+              child: const Icon(Icons.close, color: Colors.white, size: 20),
             ),
           ),
-      ],
-    );
-  }
-
-  Widget _buildSignatureWidget() {
-    if (newSignatureFile != null) {
-      return _buildImageItem(
-        localFile: newSignatureFile,
-        onRemove: isEdit ? clearNewSignature : null,
-      );
-    }
-
-    if (widget.job.signatureUrl.isNotEmpty) {
-      final String path = widget.job.signatureUrl;
-      return _buildImageItem(
-        url: _isNetworkUrl(path) ? path : null,
-        localFile: _isNetworkUrl(path)
-            ? null
-            : (_isValidLocalFile(path) ? File(path) : null),
-        onRemove: isEdit ? () => setState(() => widget.job.signatureUrl) : null,
-      );
-    }
-
-    return Container(
-      width: 240,
-      height: 140,
-      decoration: BoxDecoration(
-        color: Colors.white12,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.draw_outlined, color: Colors.white54, size: 50),
-          SizedBox(height: 8),
-          Text("No signature", style: TextStyle(color: Colors.white54)),
-        ],
-      ),
-    );
-  }
+        ),
+    ],
+  );
 }
+Widget _signatureWidget(StaffScaffoldJobDetailsController controller) {
+  // New signature
+  if (controller.newSignatureFile.value != null) {
+    return GestureDetector(
+      onTap: () => Get.to(() => FullImageViewScreen(
+          imageUrl: controller.newSignatureFile.value!.path)),
+      child: _photoItem(
+        controller,
+        local: controller.newSignatureFile.value,
+        onRemove: controller.isEdit.value ? controller.clearNewSignature : null,
+      ),
+    );
+  }
+
+  // Old signature
+  if (controller.job.signatureUrl.isNotEmpty) {
+    final path = controller.job.signatureUrl;
+
+    return GestureDetector(
+      onTap: () => Get.to(() => FullImageViewScreen(imageUrl: path)),
+      child: _photoItem(
+        controller,
+        url: controller.isNetworkUrl(path) ? path : null,
+        local: controller.isNetworkUrl(path)
+            ? null
+            : (controller.isValidLocalFile(path) ? File(path) : null),
+        onRemove: controller.isEdit.value ? controller.clearNewSignature : null,
+      ),
+    );
+  }
+
+  // No signature
+  return Container(
+    width: 240,
+    height: 140,
+    decoration: BoxDecoration(
+      color: Colors.white12,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.white24),
+    ),
+    child: const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.draw_outlined, color: Colors.white54, size: 50),
+        SizedBox(height: 8),
+        Text("No signature", style: TextStyle(color: Colors.white54)),
+      ],
+    ),
+  );
+}
+

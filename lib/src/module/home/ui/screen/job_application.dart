@@ -88,7 +88,7 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
         signature: signatureFile?.path ?? signaturePath ?? "",
       );
 
-      final repo = Get.find<SubmitRepo>();
+      final repo = Get.find<ApplicationRepo>();
       await repo.submititScaffold(model);
 
       Get.snackbar(

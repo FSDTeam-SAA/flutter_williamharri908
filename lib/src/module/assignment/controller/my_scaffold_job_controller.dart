@@ -5,7 +5,7 @@ import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 class MyScaffoldJobController extends GetxController {
   MyScaffoldJobController({required this.submitRepo});
 
-  final SubmitRepo submitRepo;
+  final ApplicationRepo submitRepo;
 
   RxList<GetMyScaffoldModel> jobs = <GetMyScaffoldModel>[].obs;
   RxBool isLoading = false.obs;

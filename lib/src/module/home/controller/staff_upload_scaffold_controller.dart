@@ -1,90 +1,128 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/utils/helpers/handle_fold.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
-import 'package:williamharri/src/module/assignment/model/update_staff_scafold.dart';
-import 'package:williamharri/src/module/assignment/repo/application_repo_impl.dart';
 
-class StaffScaffoldController extends GetxController {
+import '../../assignment/model/update_staff_scafold.dart';
+import '../../assignment/repo/application_repo.dart';
+
+class StaffScaffoldJobDetailsController extends GetxController {
   final GetMyScaffoldModel job;
-  final SubmitRepoImpl repo;
 
-  StaffScaffoldController({required this.job, required this.repo});
+  StaffScaffoldJobDetailsController(this.job);
 
-  var isEdit = false.obs;
-  var description = ''.obs;
-  var photos = <String>[].obs;
-  var signatureFilePath = Rx<String?>(null);
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: EnabledStatus(),
+  );
 
-  late final TextEditingController descController;
+  final ImagePicker picker = ImagePicker();
+
+  /// Edit mode
+  final RxBool isEdit = false.obs;
+
+  /// Description
+  late TextEditingController descController;
+
+  /// Newly added photos (local files)
+  final RxList<File> newlyAddedPhotos = <File>[].obs;
+
+  /// New signature file
+  final Rx<File?> newSignatureFile = Rx<File?>(null);
 
   @override
   void onInit() {
-    super.onInit();
-    description.value = job.description;
-    photos.addAll(job.photos);
     descController = TextEditingController(text: job.description);
+    super.onInit();
   }
 
-  /// TOGGLE EDIT MODE
-  void toggleEdit() {
-    isEdit.value = !isEdit.value;
+  @override
+  void onClose() {
+    descController.dispose();
+    super.onClose();
   }
 
-  /// PICK PHOTO
-  Future<void> pickPhoto() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      allowedExtensions: ['jpg', 'png', 'jpeg', 'pdf'],
-      type: FileType.custom,
+  // Check if URL is network image
+  bool isNetworkUrl(String path) =>
+      path.startsWith('http://') || path.startsWith('https://');
+
+  // Check if local file exists
+  bool isValidLocalFile(String path) => File(path).existsSync();
+
+  /// Pick MULTIPLE images
+  Future<void> pickMultiplePhotos() async {
+    final List<XFile>? pickedFiles = await picker.pickMultiImage(
+      imageQuality: 85,
     );
 
-    if (result != null) {
-      photos.add(result.files.single.path!);
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      newlyAddedPhotos.addAll(pickedFiles.map((e) => File(e.path)));
+      Get.snackbar(
+        "Success",
+        "${pickedFiles.length} photo(s) added",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     }
   }
 
-  /// PICK SIGNATURE
+  /// Pick signature
   Future<void> pickSignature() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      allowedExtensions: ['jpg', 'png', 'jpeg', 'pdf'],
-      type: FileType.custom,
+    final XFile? img = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
     );
-
-    if (result != null) {
-      signatureFilePath.value = result.files.single.path!;
+    if (img != null) {
+      newSignatureFile.value = File(img.path);
     }
   }
 
-  /// REMOVE PHOTO
-  void removePhoto(int index) {
-    photos.removeAt(index);
+  /// Remove newly added photo
+  void removeNewPhoto(int index) {
+    newlyAddedPhotos.removeAt(index);
   }
 
-  /// REMOVE SIGNATURE
-  void removeSignature() {
-    signatureFilePath.value = null;
+  /// Remove signature
+  void clearNewSignature() {
+    newSignatureFile.value = null;
   }
 
-  /// SUBMIT UPDATE
-  Future<void> submitUpdate() async {
-    final updated = UpdateStaffScafold(
-      description: descController.text,
-      photos: photos,
-      signatureUrl: signatureFilePath.value ?? job.signatureUrl,
+  /// Remove existing old photo (from server list)
+  void removeExistingPhoto(int index) {
+    job.photos.removeAt(index);
+    update(); // refresh UI
+  }
+
+  /// Save changes (you can add API call)
+  Future<void> saveChanges() async {
+    final res = await Get.find<ApplicationRepo>().scaffoldUpdate(
+      UpdateStaffScafoldParam(
+        jobId: job.id,
+        description: descController.text,
+        photos: newlyAddedPhotos,
+        signature: newSignatureFile.value,
+      ),
     );
 
-    final result = await repo.scaffoldUpdate(job.id, updated);
-
-    result.fold(
-      (failure) {
-        Get.snackbar("Error", failure.uiMessage);
+    handleFold(
+      either: res,
+      processStatusNotifier: processStatusNotifier,
+      onError: (failure) {
+        debugPrint("Error: $failure");
       },
-      (success) {
-        Get.back();
+      onSuccess: (data) {
+        debugPrint("Success: $data");
       },
     );
+    // Get.snackbar(
+    //   "Saved",
+    //   "Changes saved successfully!",
+    //   backgroundColor: Colors.green,
+    //   colorText: Colors.white,
+    // );
+
+    isEdit.value = false;
   }
 }

@@ -16,16 +16,11 @@
 //   var isLoading = false.obs;
 //   var uploadedImage = Rx<File?>(null);
 
-
-
-
-
 //   // ADD THESE 4 LINES
 //   var hasOpenedMethodStatement = false.obs;
 //   var hasOpenedRiskAssessment = false.obs;
 
 //   bool get canAgree => hasOpenedMethodStatement.value && hasOpenedRiskAssessment.value;
-
 
 //   Future<void> openPdf(String url, String type) async {
 //     if (url.isEmpty) {
@@ -126,7 +121,6 @@
 //   }
 // }
 
-
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -139,7 +133,7 @@ import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/widget/pdf_view_screen.dart';
 
 class RamsDocumentController extends GetxController {
-  final SubmitRepo repo;
+  final ApplicationRepo repo;
 
   RamsDocumentController({required this.repo});
 
@@ -157,31 +151,36 @@ class RamsDocumentController extends GetxController {
   var hasOpenedRiskAssessment = false.obs;
 
   // Allow agreement only if both PDF opened
-  bool get canAgree => hasOpenedMethodStatement.value && hasOpenedRiskAssessment.value;
+  bool get canAgree =>
+      hasOpenedMethodStatement.value && hasOpenedRiskAssessment.value;
 
   // -------------------------------------------------------------------------
   // OPEN PDF – Download + View Inside App
   // -------------------------------------------------------------------------
   Future<void> openPdf(String url, String type) async {
-  if (url.isEmpty) {
-    Get.snackbar("Error", "Document not available",
-        backgroundColor: Colors.red, colorText: Colors.white);
-    return;
-  }
+    if (url.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Document not available",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
 
-  await Get.to(() => PdfViewerScreen(
+    await Get.to(
+      () => PdfViewerScreen(
         url: url,
         title: type == "method" ? "Method Statement" : "Risk Assessment",
-      ));
+      ),
+    );
 
-  if (type == "method") {
-    hasOpenedMethodStatement.value = true;
-  } else {
-    hasOpenedRiskAssessment.value = true;
+    if (type == "method") {
+      hasOpenedMethodStatement.value = true;
+    } else {
+      hasOpenedRiskAssessment.value = true;
+    }
   }
-}
-
-
 
   // -------------------------------------------------------------------------
   // PICK IMAGE ONLY (jpg/jpeg/png)

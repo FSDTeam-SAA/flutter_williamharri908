@@ -8,9 +8,9 @@ import 'package:williamharri/src/module/assignment/model/submitit_scaffold.dart'
 import 'package:williamharri/src/module/assignment/model/update_staff_scafold.dart';
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 
-base class SubmitRepoImpl extends SubmitRepo {
+base class ApplicationRepoImpl extends ApplicationRepo {
   final AppPigeon appPigeon;
-  SubmitRepoImpl({required this.appPigeon});
+  ApplicationRepoImpl({required this.appPigeon});
 
   @override
   FutureRequest<Success> submititScaffold(SubmititScaffoldModel param) async {
@@ -58,19 +58,14 @@ base class SubmitRepoImpl extends SubmitRepo {
   }
 
   @override
-  FutureRequest<UpdateStaffScafold> scaffoldUpdate(
-    String id,
-    UpdateStaffScafold param,
-  ) async {
+  FutureRequest<Success> scaffoldUpdate(UpdateStaffScafoldParam param) async {
     return await asyncTryCatch(
       tryFunc: () async {
         final response = await appPigeon.patch(
-          ApiEndpoints.scaffoldUpdate(id),
-          data: param.toJson(),
+          ApiEndpoints.scaffoldUpdate(param.jobId),
+          data: await param.toFormData(),
         );
-        return UpdateStaffScafold.fromJson(
-          response.data['data'],
-        );
+        return Success(message: extractSuccessMessage(response));
       },
     );
   }

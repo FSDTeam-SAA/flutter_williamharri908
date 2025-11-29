@@ -37,7 +37,6 @@ void initInterfaces() {
 
   Get.lazyPut<JobRepo>(() => JobRepoImpl(appPigeon: Get.find()), fenix: true);
 
-
   Get.lazyPut<JobController>(
     () => JobController(jobRepo: Get.find()),
     fenix: true,
@@ -48,10 +47,12 @@ void initInterfaces() {
   );
   Get.lazyPut(() => StaffController(repo: Get.find()));
 
-  Get.lazyPut<SubmitRepo>(() => SubmitRepoImpl(appPigeon: Get.find()), fenix: true);
-  Get.lazyPut<RamsDocumentController>(
-    () => RamsDocumentController(repo: Get.find<SubmitRepo>()),
+  Get.lazyPut<ApplicationRepo>(
+    () => ApplicationRepoImpl(appPigeon: Get.find()),
     fenix: true,
   );
-
+  Get.lazyPut<RamsDocumentController>(
+    () => RamsDocumentController(repo: Get.find<ApplicationRepo>()),
+    fenix: true,
+  );
 }
