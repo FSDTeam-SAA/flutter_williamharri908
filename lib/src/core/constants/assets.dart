@@ -23,6 +23,7 @@ class Assets {
   static const String lock = '$_iconAssets/lock.png';
   static const String user = '$_iconAssets/user.png';
   static const String phone = '$_iconAssets/phone.png';
+  static const String thumb = '$_iconAssets/istockphoto.jpg';
 
   // -------------- Profile icons -------------
 

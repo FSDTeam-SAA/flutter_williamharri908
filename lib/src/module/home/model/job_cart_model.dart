@@ -20,6 +20,9 @@ class JobModel {
   final String updatedAt;
   final String signatureUrl;
 
+  /// URL of the main thumbnail image
+  final String? thumbnail;
+
   JobModel({
     required this.id,
     required this.companyName,
@@ -39,6 +42,7 @@ class JobModel {
     required this.createdAt,
     required this.updatedAt,
     required this.signatureUrl,
+    this.thumbnail,
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -72,6 +76,8 @@ class JobModel {
       createdAt: json['createdAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
       signatureUrl: json['signatureUrl'] ?? "",
+      // if your backend uses "thumbnailUrl" or "image", change it here.
+      thumbnail: json['thumbnail']?.toString(),
     );
   }
 }
