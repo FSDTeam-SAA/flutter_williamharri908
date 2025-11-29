@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:williamharri/src/core/base/api_handler/request.dart';
-import 'package:williamharri/src/core/base/api_handler/success.dart';
+import 'package:williamharri/src/core/api_handler/request.dart';
+import 'package:williamharri/src/core/api_handler/success.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/auth/model/change_password_model.dart';

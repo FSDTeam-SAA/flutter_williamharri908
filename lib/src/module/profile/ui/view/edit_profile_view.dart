@@ -279,8 +279,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/r_icon.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/core/constants/assets.dart';
+import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
 import 'package:williamharri/src/module/profile/controller/profile_edit_controller.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
 
@@ -291,7 +294,7 @@ class EditProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Controller initialize & set profile
-    final controller = Get.put(ProfileEditController(appPigeon: Get.find()));
+    final controller = Get.put(ProfileEditController());
     controller.setProfile(profile);
 
     return Obx(() {
@@ -310,13 +313,34 @@ class EditProfileView extends StatelessWidget {
                         phone: currentProfile.phone,
                         address: currentProfile.address,
                         nationality: currentProfile.nationality,
+                        snackbarNotifier: SnackbarNotifier(
+                          context: context
+                        )
                       );
                     },
-              child: Text(
-                'Done',
-                style: TextStyle(
-                  color: AppColors.context(context).primaryColor,
-                ),
+              child: Row(
+                spacing: 4,
+                children: [
+                  Text(
+                    'Done',
+                    style: TextStyle(
+                      color: AppColors.context(context).primaryColor,
+                    ),
+                  ),
+                  RIcon(
+                    key: UniqueKey(),
+                    iconWidget: Container(),
+                    loadingStateWidget: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    ),
+                    processStatusNotifier: controller.processStatusNotifier,
+                  )
+                ],
               ),
             ),
           ],

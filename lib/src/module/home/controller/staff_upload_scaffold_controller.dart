@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
 import 'package:williamharri/src/core/utils/helpers/handle_fold.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
 

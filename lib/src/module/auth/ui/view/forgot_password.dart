@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../../../../core/base/reactive_ui/save_button.dart';
+import '../../../../core/component/reactive_ui/widget/save_button.dart';
 import '../../../../core/common/textfields/email_textfield.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../../core/notifiers/snackbar_notifier.dart';
@@ -13,7 +13,7 @@ class ForgotPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ForgetPasswordController controller = Get.put(
-      ForgetPasswordController(snackbarNotifier: SnackbarNotifier()),
+      ForgetPasswordController(snackbarNotifier: SnackbarNotifier(context: context)),
     );
 
     return Scaffold(

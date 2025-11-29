@@ -30,9 +30,6 @@ void initInterfaces() {
     fenix: true,
   );
 
-  // SnackbarNotifier
-  Get.put<SnackbarNotifier>(SnackbarNotifier(), permanent: true);
-
   // App Manager
   Get.put<AppManager>(AppManager(), permanent: true);
 

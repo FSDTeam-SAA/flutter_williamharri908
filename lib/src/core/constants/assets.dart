@@ -44,7 +44,7 @@ static const String delete = '$_iconAssets/delete.png';
   static const String booking = '$_iconAssets/booking.svg';
   static const String date = '$_iconAssets/date.svg';
   static const String message = '$_iconAssets/message.svg';
-  static const String profile = '$_iconAssets/profile.svg';
+  static const String profile = '$_iconAssets/user.png';
 
   static const String carOwner = '$_iconAssets/car_owner.png';
   static const String carWasher = '$_iconAssets/car_washer.png';

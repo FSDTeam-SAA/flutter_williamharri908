@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/core/base/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
 import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
 import 'package:williamharri/src/module/auth/model/verify_otp_param.dart';

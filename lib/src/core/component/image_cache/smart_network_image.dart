@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
-import '../../../services/debug/debug_service.dart';
+import '../../services/debug/debug_service.dart';
 import 'image_service.dart';
 import 'circle_shape.dart';
 

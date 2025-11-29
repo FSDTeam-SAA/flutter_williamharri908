@@ -5,9 +5,9 @@ import 'package:williamharri/src/module/assignment/controller/my_scaffold_job_co
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
-import 'package:williamharri/src/module/home/ui/screen/manager_my_job_details.dart';
+import 'package:williamharri/src/module/home/ui/view/manager_my_job_details.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
-import 'package:williamharri/src/module/home/ui/screen/staff_scaffold_job_details.dart';
+import 'package:williamharri/src/module/home/ui/view/staff_scaffold_job_details.dart';
 
 class StaffMyJobs extends StatelessWidget {
   const StaffMyJobs({super.key});

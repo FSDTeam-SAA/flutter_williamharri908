@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
 import 'package:williamharri/src/module/auth/controller/email_verify_otp_controller.dart';
-import '../../../../core/base/reactive_ui/save_button.dart';
+import '../../../../core/component/reactive_ui/widget/save_button.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../../core/routing/route_names.dart';
@@ -29,7 +29,9 @@ class _OtpCodeViewState extends State<OtpCodeView> {
 
     controller = VerifyAccountViewController(
       email: widget.email,
-      snackbarNotifier: SnackbarNotifier(),
+      snackbarNotifier: SnackbarNotifier(
+        context: context
+      ),
     );
   }
 

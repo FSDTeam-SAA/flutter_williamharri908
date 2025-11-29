@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
-import 'package:williamharri/src/module/home/ui/screen/rams_documents.dart';
+import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
 import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
-import 'package:williamharri/src/module/home/ui/screen/edit_job.dart';
+import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
 
 // ⬇️ add these imports
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/core/base/reactive_ui/save_button.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/core/common/textfields/password_textfield.dart';
 import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
 import 'package:williamharri/src/core/constants/assets.dart';
@@ -66,7 +66,9 @@ class ResetPasswordView extends StatelessWidget {
               doneText: "Successful",
               loadingText: "Please wait...",
               onSave: (_) async {
-                controller.resetPassword(SnackbarNotifier());
+                controller.resetPassword(SnackbarNotifier(
+                  context: context,
+                ));
               },
               onDone: () {
                 Get.offAllNamed('/login');

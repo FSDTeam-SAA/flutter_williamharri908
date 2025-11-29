@@ -1,13 +1,19 @@
 import 'dart:io';
 import 'package:get/get.dart';
-import 'package:williamharri/src/core/constants/api_endpoints.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/notifiers/snackbar_notifier.dart';
+import 'package:williamharri/src/core/utils/helpers/handle_fold.dart';
+import 'package:williamharri/src/module/profile/model/update_profile_req_param.dart';
+import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
-import '../../../core/services/app_pigeon/app_pigeon.dart';
 import '../model/profile_model.dart';
 
 class ProfileEditController extends GetxController {
-  final AppPigeon appPigeon;
-  ProfileEditController({required this.appPigeon});
+  ProfileEditController();
+
+  ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: EnabledStatus(),
+  );
 
   // Reactive variables
   var profile = Rx<ProfileModel?>(null);
@@ -30,6 +36,7 @@ class ProfileEditController extends GetxController {
     String? phone,
     String? address,
     String? nationality,
+    SnackbarNotifier? snackbarNotifier,
   }) async {
     if (profile.value == null) return;
 
@@ -42,37 +49,24 @@ class ProfileEditController extends GetxController {
       if (pickedImage.value != null)
         val?.avatarUrl = null; // local update for picked image
     });
+    processStatusNotifier.setLoading();
+    final lr = await Get.find<ProfileRepo>().updateProfile(
+      UpdateProfileReqParam(
+        name: name ?? profile.value!.name,
+        phone: phone ?? profile.value!.phone,
+        address: address ?? profile.value!.address,
+        nationality: nationality ?? profile.value!.nationality,
+        avatar: pickedImage.value,
+      ),
+    );
 
-    try {
-      isLoading.value = true;
-
-      // 2. Prepare payload for server
-      final payload = {
-        "name": profile.value!.name,
-        "phone": profile.value!.phone,
-        "address": profile.value!.address,
-        "nationality": profile.value!.nationality,
-        // avatar handled separately if needed
-      };
-
-      // 3. Server call using AppPigeon
-      final response = await appPigeon.patch(
-        ApiEndpoints.updateUser, // <-- শুধুমাত্র /users/me
-        data: payload,
-      );
-
-      // 4. Check response & update local profile
-      if (response.data != null && response.data["data"] != null) {
-        profile.value = ProfileModel.fromMap(response.data["data"]);
-        Get.snackbar("Success", "Profile updated successfully");
-      } else {
-        Get.snackbar("Error", "Profile update failed");
-      }
-    } catch (e) {
-      print("Profile update error: $e");
-      Get.snackbar("Error", e.toString());
-    } finally {
-      isLoading.value = false;
-    }
+    handleFold(
+      either: lr,
+      successSnackbarNotifier: snackbarNotifier,
+      errorSnackbarNotifier: snackbarNotifier,
+      processStatusNotifier: processStatusNotifier,
+    );
+    processStatusNotifier.setEnabled();
+    
   }
 }

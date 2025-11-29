@@ -15,7 +15,9 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController controller = Get.put(
-      LoginController(SnackbarNotifier()),
+      LoginController(
+        SnackbarNotifier(context: context)
+      ),
     );
 
     return Scaffold(

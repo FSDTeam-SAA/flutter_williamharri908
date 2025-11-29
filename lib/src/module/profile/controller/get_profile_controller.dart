@@ -35,7 +35,7 @@ class ProfileController extends GetxController {
         (failure) => print("Error: $failure"),
         (success) {
           profile.value = success.data;
-          print("PROFILE LOADED: ${profile.value?.username}");
+          print("PROFILE LOADED: ${profile.value?.username}, url: ${profile.value?.avatarUrl}");
         },
       );
     }

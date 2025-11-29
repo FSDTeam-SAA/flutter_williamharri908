@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/base/reactive_ui/save_button.dart';
+import '../../../../core/component/reactive_ui/widget/save_button.dart';
 import '../../../../core/common/textfields/email_textfield.dart';
 import '../../../../core/common/textfields/name_textfield.dart';
 import '../../../../core/common/textfields/password_textfield.dart';

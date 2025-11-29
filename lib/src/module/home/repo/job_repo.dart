@@ -1,5 +1,5 @@
-import 'package:williamharri/src/core/base/api_handler/base_repository.dart';
-import 'package:williamharri/src/core/base/api_handler/request.dart';
+import 'package:williamharri/src/core/api_handler/base_repository.dart';
+import 'package:williamharri/src/core/api_handler/request.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/model/create_job_model.dart';
 

@@ -1,5 +1,5 @@
-import 'package:williamharri/src/core/base/api_handler/base_repository.dart';
-import 'package:williamharri/src/core/base/api_handler/success.dart';
+import 'package:williamharri/src/core/api_handler/base_repository.dart';
+import 'package:williamharri/src/core/api_handler/success.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
 import 'package:williamharri/src/module/auth/model/change_password_model.dart';
 import 'package:williamharri/src/module/auth/model/resate_password_model.dart';

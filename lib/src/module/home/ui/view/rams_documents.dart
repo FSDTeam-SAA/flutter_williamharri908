@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:williamharri/src/module/assignment/controller/rams_document_controller.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
-import 'package:williamharri/src/module/home/ui/screen/job_application.dart';
+import 'package:williamharri/src/module/home/ui/view/job_application.dart';
 
 class RamsDocumentScreen extends GetView<RamsDocumentController> {
   final JobModel job;

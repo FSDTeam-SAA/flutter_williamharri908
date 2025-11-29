@@ -59,7 +59,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/core/common/textfields/s_textfield.dart';
-import 'package:williamharri/src/core/base/reactive_ui/save_button.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import '../../controller/change_password_controller.dart';
 
 class ChangePasswordView extends StatefulWidget {

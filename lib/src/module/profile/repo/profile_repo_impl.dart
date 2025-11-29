@@ -1,10 +1,12 @@
 import 'package:flutter/rendering.dart';
-import 'package:williamharri/src/core/base/api_handler/request.dart';
-import 'package:williamharri/src/core/base/api_handler/success.dart';
+import 'package:williamharri/src/core/api_handler/request.dart';
+import 'package:williamharri/src/core/api_handler/success.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
+
+import '../model/update_profile_req_param.dart';
 
 final class ProfileRepoImpl extends ProfileRepo {
   ProfileRepoImpl({required this.appPigeon});
@@ -67,31 +69,23 @@ final class ProfileRepoImpl extends ProfileRepo {
     );
   }
 
-
-
-   /// ------------------ New: Update Profile ------------------
-   @override
-  FutureRequest<Success<ProfileModel>> updateProfile(ProfileModel profile) async {
+  @override
+  FutureRequest<Success<ProfileModel>> updateProfile(
+    UpdateProfileReqParam param,
+  ) async {
     return await asyncTryCatch(
       tryFunc: () async {
-        debugPrint("UPDATING PROFILE FOR USER ID: ${profile.id}");
-
-        // Prepare payload
-        final Map<String, dynamic> payload = {
-          "name": profile.name,
-          "phone": profile.phone,
-          "address": profile.address,
-          "nationality": profile.nationality,
-          "avatarUrl": profile.avatarUrl, 
-        };
-
-        final response = await appPigeon.put(
-          "${ApiEndpoints.updateUser}/",
-          data: payload,
+        // First updates the profile
+        final response = await appPigeon.patch(
+          ApiEndpoints.updateUser,
+          data: param.toUpdateProfileDetailsData(),
         );
-
-        if (response.data == null || response.data["data"] == null) {
-          throw Exception("No data in response");
+        // Then updates the avatar, if avatar file is not null
+        if (param.avatar != null) {
+          final response2 = await appPigeon.patch(
+            ApiEndpoints.uploadProfileImage,
+            data: await param.toUpdateAvatarData(),
+          );
         }
 
         final updatedData = response.data["data"] as Map<String, dynamic>;
@@ -99,11 +93,9 @@ final class ProfileRepoImpl extends ProfileRepo {
 
         return Success<ProfileModel>(
           data: updatedProfile,
-          message: response.data["message"] ?? "Profile updated successfully",
+          message: extractSuccessMessage(response) ?? "Profile is updated!",
         );
       },
     );
   }
-
-
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/core/base/component/image_cache/smart_network_image.dart';
+import 'package:williamharri/src/core/component/image_cache/smart_network_image.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../account/ui/terms_condition_view.dart';
