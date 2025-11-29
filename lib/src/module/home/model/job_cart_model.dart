@@ -18,6 +18,7 @@ class JobModel {
   final String targetDate;
   final String createdAt;
   final String updatedAt;
+  final String signatureUrl;
 
   JobModel({
     required this.id,
@@ -37,8 +38,9 @@ class JobModel {
     required this.targetDate,
     required this.createdAt,
     required this.updatedAt,
+    required this.signatureUrl,
   });
-  
+
   factory JobModel.fromJson(Map<String, dynamic> json) {
     return JobModel(
       id: json['id'] ?? "",
@@ -69,6 +71,7 @@ class JobModel {
       targetDate: json['targetDate'] ?? "",
       createdAt: json['createdAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
+      signatureUrl: json['signatureUrl'] ?? "",
     );
   }
 }

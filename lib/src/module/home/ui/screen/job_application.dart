@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:williamharri/src/module/assignment/model/submitit_scaffold.dart';
-import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
+import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
+import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 import 'package:williamharri/src/module/home/ui/widget/return_home.dart';
 
 class JobApplicationScreen extends StatefulWidget {
@@ -16,7 +17,9 @@ class JobApplicationScreen extends StatefulWidget {
 
 class _JobApplicationScreenState extends State<JobApplicationScreen> {
   late JobModel job;
-  late File signatureFile;
+
+  File? signatureFile;
+  String? signaturePath;
 
   final TextEditingController _descriptionController = TextEditingController();
   final RxList<File> uploadedPhotos = RxList<File>();
@@ -27,7 +30,13 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
     super.initState();
     final args = Get.arguments as Map<String, dynamic>;
     job = args["job"];
-    signatureFile = args["signatureFile"];
+
+    if (args["signatureFile"] != null) {
+      signatureFile = args["signatureFile"];
+    } else if (job.signatureUrl.isNotEmpty) {
+      signaturePath = job.signatureUrl;
+    }
+
     _descriptionController.text = job.description;
   }
 
@@ -37,27 +46,24 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
     super.dispose();
   }
 
+  /// PICK ONLY IMAGES
   Future<void> pickPhotos() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    final ImagePicker picker = ImagePicker();
+    final List<XFile> images = await picker.pickMultiImage();
+
+    if (images.isEmpty) return;
+
+    uploadedPhotos.addAll(images.map((img) => File(img.path)));
+
+    Get.snackbar(
+      "Uploaded",
+      "${images.length} image(s) selected",
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
     );
-
-    if (result != null) {
-      uploadedPhotos.addAll(
-        result.paths.whereType<String>().map((path) => File(path)),
-      );
-
-      Get.snackbar(
-        "Uploaded",
-        "${result.files.length} file(s) selected",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    }
   }
 
+  /// SUBMIT APPLICATION
   Future<void> submitApplication() async {
     if (_descriptionController.text.isEmpty) {
       Get.snackbar(
@@ -79,7 +85,7 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
         riskAssessmentAgreed: true,
         termsAccepted: true,
         photos: uploadedPhotos.map((file) => file.path).toList(),
-        signature: signatureFile.path,
+        signature: signatureFile?.path ?? signaturePath ?? "",
       );
 
       final repo = Get.find<SubmitRepo>();
@@ -102,6 +108,39 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Widget buildSignaturePreview() {
+    if (signatureFile != null) {
+      return Image.file(signatureFile!, fit: BoxFit.contain);
+    } else if (signaturePath != null) {
+      if (signaturePath!.toLowerCase().endsWith(".pdf")) {
+        return const Center(
+          child: Text(
+            "PDF signature (cannot preview)",
+            style: TextStyle(color: Colors.white54),
+          ),
+        );
+      } else {
+        return Image.network(
+          signaturePath!,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => const Center(
+            child: Text(
+              "Cannot load signature",
+              style: TextStyle(color: Colors.white54),
+            ),
+          ),
+        );
+      }
+    } else {
+      return const Center(
+        child: Text(
+          "No signature uploaded",
+          style: TextStyle(color: Colors.white54),
+        ),
+      );
     }
   }
 
@@ -150,9 +189,9 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Upload photo section
+            // Upload images
             const Text(
-              "Upload photo / documents (optional)",
+              "Upload images",
               style: TextStyle(color: Colors.white70, fontSize: 15),
             ),
             const SizedBox(height: 12),
@@ -167,20 +206,20 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
+                  children: const [
+                    Icon(
                       Icons.cloud_upload_outlined,
                       color: Colors.white54,
                       size: 48,
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "Browse your files",
+                    SizedBox(height: 12),
+                    Text(
+                      "Browse your images",
                       style: TextStyle(color: Colors.white54, fontSize: 15),
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "You can select multiple files (jpg, png, pdf)",
+                    SizedBox(height: 4),
+                    Text(
+                      "You can select JPG, JPEG, PNG",
                       style: TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                   ],
@@ -194,24 +233,66 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
                   : Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: uploadedPhotos
-                          .map(
-                            (file) => Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                file.path.split('/').last,
-                                style: const TextStyle(color: Colors.white),
+                      children: uploadedPhotos.map((file) {
+                        return Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                  () =>
+                                      FullImageViewScreen(imageUrl: file.path),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  file,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          )
-                          .toList(),
+                            GestureDetector(
+                              onTap: () => uploadedPhotos.remove(file),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                     ),
             ),
-            const SizedBox(height: 120), // Space for floating button
+
+            const SizedBox(height: 24),
+
+            // Signature preview
+            const Text(
+              "Signature",
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              height: 150,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1F1F1F),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: buildSignaturePreview(),
+            ),
+
+            const SizedBox(height: 120),
           ],
         ),
       ),
@@ -221,13 +302,13 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SizedBox(
             width: double.infinity,
-            height: 56,
+            height: 52,
             child: FloatingActionButton.extended(
               onPressed: isLoading.value ? null : submitApplication,
               backgroundColor: isLoading.value ? Colors.grey : Colors.orange,
               elevation: 4,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(8),
               ),
               label: isLoading.value
                   ? const CircularProgressIndicator(color: Colors.white)

@@ -59,7 +59,7 @@ class JobDetailsUi extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              job.title,
+                              job.companyName,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -77,24 +77,36 @@ class JobDetailsUi extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 10),
-
-                      // Company
                       Row(
                         children: [
-                          const Icon(Icons.business),
+                          const Icon(Icons.business, color: Colors.white),
                           const SizedBox(width: 8),
-                          Text(job.companyName),
+                          Expanded(
+                            child: Text(
+                              job.title,
+                              style: const TextStyle(color: Colors.white),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
 
                       const SizedBox(height: 8),
 
-                      // Location
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined),
+                          const Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 8),
-                          Text(job.location),
+                          Expanded(
+                            child: Text(
+                              job.location,
+                              style: const TextStyle(color: Colors.white),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
 

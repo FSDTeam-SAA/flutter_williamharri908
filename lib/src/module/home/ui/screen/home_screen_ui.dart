@@ -141,7 +141,6 @@ class HomeScreenView extends StatelessWidget {
 
                                         const SizedBox(height: 8),
 
-                                        // COMPANY
                                         Row(
                                           children: [
                                             const Icon(
@@ -152,7 +151,12 @@ class HomeScreenView extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 staffjob.title,
+                                                maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -171,7 +175,12 @@ class HomeScreenView extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 staffjob.location,
+                                                maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -263,24 +272,46 @@ class HomeScreenView extends StatelessWidget {
                                           ],
                                         ),
                                         const SizedBox(height: 8),
-
                                         Row(
                                           children: [
                                             const Icon(Icons.business),
                                             const SizedBox(width: 8),
-                                            Text(job.title),
+                                            Flexible(
+                                              child: Text(
+                                                job.title,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 4),
 
+                                        // LOCATION
                                         Row(
                                           children: [
                                             const Icon(
                                               Icons.location_on_outlined,
                                             ),
-                                            Text(job.location),
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                job.location,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
+
                                         const SizedBox(height: 8),
                                       ],
                                     ),

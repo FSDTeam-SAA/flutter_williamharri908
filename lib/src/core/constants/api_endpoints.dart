@@ -54,6 +54,7 @@ base class ApiEndpoints {
   //---------------------------applications--------------------------
   static const String submitScaffold = _Application.application;
   static const String myScaffoldList = _Application.myScaffoldList;
+  static String scaffoldUpdate(String id) => _Application.scaffoldUpdate(id);
 }
 
 class _RemoteServer {
@@ -122,5 +123,6 @@ class _Application {
       '${ApiEndpoints.baseUrl}/applications';
   static const String application = '$_applicationRoute/';
   static const String myScaffoldList = '$_applicationRoute/mine';
+  static String scaffoldUpdate(String id) => '$_applicationRoute/$id';
 
 }
