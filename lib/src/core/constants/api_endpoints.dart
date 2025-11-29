@@ -49,6 +49,8 @@ base class ApiEndpoints {
   //get
   static const String scaffoldOverviewManager = _Jobs.scaffoldOverviewManager;
 
+  static const String myJobs = _Jobs.myJobs;
+
   //---------------------------applications--------------------------
   static const String submitScaffold = _Application.application;
   static const String myScaffoldList = _Application.myScaffoldList;
@@ -110,6 +112,8 @@ class _Jobs {
   static const String listAssignedJobsStaffView = '$_jobsRoute/assigned/me';
   static const String scaffoldOverviewManager =
       '$_jobsRoute/scaffolds/overview';
+
+  static const String myJobs = '$_jobsRoute/posted/me';
 }
 
 // ---------------------- applications -------------------------------------

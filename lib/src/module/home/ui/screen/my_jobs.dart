@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/controller/my_scaffold_job_controller.dart';
+import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
 import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
+import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/ui/screen/staff_scaffold_job_details.dart';
 
 class StaffMyJobs extends StatelessWidget {
@@ -10,7 +13,15 @@ class StaffMyJobs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(
+    final profileController = Get.find<ProfileController>();
+
+    // Manager Controller
+    final managerController = Get.put(
+      MyJobManagerController(submitRepo: Get.find<SubmitRepo>()),
+    );
+
+    // Staff Controller
+    final staffController = Get.put(
       MyScaffoldJobController(submitRepo: Get.find<SubmitRepo>()),
     );
 
@@ -21,113 +32,185 @@ class StaffMyJobs extends StatelessWidget {
         backgroundColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
-              "Job Finder",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              profileController.profile.value?.username ?? "User",
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-            Text(
-              "Welcome to Scaffolding app",
+            const Text(
+              "My Jobs",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ],
         ),
       ),
+
       body: Obx(() {
-        if (controller.isLoading.value) {
+        final role = profileController.profile.value?.role;
+
+        if (role == null) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.jobs.isEmpty) {
-          return const Center(child: Text("No jobs found"));
-        }
+        if (role == "staff") {
+          if (staffController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.jobs.length,
-          itemBuilder: (context, index) {
-            final GetMyScaffoldModel job = controller.jobs[index];
+          if (staffController.jobs.isEmpty) {
+            return const Center(child: Text("No jobs found"));
+          }
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: InkWell(
-                onTap: () {
-                  Get.to(() => StaffScaffoldJobDetails(job: job));
-                },
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: staffController.jobs.length,
+            itemBuilder: (context, index) {
+              final GetMyScaffoldModel job = staffController.jobs[index];
 
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: const [
-                          Icon(Icons.image, size: 70),
-                          Text("data"),
-                        ],
-                      ),
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: InkWell(
+                  onTap: () {
+                    Get.to(() => StaffScaffoldJobDetails(job: job));
+                  },
 
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Column(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    job.job.companyName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                            Icon(Icons.image, size: 70),
+                            Text("data"),
+                          ],
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      job.job.companyName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    job.scaffoldStatus,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ),
-
-                                const SizedBox(width: 10),
-                                Text(
-                                  job.scaffoldStatus,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 8),
-                            Text(
-                              job.job.title,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
+                                ],
                               ),
-                            ),
 
-                            const SizedBox(height: 4),
-                            Text(
-                              job.job.location,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                              const SizedBox(height: 8),
+                              Text(
+                                job.job.title,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+
+                              const SizedBox(height: 4),
+                              Text(
+                                job.job.location,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
+        }
+
+        // --------------------------------------------------
+        if (role == "manager") {
+          if (managerController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (managerController.jobs.isEmpty) {
+            return const Center(child: Text("No jobs found"));
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: managerController.jobs.length,
+            itemBuilder: (context, index) {
+              final JobModelManager job = managerController.jobs[index];
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey.shade300,
+                      child: job.photos.isNotEmpty
+                          ? Image.network(job.photos.first, fit: BoxFit.cover)
+                          : const Icon(Icons.image, size: 40),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            job.companyName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(job.title),
+                          const SizedBox(height: 4),
+                          Text(job.location),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+
+        return const Center(child: Text("Unknown role"));
       }),
     );
   }

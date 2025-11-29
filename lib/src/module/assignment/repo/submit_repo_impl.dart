@@ -3,6 +3,7 @@ import 'package:williamharri/src/core/base/api_handler/success.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
+import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
 import 'package:williamharri/src/module/assignment/model/submitit_scaffold.dart';
 import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
 
@@ -37,5 +38,19 @@ base class SubmitRepoImpl extends SubmitRepo {
         return jobs;
       },
     );
+  }
+
+  @override
+  FutureRequest<List<JobModelManager>> myJobsManager() async {
+    return await asyncTryCatch(tryFunc: () async {
+      final response = await appPigeon.get(ApiEndpoints.myJobs);
+      final body = response.data;
+
+      final jobs = (body['data']['results'] as List)
+          .map((e) => JobModelManager.fromJson(e))
+          .toList();
+
+      return jobs;
+    });
   }
 }

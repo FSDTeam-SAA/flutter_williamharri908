@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/screen/rams_documents.dart';
+import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 
 class JobDetailsUi extends StatelessWidget {
@@ -98,24 +99,6 @@ class JobDetailsUi extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 8),
-
-                      // // Status
-                      // Row(
-                      //   children: [
-                      //     const Icon(Icons.info_outline),
-                      //     const SizedBox(width: 8),
-                      //     Text(
-                      //       job.status,
-                      //       style: TextStyle(
-                      //         fontSize: 14,
-                      //         fontWeight: FontWeight.w600,
-                      //         color: job.status == "active"
-                      //             ? Colors.green
-                      //             : Colors.red,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),
@@ -148,7 +131,6 @@ class JobDetailsUi extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
             SizedBox(
               height: 100,
               child: job.photos.isEmpty
@@ -158,16 +140,30 @@ class JobDetailsUi extends StatelessWidget {
                       itemCount: job.photos.length,
                       itemBuilder: (_, index) {
                         final photoUrl = job.photos[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey.shade300,
+
+                        return InkWell(
+                          onTap: () {
+                            Get.to(
+                              () => FullImageViewScreen(imageUrl: photoUrl),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Container(
+                              height: 100,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey.shade300,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  photoUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                            child: Image.network(photoUrl, fit: BoxFit.cover),
                           ),
                         );
                       },
@@ -177,39 +173,30 @@ class JobDetailsUi extends StatelessWidget {
             const SizedBox(height: 20),
 
             // add heignt
-
             if (controller.profile.value?.role == "staff")
-
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFF99B07),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF99B07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Get.to(() => RamsDocumentScreen());
+                        Get.to(() => RamsDocumentScreen(job: job));
+                      },
+                      child: const Text(
+                        "Accept",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    onPressed: () {
-                      // Get.to(() => RamsDocumentScreen());
-                      Get.to(() => RamsDocumentScreen(job: job));
-
-                    },
-                    child: const Text("Accept",
-                        style: TextStyle(color: Colors.white)),
                   ),
-                ),
-                const SizedBox(width: 10),
-              ]
-            )
-
-            // if (job.r)
-
-            // EXTRA INFO
-            // Text("Job ID: ${job.id}"),
-            // Text("Posted By: ${job.postedBy}"),
-            // Text("Target Date: ${job.targetDate}"),
-            // Text("Scaffold Status: ${job.scaffoldStatus}"),
+                  const SizedBox(width: 10),
+                ],
+              ),
           ],
         ),
       ),
