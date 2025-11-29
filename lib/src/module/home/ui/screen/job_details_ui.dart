@@ -35,21 +35,44 @@ class JobDetailsUi extends StatelessWidget {
         backgroundColor: Colors.transparent,
         actions: [
           if (controller.profile.value?.role == "manager")
+
+
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 // ✅ make sure StaffController exists before opening EditJobScreen
                 if (!Get.isRegistered<StaffController>()) {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
                 }
 
-                Get.to(() => EditJobScreen(job: job));
+                // wait for result from EditJobScreen
+                final updated = await Get.to<bool>(() => EditJobScreen(job: job));
+
+                // if user saved successfully, show toast/snackbar
+                if (updated == true) {
+                  // optional: refresh jobs here too if you want
+                  // final jobsController = Get.find<JobController>();
+                  // await jobsController.fetchJobs();
+
+                  Get.snackbar(
+                    'Job updated',
+                    'Job has been updated successfully.',
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.green.shade600,
+                    colorText: Colors.white,
+                    margin: const EdgeInsets.all(16),
+                    borderRadius: 8,
+                  );
+                }
               },
               icon: const Icon(
                 Icons.edit_outlined,
                 color: Colors.orange,
               ),
             ),
+
+
+
           if (controller.profile.value?.role == "manager")
             IconButton(
               icon: const Icon(
