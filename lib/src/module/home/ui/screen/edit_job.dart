@@ -32,8 +32,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
   late final TextEditingController _priceCtrl;
 
   final ImagePicker _picker = ImagePicker();
+
   File? _thumbnailFile;
   final List<File> _newPhotos = []; // photos user adds while editing
+  late List<String> _existingPhotos; // existing URLs that can be removed
 
   bool _isSaving = false;
 
@@ -46,7 +48,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     _descriptionCtrl = TextEditingController(text: widget.job.description);
     _priceCtrl = TextEditingController(text: widget.job.price.toString());
 
-
+    _existingPhotos = List<String>.from(widget.job.photos ?? []);
   }
 
   @override
@@ -91,7 +93,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final staffController = Get.find<StaffController>();
     final staff = staffController.selectedStaff.value;
 
-    // backend requires staff/assigneTo – force selection
     if (staff == null || staff.id == null) {
       Get.snackbar(
         'Assign staff',
@@ -113,10 +114,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
       location: _locationCtrl.text.trim(),
       description: _descriptionCtrl.text.trim(),
       price: _priceCtrl.text.trim(),
-      staffId: staff.id!, // 👈 will be sent as "staff" in toJson()
+      staffId: staff.id!,
     );
 
-    // base map (companyName, title, location, description, price, staff)
     final Map<String, dynamic> dataMap = createModel.toJson();
 
     // thumbnail
@@ -125,25 +125,25 @@ class _EditJobScreenState extends State<EditJobScreen> {
           dio.MultipartFile.fromFileSync(_thumbnailFile!.path);
     }
 
-    // new photos
+    // new photos only (existing ones are already stored on server)
     if (_newPhotos.isNotEmpty) {
       dataMap['photos'] = _newPhotos
           .map((f) => dio.MultipartFile.fromFileSync(f.path))
           .toList();
     }
 
+    // NOTE: If your backend needs to know which existing photos were deleted,
+    // you can send `_existingPhotos` or a list of removed URLs as extra fields.
+
     final formData = dio.FormData.fromMap(dataMap);
 
     try {
       await appPigeon.patch(
-        ApiEndpoints.updateJob(widget.job.id), // PATCH /jobs/{id}
+        ApiEndpoints.updateJob(widget.job.id),
         data: formData,
       );
 
-      // refresh list in controller
       await jobsController.fetchJobs();
-
-      // Let previous screen handle snackbar
       Get.back(result: true);
     } on dio.DioException catch (e) {
       final data = e.response?.data;
@@ -215,18 +215,48 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  static Widget _photoItem(ImageProvider image) => Padding(
-    padding: const EdgeInsets.only(right: 10),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: Image(
-        image: image,
-        width: 80,
-        height: 80,
-        fit: BoxFit.cover,
+  // photo item WITH close button
+  static Widget _photoItem({
+    required ImageProvider image,
+    required VoidCallback onRemove,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image(
+              image: image,
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            top: 2,
+            right: 2,
+            child: GestureDetector(
+              onTap: onRemove,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 
   static Widget _addPhotoButton() => Container(
     width: 80,
@@ -249,8 +279,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     onChanged: null,
     decoration: _inputDecoration().copyWith(
       hintText: 'Loading...',
-      hintStyle:
-      const TextStyle(color: Colors.white70, fontSize: 14),
+      hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
     ),
     dropdownColor: Colors.black,
   );
@@ -283,8 +312,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final staffController = Get.find<StaffController>();
     const labelSpacing = SizedBox(height: 6.0);
 
-    // Choose avatar image: picked file or existing thumbnail or fallback
-// choose avatar image: picked file or existing thumbnail or fallback
+    // choose avatar image: picked file or existing thumbnail or fallback
     ImageProvider avatarImage;
     if (_thumbnailFile != null) {
       avatarImage = FileImage(_thumbnailFile!);
@@ -296,7 +324,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
         'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
       );
     }
-
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -320,7 +347,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Thumbnail (same style as create screen)
+              // Thumbnail
               Center(
                 child: Column(
                   children: [
@@ -447,10 +474,35 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    ...(widget.job.photos ?? [])
-                        .map((url) => _photoItem(NetworkImage(url)))
-                        .toList(),
-                    ..._newPhotos.map((file) => _photoItem(FileImage(file))),
+                    // existing photos (URLs)
+                    ..._existingPhotos.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final url = entry.value;
+                      return _photoItem(
+                        image: NetworkImage(url),
+                        onRemove: () {
+                          setState(() {
+                            _existingPhotos.removeAt(index);
+                          });
+                        },
+                      );
+                    }),
+
+                    // new photos (files)
+                    ..._newPhotos.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final file = entry.value;
+                      return _photoItem(
+                        image: FileImage(file),
+                        onRemove: () {
+                          setState(() {
+                            _newPhotos.removeAt(index);
+                          });
+                        },
+                      );
+                    }),
+
+                    // add-photo button
                     GestureDetector(
                       onTap: _addPhoto,
                       child: _addPhotoButton(),
@@ -483,8 +535,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   )
                       : const Text(
                     'Save',
-                    style:
-                    TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
