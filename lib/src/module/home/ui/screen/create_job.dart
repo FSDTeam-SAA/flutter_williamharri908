@@ -15,7 +15,7 @@ class EditJobScreen extends StatefulWidget {
   const EditJobScreen({
     super.key,
     this.jobId, // null = create mode, not null = edit mode
-    this.job,   // existing job data to prefill (optional)
+    this.job, // existing job data to prefill (optional)
   });
 
   final String? jobId;
@@ -56,10 +56,30 @@ class _EditJobScreenState extends State<EditJobScreen> {
         TextEditingController(text: widget.job?.title ?? '');
     _locationController =
         TextEditingController(text: widget.job?.location ?? '');
-    _priceController =
-        TextEditingController(text: widget.job?.price.toString() ?? '');
+    // price in model is already String
+    _priceController = TextEditingController(text: widget.job?.price ?? '');
     _descriptionController =
         TextEditingController(text: widget.job?.description ?? '');
+
+    // 🔹 Preselect staff in dropdown when editing
+    if (_isEditing && widget.job != null) {
+      final job = widget.job!;
+      String? staffId = job.staffId;
+
+      // if staffId is null, fall back to first assignedTo from backend
+      if (staffId == null && job.assignedTo.isNotEmpty) {
+        staffId = job.assignedTo.first;
+      }
+
+      if (staffId != null) {
+        for (final s in staffController.staffList) {
+          if (s.id == staffId) {
+            staffController.selectStaff(s);
+            break;
+          }
+        }
+      }
+    }
   }
 
   @override
@@ -100,7 +120,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final description = _descriptionController.text.trim();
     final staff = staffController.selectedStaff.value;
 
-    //  Backend says "assigneTo is required" -> force user to select a staff
+    // Backend says "assigneTo is required" -> force user to select a staff
     if (staff == null || staff.id == null) {
       Get.snackbar(
         'Assign staff',
@@ -114,29 +134,26 @@ class _EditJobScreenState extends State<EditJobScreen> {
     setState(() => _isSaving = true);
 
     try {
-      String jobId;
-
       if (_isEditing) {
-        jobId = widget.jobId!;
         await _updateJob(
-          jobId: jobId,
+          jobId: widget.jobId!,
           company: company,
           designation: designation,
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!,   //  send assigneTo for update
+          assigneeId: staff.id!, // send assigneTo for update
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
       } else {
-        jobId = await _createJob(
+        await _createJob(
           company: company,
           designation: designation,
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!,   //  send assigneTo for create
+          assigneeId: staff.id!, // send assigneTo for create
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
@@ -166,17 +183,81 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // API CALLS (using AppPigeon + Dio, so auth is reused automatically)
+  // API CALLS
   // ---------------------------------------------------------------------------
 
   /// POST /jobs/
+  // Future<String> _createJob({
+  //   required String company,
+  //   required String designation,
+  //   required String location,
+  //   required String price,
+  //   required String description,
+  //   required String assigneeId, // assigneTo required by backend
+  //   File? thumbnail,
+  //   List<File> photos = const [],
+  // }) async {
+  //   final cleanedPrice = price.replaceAll('\$', '').trim();
+  //
+  //   final formDataMap = <String, dynamic>{
+  //     'companyName': company,
+  //     'title': designation,
+  //     'location': location,
+  //     'price': cleanedPrice,
+  //     'description': description,
+  //     'assigneTo': assigneeId, // ✅ matches backend
+  //   };
+  //
+  //   if (thumbnail != null) {
+  //     formDataMap['thumbnail'] =
+  //         dio.MultipartFile.fromFileSync(thumbnail.path);
+  //   }
+  //
+  //   if (photos.isNotEmpty) {
+  //     formDataMap['photos'] = photos
+  //         .map((f) => dio.MultipartFile.fromFileSync(f.path))
+  //         .toList();
+  //   }
+  //
+  //   final formData = dio.FormData.fromMap(formDataMap);
+  //
+  //   try {
+  //     final response = await appPigeon.post(
+  //       ApiEndpoints.createJob,
+  //       data: formData,
+  //     );
+  //
+  //     final body = response.data as Map<String, dynamic>;
+  //     final id = body['data']?['id'] ?? body['id'];
+  //
+  //     if (id == null) {
+  //       throw Exception('Create job successful but no id returned');
+  //     }
+  //
+  //     return id.toString();
+  //   } on dio.DioException catch (e) {
+  //     debugPrint('createJob status: ${e.response?.statusCode}');
+  //     debugPrint('createJob data  : ${e.response?.data}');
+  //
+  //     String msg;
+  //     final data = e.response?.data;
+  //     if (data is Map && data['message'] != null) {
+  //       msg = data['message'].toString();
+  //     } else {
+  //       msg =
+  //       'Failed to create job (status: ${e.response?.statusCode ?? 'unknown'})';
+  //     }
+  //     throw Exception(msg);
+  //   }
+  // }
+
   Future<String> _createJob({
     required String company,
     required String designation,
     required String location,
     required String price,
     required String description,
-    required String assigneeId, // <-- assigneTo required by backend
+    required String assigneeId, // assigneTo required by backend
     File? thumbnail,
     List<File> photos = const [],
   }) async {
@@ -188,8 +269,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
       'location': location,
       'price': cleanedPrice,
       'description': description,
-      //  this matches backend requirement: "assigneTo is required"
+      // 👇 send both forms
       'assigneTo': assigneeId,
+      'assignedTo': [assigneeId],
     };
 
     if (thumbnail != null) {
@@ -235,7 +317,64 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
   }
 
+
   /// PATCH /jobs/{id}
+  // Future<void> _updateJob({
+  //   required String jobId,
+  //   required String company,
+  //   required String designation,
+  //   required String location,
+  //   required String price,
+  //   required String description,
+  //   required String assigneeId, // also send assigneTo on update
+  //   File? thumbnail,
+  //   List<File> photos = const [],
+  // }) async {
+  //   final cleanedPrice = price.replaceAll('\$', '').trim();
+  //
+  //   final formDataMap = <String, dynamic>{
+  //     'companyName': company,
+  //     'title': designation,
+  //     'location': location,
+  //     'price': cleanedPrice,
+  //     'description': description,
+  //     'assigneTo': assigneeId,
+  //   };
+  //
+  //   if (thumbnail != null) {
+  //     formDataMap['thumbnail'] =
+  //         dio.MultipartFile.fromFileSync(thumbnail.path);
+  //   }
+  //
+  //   if (photos.isNotEmpty) {
+  //     formDataMap['photos'] = photos
+  //         .map((f) => dio.MultipartFile.fromFileSync(f.path))
+  //         .toList();
+  //   }
+  //
+  //   final formData = dio.FormData.fromMap(formDataMap);
+  //
+  //   try {
+  //     await appPigeon.patch(
+  //       ApiEndpoints.updateJob(jobId),
+  //       data: formData,
+  //     );
+  //   } on dio.DioException catch (e) {
+  //     debugPrint('updateJob status: ${e.response?.statusCode}');
+  //     debugPrint('updateJob data  : ${e.response?.data}');
+  //
+  //     String msg;
+  //     final data = e.response?.data;
+  //     if (data is Map && data['message'] != null) {
+  //       msg = data['message'].toString();
+  //     } else {
+  //       msg =
+  //       'Failed to update job (status: ${e.response?.statusCode ?? 'unknown'})';
+  //     }
+  //     throw Exception(msg);
+  //   }
+  // }
+
   Future<void> _updateJob({
     required String jobId,
     required String company,
@@ -243,7 +382,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     required String location,
     required String price,
     required String description,
-    required String assigneeId, // <-- also send assigneTo on update
+    required String assigneeId, // also send assigneTo on update
     File? thumbnail,
     List<File> photos = const [],
   }) async {
@@ -255,7 +394,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
       'location': location,
       'price': cleanedPrice,
       'description': description,
+      // 👇 again send both
       'assigneTo': assigneeId,
+      'assignedTo': [assigneeId],
     };
 
     if (thumbnail != null) {
@@ -291,6 +432,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
       throw Exception(msg);
     }
   }
+
 
   // ---------------------------------------------------------------------------
   // UI
@@ -342,7 +484,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       radius: 45,
                       backgroundImage: _thumbnailFile != null
                           ? FileImage(_thumbnailFile!)
-                          :const AssetImage('assets/icons/istockphoto.jpg') as ImageProvider,
+                          : const AssetImage('assets/icons/istockphoto.jpg'),
                     ),
                     const SizedBox(height: 10),
                     TextButton(
@@ -447,8 +589,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 style: _fieldTextStyle,
                 keyboardType: TextInputType.multiline,
                 decoration: _inputDecoration(isBig: true).copyWith(
-                  hintText:
-                  'Write Something...',
+                  hintText: 'Write Something...',
                   hintStyle:
                   const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
@@ -481,7 +622,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   ],
                 ),
               ),
-
 
               const SizedBox(height: 30),
 
@@ -564,19 +704,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  static Widget _photoItem(ImageProvider image) => Padding(
-    padding: const EdgeInsets.only(right: 10),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: Image(
-        image: image,
-        width: 80,
-        height: 80,
-        fit: BoxFit.cover,
-      ),
-    ),
-  );
-
   static Widget _addPhotoButton() => Container(
     width: 80,
     height: 80,
@@ -627,6 +754,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 }
 
+/// Thumbnail with close button for photos list
 Widget _removablePhotoItem({
   required ImageProvider image,
   required VoidCallback onRemove,
