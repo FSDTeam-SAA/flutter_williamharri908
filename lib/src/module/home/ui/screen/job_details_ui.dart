@@ -188,6 +188,7 @@ class JobDetailsUi extends StatelessWidget {
                     ? "No description available"
                     : job.description,
                 textAlign: TextAlign.justify,
+                maxLines: 40,
                 style: const TextStyle(fontSize: 14),
               ),
         
