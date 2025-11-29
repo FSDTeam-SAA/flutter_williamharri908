@@ -450,8 +450,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 keyboardType: TextInputType.multiline,
                 decoration: _inputDecoration(isBig: true).copyWith(
                   hintText:
-                  'Lorem ipsum dolor sit amet consectetur. Lectus sed in egestas ultrices a odio eget varius sit. '
-                      'Viverra senectus egestas nisl vel adipiscing...',
+                  'Write Something...',
                   hintStyle:
                   const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
