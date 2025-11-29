@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
+import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
 import 'package:williamharri/src/module/assignment/repo/submit_repo.dart';
-import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 
 class MyScaffoldJobController extends GetxController {
   MyScaffoldJobController({required this.submitRepo});
 
   final SubmitRepo submitRepo;
 
-  RxList<JobModel> jobs = <JobModel>[].obs;
+  RxList<GetMyScaffoldModel> jobs = <GetMyScaffoldModel>[].obs;
   RxBool isLoading = false.obs;
 
   @override

@@ -15,6 +15,7 @@ class GetMyScaffoldModel {
   final String targetDate;
   final String createdAt;
   final String updatedAt;
+  final String description;
 
   GetMyScaffoldModel({
     required this.id,
@@ -31,24 +32,18 @@ class GetMyScaffoldModel {
     required this.targetDate,
     required this.createdAt,
     required this.updatedAt,
+    required this.description,
   });
 
   factory GetMyScaffoldModel.fromJson(Map<String, dynamic> json) {
     return GetMyScaffoldModel(
       id: json['id'] ?? "",
-      job: Job(
-        companyName: json['job']['companyName'] ?? "",
-        title: json['job']['title'] ?? "",
-        location: json['job']['location'] ?? "",
-        scaffoldStatus: json['job']['scaffoldStatus'] ?? "",
-        targetDate: json['job']['targetDate'] ?? "",
-        id: json['job']['id'] ?? "",
-      ),
+      job: Job.fromJson(json['job'] ?? {}),
       price: json['price'] ?? 0,
       photos: List<String>.from(json['photos'] ?? []),
       methodStatementUrl: json['methodStatementUrl'] ?? "",
       riskAssessmentUrl: json['riskAssessmentUrl'] ?? "",
-      status: json['status'] ?? "",
+      status: json['jobStatus'] ?? "",
       isDeleted: json['isDeleted'] ?? false,
 
       postedBy: (json['postedBy'] is String)
@@ -67,25 +62,32 @@ class GetMyScaffoldModel {
       targetDate: json['targetDate'] ?? "",
       createdAt: json['createdAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
+      description: json['description'] ?? "",
     );
   }
 }
 
 class Job {
-  String companyName;
-  String title;
-  String location;
-  String scaffoldStatus;
-  String targetDate;
-  String id;
+  final String companyName;
+  final String title;
+  final String location;
+  final String methodStatementUrl;
+  final String riskAssessmentUrl;
+  final String scaffoldStatus;
+  final String targetDate;
+  final String id;
+  final String jobStatus;
 
   Job({
     required this.companyName,
     required this.title,
     required this.location,
+    required this.methodStatementUrl,
+    required this.riskAssessmentUrl,
     required this.scaffoldStatus,
     required this.targetDate,
     required this.id,
+    required this.jobStatus,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
@@ -93,11 +95,13 @@ class Job {
       companyName: json['companyName'] ?? "",
       title: json['title'] ?? "",
       location: json['location'] ?? "",
+      methodStatementUrl: json['methodStatementUrl'] ?? "",
+      riskAssessmentUrl: json['riskAssessmentUrl'] ?? "",
       scaffoldStatus: json['scaffoldStatus'] ?? "",
       targetDate: json['targetDate'] ?? "",
       id: json['id'] ?? "",
+      jobStatus: json['jobStatus'] ?? "",
     );
   }
-
   //tojson
 }

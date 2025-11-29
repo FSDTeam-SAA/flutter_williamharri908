@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/module/home/ui/screen/home_screen_ui.dart';
-import 'package:williamharri/src/module/home/ui/screen/staff_my_jobs.dart';
+import 'package:williamharri/src/module/home/ui/screen/my_jobs.dart';
 import 'package:williamharri/src/module/profile/ui/view/profile_view.dart';
 
 class AppGround extends StatefulWidget {
@@ -24,53 +24,55 @@ class _AppGroundState extends State<AppGround> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: Container(
-        height: 100,
-        // margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0D1B2A),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(3, (index) {
-            final icons = [
-              Icons.home_outlined,
-              Icons.work_outline,
-              Icons.person_outline,
-            ];
-
-            final labels = ['Home', 'My Jobs', 'Profile'];
-
-            final isSelected = _currentIndex == index;
-
-            return GestureDetector(
-              onTap: () => setState(() => _currentIndex = index),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    icons[index],
-                    size: 28,
-                    color: isSelected
-                        ? AppColors.context(context).primaryColor
-                        : Colors.grey,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    labels[index],
-                    style: TextStyle(
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 100,
+          // margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D1B2A),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(3, (index) {
+              final icons = [
+                Icons.home_outlined,
+                Icons.work_outline,
+                Icons.person_outline,
+              ];
+        
+              final labels = ['Home', 'My Jobs', 'Profile'];
+        
+              final isSelected = _currentIndex == index;
+        
+              return GestureDetector(
+                onTap: () => setState(() => _currentIndex = index),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icons[index],
+                      size: 28,
                       color: isSelected
                           ? AppColors.context(context).primaryColor
                           : Colors.grey,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
                     ),
-                  )
-                ],
-              ),
-            );
-          }),
+                    const SizedBox(height: 4),
+                    Text(
+                      labels[index],
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.context(context).primaryColor
+                            : Colors.grey,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }),
+          ),
         ),
       ),
     );

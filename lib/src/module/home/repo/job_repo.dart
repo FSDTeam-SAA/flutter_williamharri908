@@ -8,4 +8,6 @@ abstract base class JobRepo extends BaseRepository {
   FutureRequest<List<JobModel>> getStaffJobs();
 
   
+
+  
 }

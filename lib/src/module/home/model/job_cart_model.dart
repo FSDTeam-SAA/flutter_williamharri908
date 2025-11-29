@@ -50,7 +50,7 @@ class JobModel {
       photos: List<String>.from(json['photos'] ?? []),
       methodStatementUrl: json['methodStatementUrl'] ?? "",
       riskAssessmentUrl: json['riskAssessmentUrl'] ?? "",
-      status: json['status'] ?? "",
+      status: json['jobStatus'] ?? "",
       isDeleted: json['isDeleted'] ?? false,
 
       postedBy: (json['postedBy'] is String)

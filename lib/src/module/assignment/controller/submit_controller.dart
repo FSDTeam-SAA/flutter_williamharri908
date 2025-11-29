@@ -68,7 +68,7 @@ class RamsDocumentController extends GetxController {
         signature: uploadedFile.value!.path,
       );
 
-      final response = await repo.submititScaffold(model);
+      // final response = await repo.submititScaffold(model);
 
       Get.snackbar(
         "Success",

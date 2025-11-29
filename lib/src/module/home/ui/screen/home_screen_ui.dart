@@ -18,6 +18,7 @@ class HomeScreenView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: false,
         backgroundColor: Colors.transparent,
         title: Column(
@@ -117,7 +118,7 @@ class HomeScreenView extends StatelessWidget {
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                staffjob.title,
+                                                staffjob.companyName,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w600,
@@ -150,7 +151,7 @@ class HomeScreenView extends StatelessWidget {
                                             const SizedBox(width: 6),
                                             Expanded(
                                               child: Text(
-                                                staffjob.companyName,
+                                                staffjob.title,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
@@ -239,11 +240,13 @@ class HomeScreenView extends StatelessWidget {
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              job.title,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
+                                            Expanded(
+                                              child: Text(
+                                                job.companyName,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                             ),
                                             const Spacer(),
@@ -265,7 +268,7 @@ class HomeScreenView extends StatelessWidget {
                                           children: [
                                             const Icon(Icons.business),
                                             const SizedBox(width: 8),
-                                            Text(job.companyName),
+                                            Text(job.title),
                                           ],
                                         ),
                                         const SizedBox(height: 4),
