@@ -86,168 +86,171 @@ class JobDetailsUi extends StatelessWidget {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          spacing: 15,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-
-            // HEADER INFO
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 35,
-                  backgroundColor: avatarImage == null
-                      ? Colors.blue
-                      : Colors.transparent,
-                  backgroundImage: avatarImage,
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title + Price
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              job.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            spacing: 15,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+        
+              // HEADER INFO
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundColor: avatarImage == null
+                        ? Colors.blue
+                        : Colors.transparent,
+                    backgroundImage: avatarImage,
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Title + Price
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                job.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "£ ${job.price}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                            const SizedBox(width: 8),
+                            Text(
+                              "£ ${job.price}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Company
-                      Row(
-                        children: [
-                          const Icon(Icons.business),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              job.companyName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Location
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on_outlined),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              job.location,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // DESCRIPTION
-            const Text(
-              "Description",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              job.description.isEmpty
-                  ? "No description available"
-                  : job.description,
-              style: const TextStyle(fontSize: 14),
-            ),
-
-            const SizedBox(height: 20),
-
-            // PHOTOS
-            const Text(
-              "Photos",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 100,
-              child: job.photos.isEmpty
-                  ? const Text("No photos available")
-                  : ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: job.photos.length,
-                itemBuilder: (_, index) {
-                  final photoUrl = job.photos[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey.shade300,
-                      ),
-                      child: Image.network(photoUrl, fit: BoxFit.cover),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            if (controller.profile.value?.role == "staff")
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF99B07),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          ],
                         ),
-                      ),
-                      onPressed: () {
-                        Get.to(() => RamsDocumentScreen(job: job));
-                      },
-                      child: const Text(
-                        "Accept",
-                        style: TextStyle(color: Colors.white),
-                      ),
+        
+                        const SizedBox(height: 10),
+        
+                        // Company
+                        Row(
+                          children: [
+                            const Icon(Icons.business),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                job.companyName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+        
+                        const SizedBox(height: 8),
+        
+                        // Location
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                job.location,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 10),
                 ],
               ),
-          ],
+        
+              const SizedBox(height: 20),
+        
+              // DESCRIPTION
+              const Text(
+                "Description",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                job.description.isEmpty
+                    ? "No description available"
+                    : job.description,
+                textAlign: TextAlign.justify,
+                style: const TextStyle(fontSize: 14),
+              ),
+        
+              const SizedBox(height: 20),
+        
+              // PHOTOS
+              const Text(
+                "Photos",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 100,
+                child: job.photos.isEmpty
+                    ? const Text("No photos available")
+                    : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: job.photos.length,
+                  itemBuilder: (_, index) {
+                    final photoUrl = job.photos[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey.shade300,
+                        ),
+                        child: Image.network(photoUrl, fit: BoxFit.cover),
+                      ),
+                    );
+                  },
+                ),
+              ),
+        
+              const SizedBox(height: 20),
+        
+              if (controller.profile.value?.role == "staff")
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF99B07),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          Get.to(() => RamsDocumentScreen(job: job));
+                        },
+                        child: const Text(
+                          "Accept",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );
