@@ -1,14 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:williamharri/src/core/base/component/image_cache/smart_network_image.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/controller/staff_all_jobs.controller.dart';
 import 'package:williamharri/src/module/home/ui/screen/create_job.dart';
 import 'package:williamharri/src/module/home/ui/screen/job_details_ui.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart'; // <-- StaffController
+import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
+
+
 
 class HomeScreenView extends StatelessWidget {
   const HomeScreenView({super.key});
+
+  /// Small helper to build the thumbnail for a job.
+  /// Uses `thumbnail` if available, otherwise first photo, otherwise icon.
+  Widget _buildJobThumbnail({
+    required String? thumbnail,
+    required List<String> photos,
+  }) {
+    String? url;
+
+    if (thumbnail != null && thumbnail.isNotEmpty) {
+      url = thumbnail;
+    } else if (photos.isNotEmpty) {
+      url = photos.first;
+    }
+
+    if (url == null || url.isEmpty) {
+      // fallback: icon only
+      return Column(
+        children: const [
+          Icon(Icons.image, size: 70),
+          SizedBox(height: 4),
+          Text("data"),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            url,
+            width: 70,
+            height: 70,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text("data"),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +84,14 @@ class HomeScreenView extends StatelessWidget {
           if (controller.profile.value?.role == "manager")
             IconButton(
               onPressed: () {
-                Get.to(() => EditJobScreen());
+                //  Make sure StaffController exists before opening create screen
+                if (!Get.isRegistered<StaffController>()) {
+                  final profileRepo = Get.find<ProfileRepo>();      // get repo from DI
+                  Get.put(StaffController(repo: profileRepo));      //  pass repo
+                }
+
+                //  Use the create screen when tapping "+" (not EditJobScreen)
+                Get.to(() => const EditJobScreen());
               },
               icon: const Icon(Icons.add, color: Colors.white),
             ),
@@ -52,12 +106,13 @@ class HomeScreenView extends StatelessWidget {
           ),
         ],
       ),
-
       body: Obx(() {
         final role = controller.profile.value?.role;
         if (role == null) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        // ---------------- STAFF VIEW ----------------
         if (role == "staff") {
           if (staffJobController.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
@@ -96,51 +151,45 @@ class HomeScreenView extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // SmartNetworkImage.circle(
-                                  //   imageUrl: "",
-                                  //   diameter: 70,
-                                  // ),
-                                  Column(
-                                    children: [
-                                      Icon(Icons.image, size: 70),
-
-                                      Text("data"),
-                                    ],
+                                  _buildJobThumbnail(
+                                    thumbnail: staffjob.thumbnail,
+                                    photos: staffjob.photos,
                                   ),
-
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
                                             Expanded(
                                               child: Text(
                                                 staffjob.title,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ),
+                                            const SizedBox(width: 8),
                                             Text(
                                               staffjob.status,
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600,
                                                 color:
-                                                    staffjob.status == "active"
+                                                staffjob.status == "active"
                                                     ? Colors.green
                                                     : Colors.red,
                                               ),
                                             ),
                                           ],
                                         ),
-
                                         const SizedBox(height: 8),
-
-                                        // COMPANY
                                         Row(
                                           children: [
                                             const Icon(
@@ -151,15 +200,14 @@ class HomeScreenView extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 staffjob.companyName,
-                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],
                                         ),
-
                                         const SizedBox(height: 4),
-
-                                        // LOCATION
                                         Row(
                                           children: [
                                             const Icon(
@@ -170,7 +218,9 @@ class HomeScreenView extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 staffjob.location,
-                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],
@@ -192,6 +242,7 @@ class HomeScreenView extends StatelessWidget {
           );
         }
 
+        // ---------------- MANAGER VIEW ----------------
         if (role == "manager") {
           if (jobController.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
@@ -227,26 +278,33 @@ class HomeScreenView extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    children: [
-                                      Icon(Icons.image, size: 70),
-                                      Text("data"),
-                                    ],
+                                  _buildJobThumbnail(
+                                    thumbnail: job.thumbnail,
+                                    photos: job.photos,
                                   ),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              job.title,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
+                                            Expanded(
+                                              child: Text(
+                                                job.title,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                             ),
-                                            const Spacer(),
+                                            const SizedBox(width: 8),
                                             Text(
                                               job.status,
                                               style: TextStyle(
@@ -260,22 +318,36 @@ class HomeScreenView extends StatelessWidget {
                                           ],
                                         ),
                                         const SizedBox(height: 8),
-
                                         Row(
                                           children: [
-                                            const Icon(Icons.business),
+                                            const Icon(Icons.business, size: 18),
                                             const SizedBox(width: 8),
-                                            Text(job.companyName),
+                                            Expanded(
+                                              child: Text(
+                                                job.companyName,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 4),
-
                                         Row(
                                           children: [
                                             const Icon(
                                               Icons.location_on_outlined,
+                                              size: 18,
                                             ),
-                                            Text(job.location),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                job.location,
+                                                maxLines: 1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 8),

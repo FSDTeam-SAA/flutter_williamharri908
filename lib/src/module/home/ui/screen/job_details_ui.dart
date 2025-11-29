@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/screen/rams_documents.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/home/controller/job_controller.dart';
+import 'package:williamharri/src/module/home/ui/screen/edit_job.dart';
+
+// ⬇️ add these imports
+import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
+import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
 class JobDetailsUi extends StatelessWidget {
   final JobModel job;
@@ -12,8 +19,15 @@ class JobDetailsUi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
-    // final jobController = Get.find<JobController>();
-    // final staffJobController = Get.find<StaffJobController>();
+    final jobsController = Get.find<JobController>();
+
+    // ---------------- THUMBNAIL IMAGE ----------------
+    ImageProvider? avatarImage;
+    if (job.thumbnail != null && job.thumbnail!.isNotEmpty) {
+      avatarImage = NetworkImage(job.thumbnail!);
+    } else if (job.photos.isNotEmpty) {
+      avatarImage = NetworkImage(job.photos.first);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -23,18 +37,55 @@ class JobDetailsUi extends StatelessWidget {
           if (controller.profile.value?.role == "manager")
             IconButton(
               onPressed: () {
-                Get.to(() => Scaffold());
+                // ✅ make sure StaffController exists before opening EditJobScreen
+                if (!Get.isRegistered<StaffController>()) {
+                  final profileRepo = Get.find<ProfileRepo>();
+                  Get.put(StaffController(repo: profileRepo));
+                }
+
+                Get.to(() => EditJobScreen(job: job));
               },
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(
+                Icons.edit_outlined,
+                color: Colors.orange,
+              ),
             ),
           if (controller.profile.value?.role == "manager")
             IconButton(
-              icon: Icon(Icons.delete_forever_outlined, color: Colors.red),
-              onPressed: () {},
+              icon: const Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.red,
+              ),
+              onPressed: () async {
+                final confirm = await Get.dialog<bool>(
+                  AlertDialog(
+                    title: const Text('Delete job'),
+                    content: const Text(
+                      'Are you sure you want to delete this job?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(result: false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Get.back(result: true),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm != true) return;
+
+                await jobsController.deleteJob(job.id);
+              },
             ),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -45,10 +96,16 @@ class JobDetailsUi extends StatelessWidget {
 
             // HEADER INFO
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CircleAvatar(radius: 35),
+                CircleAvatar(
+                  radius: 35,
+                  backgroundColor: avatarImage == null
+                      ? Colors.blue
+                      : Colors.transparent,
+                  backgroundImage: avatarImage,
+                ),
                 const SizedBox(width: 15),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,12 +116,15 @@ class JobDetailsUi extends StatelessWidget {
                           Expanded(
                             child: Text(
                               job.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Text(
                             "£ ${job.price}",
                             style: const TextStyle(
@@ -82,7 +142,13 @@ class JobDetailsUi extends StatelessWidget {
                         children: [
                           const Icon(Icons.business),
                           const SizedBox(width: 8),
-                          Text(job.companyName),
+                          Expanded(
+                            child: Text(
+                              job.companyName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
 
@@ -93,29 +159,15 @@ class JobDetailsUi extends StatelessWidget {
                         children: [
                           const Icon(Icons.location_on_outlined),
                           const SizedBox(width: 8),
-                          Text(job.location),
+                          Expanded(
+                            child: Text(
+                              job.location,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
-
-                      const SizedBox(height: 8),
-
-                      // // Status
-                      // Row(
-                      //   children: [
-                      //     const Icon(Icons.info_outline),
-                      //     const SizedBox(width: 8),
-                      //     Text(
-                      //       job.status,
-                      //       style: TextStyle(
-                      //         fontSize: 14,
-                      //         fontWeight: FontWeight.w600,
-                      //         color: job.status == "active"
-                      //             ? Colors.green
-                      //             : Colors.red,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),
@@ -129,9 +181,7 @@ class JobDetailsUi extends StatelessWidget {
               "Description",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-
             const SizedBox(height: 10),
-
             Text(
               job.description.isEmpty
                   ? "No description available"
@@ -146,70 +196,57 @@ class JobDetailsUi extends StatelessWidget {
               "Photos",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-
             const SizedBox(height: 10),
-
             SizedBox(
               height: 100,
               child: job.photos.isEmpty
                   ? const Text("No photos available")
                   : ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: job.photos.length,
-                      itemBuilder: (_, index) {
-                        final photoUrl = job.photos[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey.shade300,
-                            ),
-                            child: Image.network(photoUrl, fit: BoxFit.cover),
-                          ),
-                        );
-                      },
+                scrollDirection: Axis.horizontal,
+                itemCount: job.photos.length,
+                itemBuilder: (_, index) {
+                  final photoUrl = job.photos[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade300,
+                      ),
+                      child: Image.network(photoUrl, fit: BoxFit.cover),
                     ),
+                  );
+                },
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            // add heignt
-
             if (controller.profile.value?.role == "staff")
-
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFF99B07),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF99B07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.to(() => RamsDocumentScreen(job: job));
+                      },
+                      child: const Text(
+                        "Accept",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    onPressed: () {
-                      // Get.to(() => RamsDocumentScreen());
-                      Get.to(() => RamsDocumentScreen(job: job));
-
-                    },
-                    child: const Text("Accept",
-                        style: TextStyle(color: Colors.white)),
                   ),
-                ),
-                const SizedBox(width: 10),
-              ]
-            )
-
-            // if (job.r)
-
-            // EXTRA INFO
-            // Text("Job ID: ${job.id}"),
-            // Text("Posted By: ${job.postedBy}"),
-            // Text("Target Date: ${job.targetDate}"),
-            // Text("Scaffold Status: ${job.scaffoldStatus}"),
+                  const SizedBox(width: 10),
+                ],
+              ),
           ],
         ),
       ),
