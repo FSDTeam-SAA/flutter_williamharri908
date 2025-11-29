@@ -125,7 +125,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!,   // 👈 send assigneTo for update
+          assigneeId: staff.id!,   //  send assigneTo for update
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
@@ -136,7 +136,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!,   // 👈 send assigneTo for create
+          assigneeId: staff.id!,   //  send assigneTo for create
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
@@ -342,9 +342,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       radius: 45,
                       backgroundImage: _thumbnailFile != null
                           ? FileImage(_thumbnailFile!)
-                          : const NetworkImage(
-                        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
-                      ) as ImageProvider,
+                          :const AssetImage('assets/icons/istockphoto.jpg') as ImageProvider,
                     ),
                     const SizedBox(height: 10),
                     TextButton(
