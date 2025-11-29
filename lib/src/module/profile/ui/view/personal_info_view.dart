@@ -19,7 +19,9 @@ class PersonalInfoView extends StatelessWidget {
         centerTitle: true,
         actions: [
           InkWell(
-            onTap: () => Get.to(() => EditProfileView()),
+            onTap: () => Get.to(
+              () => EditProfileView(profile: controller.profile.value!),
+            ),
             child: Padding(
               padding: const EdgeInsets.only(right: 20.0),
               child: Image.asset(Assets.edit, height: 24, width: 24),
@@ -62,7 +64,7 @@ class PersonalInfoView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                profile.username ?? "No Name",
+                profile.name ?? "No Name",
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -74,7 +76,7 @@ class PersonalInfoView extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              personalInfoShow(type: "Name", data: profile.username ?? "N/A"),
+              personalInfoShow(type: "Name", data: profile.name ?? "N/A"),
               personalInfoShow(type: "Email", data: profile.email ?? "N/A"),
               personalInfoShow(type: "Mobile", data: profile.phone ?? "N/A"),
               personalInfoShow(type: "Address", data: profile.address ?? "N/A"),

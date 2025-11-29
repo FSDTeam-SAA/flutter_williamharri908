@@ -25,4 +25,5 @@ abstract base class AuthRepo extends BaseRepository {
   FutureRequest<Success> createNewPassword(ResatePasswordModel param);
 
   FutureRequest<Success> changePassword(ChangePasswordModel param);
+  
 }

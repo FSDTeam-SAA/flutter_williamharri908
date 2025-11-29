@@ -10,6 +10,7 @@ import 'package:williamharri/src/module/home/controller/staff_all_jobs.controlle
 import 'package:williamharri/src/module/home/repo/job_repo.dart';
 import 'package:williamharri/src/module/home/repo/job_repo_impl.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_edit_controller.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo_impl.dart';

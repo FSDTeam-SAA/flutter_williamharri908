@@ -9,5 +9,8 @@ abstract base class ProfileRepo extends BaseRepository{
   FutureRequest<Success> logout();
 
   FutureRequest<Success<List<ProfileModel>>> staffList();
+  FutureRequest<Success<ProfileModel>> updateProfile(ProfileModel profile);
+
+   
 
 }

@@ -20,8 +20,10 @@ base class ApiEndpoints {
   // ---------------------- USER -----------------------------
   /// ### get
   static String getuserbyId(String id) => _User.getuserbyId(id);
+
   /// ### patch
   static const String updateUser = _User.updateUser;
+
   /// ### patch
   static const String uploadProfileImage = _User.uploadProfileImage;
   //Get

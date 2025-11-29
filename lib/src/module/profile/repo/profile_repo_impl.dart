@@ -66,4 +66,44 @@ final class ProfileRepoImpl extends ProfileRepo {
       },
     );
   }
+
+
+
+   /// ------------------ New: Update Profile ------------------
+   @override
+  FutureRequest<Success<ProfileModel>> updateProfile(ProfileModel profile) async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        debugPrint("UPDATING PROFILE FOR USER ID: ${profile.id}");
+
+        // Prepare payload
+        final Map<String, dynamic> payload = {
+          "name": profile.name,
+          "phone": profile.phone,
+          "address": profile.address,
+          "nationality": profile.nationality,
+          "avatarUrl": profile.avatarUrl, 
+        };
+
+        final response = await appPigeon.put(
+          "${ApiEndpoints.updateUser}/",
+          data: payload,
+        );
+
+        if (response.data == null || response.data["data"] == null) {
+          throw Exception("No data in response");
+        }
+
+        final updatedData = response.data["data"] as Map<String, dynamic>;
+        final updatedProfile = ProfileModel.fromMap(updatedData);
+
+        return Success<ProfileModel>(
+          data: updatedProfile,
+          message: response.data["message"] ?? "Profile updated successfully",
+        );
+      },
+    );
+  }
+
+
 }
