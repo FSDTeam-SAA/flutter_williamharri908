@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
-import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
@@ -45,15 +44,9 @@ class JobDetailsUi extends StatelessWidget {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
                 }
-
-                // wait for result from EditJobScreen
                 final updated = await Get.to<bool>(() => EditJobScreen(job: job));
 
-                // if user saved successfully, show toast/snackbar
                 if (updated == true) {
-                  // optional: refresh jobs here too if you want
-                  // final jobsController = Get.find<JobController>();
-                  // await jobsController.fetchJobs();
 
                   Get.snackbar(
                     'Job updated',

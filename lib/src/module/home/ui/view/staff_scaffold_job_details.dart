@@ -128,8 +128,6 @@ class StaffScaffoldJobDetails extends StatelessWidget {
                             : null,
                       );
                     }
-
-                    // Newly added photos
                     final newIndex = index - job.photos.length;
                     return _photoItem(
                       controller,

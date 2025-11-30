@@ -1,5 +1,4 @@
-
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
@@ -22,7 +21,7 @@ class JobDetailsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Job Details',
+          'Scaffold Details',
           style: TextStyle(color: Colors.white, fontSize: 17),
         ),
         centerTitle: true,
@@ -32,7 +31,7 @@ class JobDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Job Title
+            // Title
             Text(
               job.title,
               style: const TextStyle(
@@ -46,10 +45,7 @@ class JobDetailsScreen extends StatelessWidget {
             // Company & Location
             Text(
               '${job.companyName} • ${job.location}',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
             ),
             const SizedBox(height: 24),
 
@@ -73,7 +69,7 @@ class JobDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Photos
+            // Job Photos
             const Text(
               'Photos',
               style: TextStyle(
@@ -84,41 +80,151 @@ class JobDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: job.photos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
+            _buildPhotoGrid(job.photos),
+
+            const SizedBox(height: 32),
+
+            // Staff Submitted Section
+            if (job.latestScaffold != null) ...[
+              const Text(
+                'Submitted Photos',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              itemBuilder: (context, index) {
-                return _buildPhotoCard(job.photos[index]);
-              },
-            ),
+              const SizedBox(height: 16),
+
+              _buildPhotoGrid(job.latestScaffold!.photos),
+
+              const SizedBox(height: 32),
+
+              // Signature Section
+              const Text(
+                'Signature',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              _buildSignature(job.latestScaffold!.signatureUrl),
+
+              SizedBox(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF99B07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Complete',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.to(() => Scaffold()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF99B07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancle',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPhotoCard(String url) {
-    return GestureDetector(
-      onTap: () {
-        Get.to(() => FullImageViewScreen(imageUrl: url));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          image: DecorationImage(
-            image: NetworkImage(url),
-            fit: BoxFit.cover,
-            colorFilter: const ColorFilter.mode(
-              Colors.black45,
-              BlendMode.darken,
+  /// Detects and loads correct image type
+  ImageProvider loadImage(String path) {
+    if (path.startsWith('http')) {
+      return NetworkImage(path);
+    } else {
+      return FileImage(File(path));
+    }
+  }
+
+  /// Grid builder for photos
+  Widget _buildPhotoGrid(List<String> photos) {
+    if (photos.isEmpty) {
+      return const Text(
+        'No photos available',
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: photos.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+      ),
+      itemBuilder: (context, index) {
+        final url = photos[index];
+
+        return GestureDetector(
+          onTap: () => Get.to(() => FullImageViewScreen(imageUrl: url)),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(image: loadImage(url), fit: BoxFit.cover),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  /// Signature Widget
+  Widget _buildSignature(String url) {
+    if (url.isEmpty) {
+      return const Text(
+        'No signature submitted',
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => Get.to(() => FullImageViewScreen(imageUrl: url)),
+      child: Container(
+        height: 180,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          image: DecorationImage(image: loadImage(url), fit: BoxFit.cover),
         ),
       ),
     );
