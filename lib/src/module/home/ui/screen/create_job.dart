@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,6 +41,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
   File? _thumbnailFile;
   final List<File> _photos = [];
 
+  // NEW: PDF files
+  File? _methodStatementFile;
+  File? _riskAssessmentFile;
+
   bool _isSaving = false;
 
   final ImagePicker _picker = ImagePicker();
@@ -76,6 +81,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
           }
         }
       }
+
+      // NOTE: if your CreateJobModel has methodStatement / riskAssessment URLs,
+      // you could show their names here, but it's optional since picking PDFs is manual.
     }
   }
 
@@ -103,6 +111,34 @@ class _EditJobScreenState extends State<EditJobScreen> {
     if (picked != null) {
       setState(() {
         _photos.add(File(picked.path));
+      });
+    }
+  }
+
+  // NEW: pick Method Statement PDF
+  Future<void> _pickMethodStatementPdf() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _methodStatementFile = File(result.files.single.path!);
+      });
+    }
+  }
+
+  // NEW: pick Risk Assessment PDF
+  Future<void> _pickRiskAssessmentPdf() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _riskAssessmentFile = File(result.files.single.path!);
       });
     }
   }
@@ -141,6 +177,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
           assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
+          methodStatement: _methodStatementFile,
+          riskAssessment: _riskAssessmentFile,
         );
       } else {
         await _createJob(
@@ -152,6 +190,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
           assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
+          methodStatement: _methodStatementFile,
+          riskAssessment: _riskAssessmentFile,
         );
       }
 
@@ -162,7 +202,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         colorText: Colors.white,
       );
 
-      // 🔴 IMPORTANT: return `true` so HomeScreen knows to refresh
+      //  IMPORTANT: return `true` so HomeScreen knows to refresh
       Navigator.pop(context, true);
     } catch (e, st) {
       debugPrint('Error while saving job: $e\n$st');
@@ -188,6 +228,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
     required String assigneeId,
     File? thumbnail,
     List<File> photos = const [],
+    File? methodStatement,
+    File? riskAssessment,
   }) async {
     final cleanedPrice = price.replaceAll('\$', '').trim();
 
@@ -207,9 +249,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
 
     if (photos.isNotEmpty) {
-      formDataMap['photos'] = photos
-          .map((f) => dio.MultipartFile.fromFileSync(f.path))
-          .toList();
+      formDataMap['photos'] =
+          photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
+    }
+
+    // NEW: add PDFs
+    if (methodStatement != null) {
+      formDataMap['methodStatement'] =
+          dio.MultipartFile.fromFileSync(methodStatement.path);
+    }
+
+    if (riskAssessment != null) {
+      formDataMap['riskAssessment'] =
+          dio.MultipartFile.fromFileSync(riskAssessment.path);
     }
 
     final formData = dio.FormData.fromMap(formDataMap);
@@ -254,6 +306,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
     required String assigneeId,
     File? thumbnail,
     List<File> photos = const [],
+    File? methodStatement,
+    File? riskAssessment,
   }) async {
     final cleanedPrice = price.replaceAll('\$', '').trim();
 
@@ -273,9 +327,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
 
     if (photos.isNotEmpty) {
-      formDataMap['photos'] = photos
-          .map((f) => dio.MultipartFile.fromFileSync(f.path))
-          .toList();
+      formDataMap['photos'] =
+          photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
+    }
+
+    // NEW: add PDFs only if user picked them
+    if (methodStatement != null) {
+      formDataMap['methodStatement'] =
+          dio.MultipartFile.fromFileSync(methodStatement.path);
+    }
+
+    if (riskAssessment != null) {
+      formDataMap['riskAssessment'] =
+          dio.MultipartFile.fromFileSync(riskAssessment.path);
     }
 
     final formData = dio.FormData.fromMap(formDataMap);
@@ -450,6 +514,53 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 ),
                 validator: _requiredValidator,
               ),
+
+              // NEW: PDF fields
+              const SizedBox(height: 20),
+              _label('Method Statement'),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: _pickMethodStatementPdf,
+                    child: const Text('Choose file'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _methodStatementFile != null
+                          ? _methodStatementFile!.path.split('/').last
+                          : 'No file selected',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _label('Risk Assessment (PDF)'),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: _pickRiskAssessmentPdf,
+                    child: const Text('Choose file'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _riskAssessmentFile != null
+                          ? _riskAssessmentFile!.path.split('/').last
+                          : 'No file selected',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 20),
               _label('Photos'),
               const SizedBox(height: 8),

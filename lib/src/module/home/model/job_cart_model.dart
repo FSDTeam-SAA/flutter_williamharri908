@@ -21,6 +21,8 @@ class JobModel {
 
   /// URL of the main thumbnail image
   final String? thumbnail;
+  final String? methodStatement;
+  final String? riskAssessment;
 
   JobModel({
     required this.id,
@@ -41,8 +43,10 @@ class JobModel {
     required this.createdAt,
     required this.updatedAt,
     this.thumbnail,
+    this.methodStatement,
+    this.riskAssessment,
   });
-  
+
   factory JobModel.fromJson(Map<String, dynamic> json) {
     return JobModel(
       id: json['id'] ?? "",
@@ -75,6 +79,8 @@ class JobModel {
       updatedAt: json['updatedAt'] ?? "",
       // if your backend uses "thumbnailUrl" or "image", change it here.
       thumbnail: json['thumbnail']?.toString(),
+      methodStatement: json['methodStatement'],
+      riskAssessment: json['riskAssessment'],
     );
   }
 }
