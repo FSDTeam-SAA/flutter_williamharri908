@@ -111,7 +111,7 @@ class JobDetailsUi extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-        
+
               // HEADER INFO
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,9 +152,9 @@ class JobDetailsUi extends StatelessWidget {
                             ),
                           ],
                         ),
-        
+
                         const SizedBox(height: 10),
-        
+
                         // Company
                         Row(
                           children: [
@@ -169,9 +169,9 @@ class JobDetailsUi extends StatelessWidget {
                             ),
                           ],
                         ),
-        
+
                         const SizedBox(height: 8),
-        
+
                         // Location
                         Row(
                           children: [
@@ -191,9 +191,9 @@ class JobDetailsUi extends StatelessWidget {
                   ),
                 ],
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // DESCRIPTION
               const Text(
                 "Description",
@@ -208,9 +208,70 @@ class JobDetailsUi extends StatelessWidget {
                 maxLines: 40,
                 style: const TextStyle(fontSize: 14),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
+
+              // ---------------- RAMS DOCUMENTS (PDFs) ----------------
+              Builder(
+                builder: (_) {
+                  // figure out effective URLs (prefer the nullable fields, fall back to *Url)
+                  final String? methodUrl = (job.methodStatement != null &&
+                      job.methodStatement!.trim().isNotEmpty)
+                      ? job.methodStatement!.trim()
+                      : (job.methodStatementUrl.trim().isNotEmpty
+                      ? job.methodStatementUrl.trim()
+                      : null);
+
+                  final String? riskUrl = (job.riskAssessment != null &&
+                      job.riskAssessment!.trim().isNotEmpty)
+                      ? job.riskAssessment!.trim()
+                      : (job.riskAssessmentUrl.trim().isNotEmpty
+                      ? job.riskAssessmentUrl.trim()
+                      : null);
+
+                  // if both are null/empty, you can hide the whole block
+                  if (methodUrl == null && riskUrl == null) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Documents",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 10),
+
+                      _pdfTile(
+                        label: "Method Statement",
+                        enabled: methodUrl != null,
+                        onTap: methodUrl == null
+                            ? null
+                            : () {
+                          // you can pass just the URL to a PDF viewer if you prefer
+                          Get.to(() => RamsDocumentScreen(job: job));
+                        },
+                      ),
+
+                      _pdfTile(
+                        label: "Risk Assessment",
+                        enabled: riskUrl != null,
+                        onTap: riskUrl == null
+                            ? null
+                            : () {
+                          Get.to(() => RamsDocumentScreen(job: job));
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+
+
+              const SizedBox(height: 20),
+
               // PHOTOS
               const Text(
                 "Photos",
@@ -241,9 +302,9 @@ class JobDetailsUi extends StatelessWidget {
                   },
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               if (controller.profile.value?.role == "staff")
                 Row(
                   children: [
@@ -273,4 +334,49 @@ class JobDetailsUi extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Widget _pdfTile({
+  required String label,
+  required bool enabled,
+  required VoidCallback? onTap,
+}) {
+  return Opacity(
+    opacity: enabled ? 1 : 0.5,
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.picture_as_pdf,
+            color: Colors.red,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.remove_red_eye_outlined,
+              color: enabled ? Colors.green : Colors.grey,
+            ),
+            onPressed: enabled ? onTap : null,
+          ),
+        ],
+      ),
+    ),
+  );
 }

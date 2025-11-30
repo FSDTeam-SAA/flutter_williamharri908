@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
-import 'package:williamharri/src/module/home/model/create_job_model.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
@@ -34,8 +34,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
   final ImagePicker _picker = ImagePicker();
 
   File? _thumbnailFile;
-  final List<File> _newPhotos = []; // photos user adds while editing
-  late List<String> _existingPhotos; // existing URLs that can be removed
+
+  /// new photos user adds while editing
+  final List<File> _newPhotos = [];
+
+  /// existing photo URLs from backend
+  late List<String> _existingPhotos;
+
+  /// NEW: PDFs
+  File? _methodStatementFile;          // new picked file (if any)
+  File? _riskAssessmentFile;           // new picked file (if any)
+
+  String? _existingMethodStatementUrl; // existing pdf url from backend
+  String? _existingRiskAssessmentUrl;  // existing pdf url from backend
 
   bool _isSaving = false;
 
@@ -49,6 +60,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
     _priceCtrl = TextEditingController(text: widget.job.price.toString());
 
     _existingPhotos = List<String>.from(widget.job.photos ?? []);
+
+    // ✅ Get existing PDF URLs from JobModel
+    _existingMethodStatementUrl = widget.job.methodStatement;   // <--- make sure JobModel has this
+    _existingRiskAssessmentUrl = widget.job.riskAssessment;     // <--- and this
   }
 
   @override
@@ -84,6 +99,36 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // NEW: PDF pickers
+  // ---------------------------------------------------------------------------
+
+  Future<void> _pickMethodStatementPdf() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _methodStatementFile = File(result.files.single.path!);
+      });
+    }
+  }
+
+  Future<void> _pickRiskAssessmentPdf() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _riskAssessmentFile = File(result.files.single.path!);
+      });
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // SAVE: PATCH /jobs/{id} with multipart/form-data
   // ---------------------------------------------------------------------------
 
@@ -108,18 +153,16 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final appPigeon = Get.find<AppPigeon>();
     final jobsController = Get.find<JobController>();
 
-    final createModel = CreateJobModel(
-      companyName: _companyCtrl.text.trim(),
-      title: _titleCtrl.text.trim(),
-      location: _locationCtrl.text.trim(),
-      description: _descriptionCtrl.text.trim(),
-      price: _priceCtrl.text.trim(),
-      staffId: staff.id!,
-    );
+    final Map<String, dynamic> dataMap = {
+      'companyName': _companyCtrl.text.trim(),
+      'title': _titleCtrl.text.trim(),
+      'location': _locationCtrl.text.trim(),
+      'description': _descriptionCtrl.text.trim(),
+      'price': _priceCtrl.text.trim(),
+      'assigneTo': staff.id!,
+      'assignedTo': [staff.id], // if your backend expects this as well
+    };
 
-    final Map<String, dynamic> dataMap = createModel.toJson();
-
-    // thumbnail
     if (_thumbnailFile != null) {
       dataMap['thumbnail'] =
           dio.MultipartFile.fromFileSync(_thumbnailFile!.path);
@@ -132,8 +175,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
           .toList();
     }
 
-    // NOTE: If your backend needs to know which existing photos were deleted,
-    // you can send `_existingPhotos` or a list of removed URLs as extra fields.
+    // ✅ PDFs: only send if user picked a new one
+    if (_methodStatementFile != null) {
+      dataMap['methodStatement'] =
+          dio.MultipartFile.fromFileSync(_methodStatementFile!.path);
+    }
+
+    if (_riskAssessmentFile != null) {
+      dataMap['riskAssessment'] =
+          dio.MultipartFile.fromFileSync(_riskAssessmentFile!.path);
+    }
+
+    // If backend needs to know which existing photos were removed,
+    // you can send list of remaining `_existingPhotos` or removed URLs here.
 
     final formData = dio.FormData.fromMap(dataMap);
 
@@ -215,7 +269,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  // photo item WITH close button
   static Widget _photoItem({
     required ImageProvider image,
     required VoidCallback onRemove,
@@ -305,6 +358,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
       }).toList(),
       onChanged: (value) => controller.selectStaff(value),
     );
+  }
+
+  String _fileNameFromUrl(String url) {
+    try {
+      return Uri.parse(url).pathSegments.last;
+    } catch (_) {
+      return url.split('/').last;
+    }
   }
 
   @override
@@ -463,6 +524,61 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
                 validator: _requiredValidator,
+              ),
+
+              // -------------------- PDFs (like create screen) --------------------
+              const SizedBox(height: 20),
+              _label('Method Statement'),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: _pickMethodStatementPdf,
+                    child: const Text('Choose file'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _methodStatementFile != null
+                          ? _methodStatementFile!.path.split('/').last
+                          : (_existingMethodStatementUrl != null
+                          ? _fileNameFromUrl(_existingMethodStatementUrl!)
+                          : 'No file selected'),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+              _label('Risk Assessment'),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: _pickRiskAssessmentPdf,
+                    child: const Text('Choose file'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _riskAssessmentFile != null
+                          ? _riskAssessmentFile!.path.split('/').last
+                          : (_existingRiskAssessmentUrl != null
+                          ? _fileNameFromUrl(_existingRiskAssessmentUrl!)
+                          : 'No file selected'),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 18),
