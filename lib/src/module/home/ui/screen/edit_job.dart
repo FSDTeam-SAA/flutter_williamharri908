@@ -555,7 +555,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
               ),
 
               const SizedBox(height: 16),
-              _label('Risk Assessment (PDF)'),
+              _label('Risk Assessment'),
               const SizedBox(height: 8),
               Row(
                 children: [
