@@ -10,8 +10,6 @@ import 'package:williamharri/src/module/profile/controller/get_profile_controlle
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart'; // <-- StaffController
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
-
-
 class HomeScreenView extends StatelessWidget {
   const HomeScreenView({super.key});
 
@@ -83,15 +81,24 @@ class HomeScreenView extends StatelessWidget {
         actions: [
           if (controller.profile.value?.role == "manager")
             IconButton(
-              onPressed: () {
-                //  Make sure StaffController exists before opening create screen
+              // 🔴 CHANGED: make this async & refresh jobs after pop
+              onPressed: () async {
+                // Make sure StaffController exists before opening create screen
                 if (!Get.isRegistered<StaffController>()) {
-                  final profileRepo = Get.find<ProfileRepo>();      // get repo from DI
-                  Get.put(StaffController(repo: profileRepo));      //  pass repo
+                  final profileRepo = Get.find<ProfileRepo>(); // get repo from DI
+                  Get.put(StaffController(repo: profileRepo)); // pass repo
                 }
 
-                //  Use the create screen when tapping "+" (not EditJobScreen)
-                Get.to(() => const EditJobScreen());
+                // Open create screen and wait for result
+                final result = await Get.to(() => const EditJobScreen());
+
+                // If EditJobScreen popped with `true` => reload jobs
+                if (result == true) {
+                  // 🔸 Replace `fetchJobs()` with your actual refresh method
+                  await jobController.fetchJobs();
+                  // e.g. if your method is `getJobs()` use:
+                  // await jobController.getJobs();
+                }
               },
               icon: const Icon(Icons.add, color: Colors.white),
             ),

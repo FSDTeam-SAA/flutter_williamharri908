@@ -56,17 +56,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
         TextEditingController(text: widget.job?.title ?? '');
     _locationController =
         TextEditingController(text: widget.job?.location ?? '');
-    // price in model is already String
     _priceController = TextEditingController(text: widget.job?.price ?? '');
     _descriptionController =
         TextEditingController(text: widget.job?.description ?? '');
 
-    // 🔹 Preselect staff in dropdown when editing
     if (_isEditing && widget.job != null) {
       final job = widget.job!;
       String? staffId = job.staffId;
 
-      // if staffId is null, fall back to first assignedTo from backend
       if (staffId == null && job.assignedTo.isNotEmpty) {
         staffId = job.assignedTo.first;
       }
@@ -120,7 +117,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final description = _descriptionController.text.trim();
     final staff = staffController.selectedStaff.value;
 
-    // Backend says "assigneTo is required" -> force user to select a staff
     if (staff == null || staff.id == null) {
       Get.snackbar(
         'Assign staff',
@@ -142,7 +138,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!, // send assigneTo for update
+          assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
@@ -153,7 +149,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           location: location,
           price: price,
           description: description,
-          assigneeId: staff.id!, // send assigneTo for create
+          assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
         );
@@ -166,6 +162,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         colorText: Colors.white,
       );
 
+      // 🔴 IMPORTANT: return `true` so HomeScreen knows to refresh
       Navigator.pop(context, true);
     } catch (e, st) {
       debugPrint('Error while saving job: $e\n$st');
@@ -182,82 +179,13 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // API CALLS
-  // ---------------------------------------------------------------------------
-
-  /// POST /jobs/
-  // Future<String> _createJob({
-  //   required String company,
-  //   required String designation,
-  //   required String location,
-  //   required String price,
-  //   required String description,
-  //   required String assigneeId, // assigneTo required by backend
-  //   File? thumbnail,
-  //   List<File> photos = const [],
-  // }) async {
-  //   final cleanedPrice = price.replaceAll('\$', '').trim();
-  //
-  //   final formDataMap = <String, dynamic>{
-  //     'companyName': company,
-  //     'title': designation,
-  //     'location': location,
-  //     'price': cleanedPrice,
-  //     'description': description,
-  //     'assigneTo': assigneeId, // ✅ matches backend
-  //   };
-  //
-  //   if (thumbnail != null) {
-  //     formDataMap['thumbnail'] =
-  //         dio.MultipartFile.fromFileSync(thumbnail.path);
-  //   }
-  //
-  //   if (photos.isNotEmpty) {
-  //     formDataMap['photos'] = photos
-  //         .map((f) => dio.MultipartFile.fromFileSync(f.path))
-  //         .toList();
-  //   }
-  //
-  //   final formData = dio.FormData.fromMap(formDataMap);
-  //
-  //   try {
-  //     final response = await appPigeon.post(
-  //       ApiEndpoints.createJob,
-  //       data: formData,
-  //     );
-  //
-  //     final body = response.data as Map<String, dynamic>;
-  //     final id = body['data']?['id'] ?? body['id'];
-  //
-  //     if (id == null) {
-  //       throw Exception('Create job successful but no id returned');
-  //     }
-  //
-  //     return id.toString();
-  //   } on dio.DioException catch (e) {
-  //     debugPrint('createJob status: ${e.response?.statusCode}');
-  //     debugPrint('createJob data  : ${e.response?.data}');
-  //
-  //     String msg;
-  //     final data = e.response?.data;
-  //     if (data is Map && data['message'] != null) {
-  //       msg = data['message'].toString();
-  //     } else {
-  //       msg =
-  //       'Failed to create job (status: ${e.response?.statusCode ?? 'unknown'})';
-  //     }
-  //     throw Exception(msg);
-  //   }
-  // }
-
   Future<String> _createJob({
     required String company,
     required String designation,
     required String location,
     required String price,
     required String description,
-    required String assigneeId, // assigneTo required by backend
+    required String assigneeId,
     File? thumbnail,
     List<File> photos = const [],
   }) async {
@@ -269,7 +197,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       'location': location,
       'price': cleanedPrice,
       'description': description,
-      // 👇 send both forms
       'assigneTo': assigneeId,
       'assignedTo': [assigneeId],
     };
@@ -317,64 +244,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
   }
 
-
-  /// PATCH /jobs/{id}
-  // Future<void> _updateJob({
-  //   required String jobId,
-  //   required String company,
-  //   required String designation,
-  //   required String location,
-  //   required String price,
-  //   required String description,
-  //   required String assigneeId, // also send assigneTo on update
-  //   File? thumbnail,
-  //   List<File> photos = const [],
-  // }) async {
-  //   final cleanedPrice = price.replaceAll('\$', '').trim();
-  //
-  //   final formDataMap = <String, dynamic>{
-  //     'companyName': company,
-  //     'title': designation,
-  //     'location': location,
-  //     'price': cleanedPrice,
-  //     'description': description,
-  //     'assigneTo': assigneeId,
-  //   };
-  //
-  //   if (thumbnail != null) {
-  //     formDataMap['thumbnail'] =
-  //         dio.MultipartFile.fromFileSync(thumbnail.path);
-  //   }
-  //
-  //   if (photos.isNotEmpty) {
-  //     formDataMap['photos'] = photos
-  //         .map((f) => dio.MultipartFile.fromFileSync(f.path))
-  //         .toList();
-  //   }
-  //
-  //   final formData = dio.FormData.fromMap(formDataMap);
-  //
-  //   try {
-  //     await appPigeon.patch(
-  //       ApiEndpoints.updateJob(jobId),
-  //       data: formData,
-  //     );
-  //   } on dio.DioException catch (e) {
-  //     debugPrint('updateJob status: ${e.response?.statusCode}');
-  //     debugPrint('updateJob data  : ${e.response?.data}');
-  //
-  //     String msg;
-  //     final data = e.response?.data;
-  //     if (data is Map && data['message'] != null) {
-  //       msg = data['message'].toString();
-  //     } else {
-  //       msg =
-  //       'Failed to update job (status: ${e.response?.statusCode ?? 'unknown'})';
-  //     }
-  //     throw Exception(msg);
-  //   }
-  // }
-
   Future<void> _updateJob({
     required String jobId,
     required String company,
@@ -382,7 +251,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     required String location,
     required String price,
     required String description,
-    required String assigneeId, // also send assigneTo on update
+    required String assigneeId,
     File? thumbnail,
     List<File> photos = const [],
   }) async {
@@ -394,7 +263,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       'location': location,
       'price': cleanedPrice,
       'description': description,
-      // 👇 again send both
       'assigneTo': assigneeId,
       'assignedTo': [assigneeId],
     };
@@ -432,11 +300,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       throw Exception(msg);
     }
   }
-
-
-  // ---------------------------------------------------------------------------
-  // UI
-  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -476,7 +339,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Thumbnail
               Center(
                 child: Column(
                   children: [
@@ -484,7 +346,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       radius: 45,
                       backgroundImage: _thumbnailFile != null
                           ? FileImage(_thumbnailFile!)
-                          : const AssetImage('assets/icons/istockphoto.jpg'),
+                          : const AssetImage('assets/icons/istockphoto.jpg')
+                      as ImageProvider,
                     ),
                     const SizedBox(height: 10),
                     TextButton(
@@ -500,9 +363,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 18),
-
               _label('Company/Agency Name'),
               labelSpacing,
               TextFormField(
@@ -516,7 +377,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 validator: _requiredValidator,
               ),
               const SizedBox(height: 16),
-
               _label('Job designation'),
               labelSpacing,
               TextFormField(
@@ -530,7 +390,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 validator: _requiredValidator,
               ),
               const SizedBox(height: 16),
-
               _label('Location'),
               labelSpacing,
               TextFormField(
@@ -544,7 +403,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 validator: _requiredValidator,
               ),
               const SizedBox(height: 16),
-
               _label('Price'),
               labelSpacing,
               TextFormField(
@@ -568,7 +426,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 },
               ),
               const SizedBox(height: 16),
-
               _label('Assign to Staff'),
               labelSpacing,
               Obx(() {
@@ -577,9 +434,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 }
                 return _staffDropdown(staffController);
               }),
-
               const SizedBox(height: 18),
-
               _label('Description'),
               labelSpacing,
               TextFormField(
@@ -595,12 +450,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 ),
                 validator: _requiredValidator,
               ),
-
               const SizedBox(height: 20),
-
               _label('Photos'),
               const SizedBox(height: 8),
-
               SizedBox(
                 height: 90,
                 child: ListView(
@@ -622,9 +474,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 30),
-
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -658,10 +508,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       ),
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // UI helpers
-  // ---------------------------------------------------------------------------
 
   static const TextStyle _fieldTextStyle =
   TextStyle(color: Colors.white, fontSize: 14);
