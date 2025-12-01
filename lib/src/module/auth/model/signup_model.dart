@@ -3,6 +3,7 @@ import 'package:williamharri/src/module/auth/model/login_request_params.dart';
 class SignupRequestParam {
   final String? fullName;
   final String? email;
+  final String? username;
   final String? number;
   final String address;
   final String? password;
@@ -11,6 +12,7 @@ class SignupRequestParam {
   SignupRequestParam({
     required this.fullName,
     required this.email,
+    required this.username,
     required this.number,
     required this.address,
     required this.password,
@@ -18,8 +20,9 @@ class SignupRequestParam {
   });
 
   Map<String, dynamic> toJson() => {
-        'fullName': fullName,
+        'name': fullName,
         'email': email,
+        'username': username,
         'number': number,
         'address': address,
         'password': password,

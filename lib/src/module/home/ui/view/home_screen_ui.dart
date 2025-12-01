@@ -12,9 +12,6 @@ import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
 class HomeScreenView extends StatelessWidget {
   const HomeScreenView({super.key});
-
-  /// Small helper to build the thumbnail for a job.
-  /// Uses `thumbnail` if available, otherwise first photo, otherwise icon.
   Widget _buildJobThumbnail({
     required String? thumbnail,
     required List<String> photos,
@@ -78,48 +75,29 @@ class HomeScreenView extends StatelessWidget {
           // For Create job
           if (profileController.profile.value?.role == "manager")
             IconButton(
-              // 🔴 CHANGED: make this async & refresh jobs after pop
               onPressed: () async {
-                // Make sure StaffController exists before opening create screen
                 if (!Get.isRegistered<StaffController>()) {
-<<<<<<< HEAD:lib/src/module/home/ui/view/home_screen_ui.dart
-                  final profileRepo =
-                      Get.find<ProfileRepo>(); // get repo from DI
-                  Get.put(StaffController(repo: profileRepo)); //  pass repo
-=======
-                  final profileRepo = Get.find<ProfileRepo>(); // get repo from DI
-                  Get.put(StaffController(repo: profileRepo)); // pass repo
->>>>>>> 8228a10fd5dd3bf9fadce14d7a3447094d7c7490:lib/src/module/home/ui/screen/home_screen_ui.dart
+                  final profileRepo = Get.find<ProfileRepo>();
+                  Get.put(StaffController(repo: profileRepo));
                 }
-
-                // Open create screen and wait for result
                 final result = await Get.to(() => const EditJobScreen());
-
-                // If EditJobScreen popped with `true` => reload jobs
                 if (result == true) {
-                  // 🔸 Replace `fetchJobs()` with your actual refresh method
                   await jobController.fetchJobs();
-                  // e.g. if your method is `getJobs()` use:
-                  // await jobController.getJobs();
                 }
               },
               icon: const Icon(Icons.add, color: Colors.white),
             ),
-          // For Profile Image
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ObxValue(
-              (profile) {
-                debugPrint("UI avatarUrl: ${profile.value?.avatarUrl}");
-                return SmartNetworkImage.circle(
-                  key: UniqueKey(),
-                  imageUrl: profile.value?.avatarUrl ?? "",
-                  diameter: 40,
-                  errorWidget: Icon(Icons.person, size: 40),
-                );
-              },
-              profileController.profile
-            ),
+            child: ObxValue((profile) {
+              debugPrint("UI avatarUrl: ${profile.value?.avatarUrl}");
+              return SmartNetworkImage.circle(
+                key: UniqueKey(),
+                imageUrl: profile.value?.avatarUrl ?? "",
+                diameter: 40,
+                errorWidget: Icon(Icons.person, size: 40),
+              );
+            }, profileController.profile),
           ),
         ],
       ),
@@ -191,7 +169,11 @@ class HomeScreenView extends StatelessWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              staffjob.status,
+                                              staffjob.status
+                                                      .toString()
+                                                      .trim()
+                                                      .capitalizeFirst ??
+                                                  '',
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600,
@@ -323,11 +305,17 @@ class HomeScreenView extends StatelessWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              job.status,
+                                              job.status
+                                                      .toString()
+                                                      .trim()
+                                                      .capitalizeFirst ??
+                                                  '',
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600,
-                                                color: job.status == "active"
+                                                color:
+                                                    job.status.toLowerCase() ==
+                                                        "active"
                                                     ? Colors.green
                                                     : Colors.red,
                                               ),
@@ -370,18 +358,6 @@ class HomeScreenView extends StatelessWidget {
                                                 job.location,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                job.location,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
                                               ),
                                             ),
                                           ],

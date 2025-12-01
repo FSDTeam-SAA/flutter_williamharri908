@@ -30,24 +30,22 @@ class ForgotPasswordView extends StatelessWidget {
             Image.asset(Assets.appLogo, width: 150, height: 150),
             const SizedBox(height: 16),
             const Text(
+              maxLines: 3,
               "Select which contact details should we use to reset your password",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 60,
-              child: EmailTextfield(
-                onChanged: (value) => controller.email = value,
-                validationCheck: (value) {
-                  if (value.isEmpty) return "Please enter email";
-                  if (!value.contains("@")) return "Invalid email";
-                  return null;
-                },
-                labelText: "Email",
-                hintText: "Enter Your Email",
-                maxLines: 1,
-              ),
+            EmailTextfield(
+              onChanged: (value) => controller.email = value,
+              validationCheck: (value) {
+                if (value.isEmpty) return "Please enter email";
+                if (!value.contains("@")) return "Invalid email";
+                return null;
+              },
+              labelText: "Email",
+              hintText: "Enter Your Email",
+              maxLines: 1,
             ),
             const SizedBox(height: 30),
             RSaveButton(

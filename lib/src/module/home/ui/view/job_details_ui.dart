@@ -250,8 +250,7 @@ class JobDetailsUi extends StatelessWidget {
                         onTap: methodUrl == null
                             ? null
                             : () {
-                          // you can pass just the URL to a PDF viewer if you prefer
-                          Get.to(() => RamsDocumentScreen(job: job));
+                          Get.to(() => (job: job));
                         },
                       ),
 
@@ -261,7 +260,7 @@ class JobDetailsUi extends StatelessWidget {
                         onTap: riskUrl == null
                             ? null
                             : () {
-                          Get.to(() => RamsDocumentScreen(job: job));
+                          Get.to(() =>(job: job));
                         },
                       ),
                     ],

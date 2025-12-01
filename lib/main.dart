@@ -52,21 +52,10 @@ class _MyAppState extends State<MyApp> {
             return MaterialPageRoute(builder: (_) => SignUpView());
           case RouteNames.appground:
             return MaterialPageRoute(builder: (_) => const AppGround());
-          // case RouteNames.terms:
-          //   return MaterialPageRoute(
-          //       builder: (_) => const TermsConditionView());
-          // case RouteNames.forgotPassword:
-          //   return MaterialPageRoute(
-          //       builder: (_) => const ForgotPasswordView());
-          // case RouteNames.resetPassword:
-          //   return MaterialPageRoute(builder: (_) => const ResetPasswordView());
-
-          //return MaterialPageRoute(builder: (_) => const HomeView());
           default:
             return null;
         }
       },
-      home: const HomeScreenView(),
     );
   }
 }

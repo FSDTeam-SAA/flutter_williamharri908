@@ -177,26 +177,26 @@ class LoginView extends StatelessWidget {
         ),
       ),
 
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 100.0),
-        child: Container(
-          height: 50,
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.context(context).primaryColor),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Text(
-              'Join As A Manager',
-              style: TextStyle(
-                color: AppColors.context(context).primaryColor,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 100.0),
+      //   child: Container(
+      //     height: 50,
+      //     decoration: BoxDecoration(
+      //       border: Border.all(color: AppColors.context(context).primaryColor),
+      //       borderRadius: BorderRadius.circular(8),
+      //     ),
+      //     child: Center(
+      //       child: Text(
+      //         'Join As A Manager',
+      //         style: TextStyle(
+      //           color: AppColors.context(context).primaryColor,
+      //           fontWeight: FontWeight.w500,
+      //           fontSize: 16,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

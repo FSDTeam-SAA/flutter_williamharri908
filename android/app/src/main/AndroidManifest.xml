@@ -1,4 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Internet permission -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Image / File permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <application
         android:label="williamharri"
         android:name="${applicationName}"

@@ -51,6 +51,7 @@ class SignupController extends GetxController {
   SignupRequestParam get signupModel => SignupRequestParam(
     fullName: fullName.value,
     email: email.value,
+    username: email.value,
     number: number.value,
     address: address.value,
     password: password.value,
@@ -79,9 +80,11 @@ class SignupController extends GetxController {
 
       // Navigate to OTP screen if needed
       Get.to(() => OtpCodeView(email: email.value,));
-      snackbarNotifier?.notifySuccess(message: success.message);
+      snackbarNotifier?.notifySuccess(message: success);
       onDone?.call();
     },
+    processStatusNotifier: buttonNotifier,
+    
   );
 }
 

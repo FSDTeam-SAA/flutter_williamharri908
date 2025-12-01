@@ -24,7 +24,6 @@ class _SignUpViewState extends State<SignUpView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -62,8 +61,8 @@ class _SignUpViewState extends State<SignUpView> {
                 children: [
                   NameTextfield(
                     prefiexIcon: TextfieldPrefixIcon(assetName: Assets.user),
-                    labelText: "Name",
-                    hintText: "Enter Your Name",
+                    labelText: "Full Name",
+                    hintText: "Enter Your Full Name",
 
                     onChanged: (value) {},
                     validationCheck: (value) {
@@ -85,8 +84,8 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                   NameTextfield(
                     prefiexIcon: TextfieldPrefixIcon(assetName: Assets.user),
-                    labelText: "Name",
-                    hintText: "Enter Your Name",
+                    labelText: "Username",
+                    hintText: "Enter Your Username",
                     onChanged: signupController.setFullName,
                     validationCheck: (value) {
                       if (value.isEmpty) return "Please enter your name";
@@ -104,6 +103,8 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
 
                   PasswordTextfield(
+                    labelText: "Password",
+                    hintText: "Enter Password",
                     onChanged: signupController.setPassword,
                     validationCheck: (value) {
                       if (value.isEmpty) return "Please enter password!";
@@ -112,6 +113,8 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
 
                   PasswordTextfield(
+                    labelText: "Confirm Password",
+                    hintText: "Enter Confirm Password",
                     onChanged: signupController.setConfirmPassword,
                     validationCheck: (value) {
                       if (value.isEmpty) return "Please confirm password!";
@@ -200,31 +203,30 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 100.0),
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            text: "Already have an account ? ",
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            children: [
-              TextSpan(
-                text: "Sign In Here",
-                style: TextStyle(
-                  color: AppColors.context(context).primaryColor,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+              Center(
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: "Already have an account ? ",
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    children: [
+                      TextSpan(
+                        text: "Sign In Here",
+                        style: TextStyle(
+                          color: AppColors.context(context).primaryColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushNamed(context, RouteNames.login);
+                          },
+                      ),
+                    ],
+                  ),
                 ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.pushNamed(context, RouteNames.login);
-                  },
               ),
+              SizedBox(height: 80),
             ],
           ),
         ),

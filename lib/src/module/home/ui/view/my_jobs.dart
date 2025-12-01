@@ -117,7 +117,6 @@ class StaffMyJobs extends StatelessWidget {
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 8),
                               Row(
                                 children: [
@@ -125,14 +124,13 @@ class StaffMyJobs extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     job.job.title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 4),
                               Row(
                                 children: [
@@ -197,10 +195,11 @@ class StaffMyJobs extends StatelessWidget {
                         width: 60,
                         height: 60,
                         color: Colors.grey.shade300,
-                        child: job.photos.isNotEmpty
-                            ? Image.network(job.photos.first, fit: BoxFit.cover)
+                        child: job.thumbnail.isNotEmpty
+                            ? Image.network(job.thumbnail, fit: BoxFit.cover)
                             : const Icon(Icons.image, size: 40),
                       ),
+
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -216,18 +215,16 @@ class StaffMyJobs extends StatelessWidget {
                                   ),
                                 ),
                                 const Spacer(),
-                                // Text(
-                                //   job.scaffoldStatus ?? "Active",
-                                //   style: const TextStyle(
-                                //     fontSize: 16,
-                                //     fontWeight: FontWeight.w600,
-                                //   ),
-                                // ),
                                 Text(
-                                  job.jobStatus,
-                                  style: const TextStyle(
+                                  job.scaffoldStatus ?? "Active",
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
+                                    color:
+                                        (job.scaffoldStatus ?? "Active") ==
+                                            "Active"
+                                        ? Colors.green
+                                        : Colors.grey,
                                   ),
                                 ),
                               ],

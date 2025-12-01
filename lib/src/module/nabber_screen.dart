@@ -15,9 +15,9 @@ class _AppGroundState extends State<AppGround> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const HomeScreenView(),
-    const StaffMyJobs(),
-    const ProfileView(),
+    HomeScreenView(),
+    StaffMyJobs(),
+    ProfileView(),
   ];
 
   @override

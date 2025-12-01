@@ -61,6 +61,10 @@ class VerifyAccountViewController extends EmailVerifyOtpController {
         snackbarNotifier.notifySuccess(message: "Account verified successfully!");
         Get.to(() => LoginView());
       },
+      onError: (failure) {
+        prcessNotifier.setError();
+        snackbarNotifier.notifyError(message: failure.uiMessage);
+      },
     );
   }
 }
