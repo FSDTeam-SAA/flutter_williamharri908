@@ -61,7 +61,7 @@ class MyJobManagerController extends GetxController {
     result.fold(
       (failure) {
         isLoading.value = false;
-        Get.snackbar("Error", failure.uiMessage);
+        // Get.snackbar("Error", failure.uiMessage);
       },
       (success) {
         jobs.value = success;
