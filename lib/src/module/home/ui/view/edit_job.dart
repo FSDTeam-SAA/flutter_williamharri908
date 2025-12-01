@@ -59,7 +59,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     _descriptionCtrl = TextEditingController(text: widget.job.description);
     _priceCtrl = TextEditingController(text: widget.job.price.toString());
 
-    _existingPhotos = List<String>.from(widget.job.photos ?? []);
+    _existingPhotos = List<String>.from(widget.job.photos);
 
     // ✅ Get existing PDF URLs from JobModel
     _existingMethodStatementUrl = widget.job.methodStatement;   // <--- make sure JobModel has this

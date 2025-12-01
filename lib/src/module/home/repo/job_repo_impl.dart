@@ -4,7 +4,6 @@ import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/repo/job_repo.dart';
 import 'package:williamharri/src/module/home/model/create_job_model.dart';
-import 'package:williamharri/src/module/home/repo/job_repo.dart';
 
 base class JobRepoImpl extends JobRepo {
   JobRepoImpl({required this.appPigeon});

@@ -9,7 +9,6 @@ import 'package:williamharri/src/module/auth/ui/view/sign_up_view.dart';
 import 'package:williamharri/src/module/nabber_screen.dart';
 import 'app/splash_view.dart';
 import 'src/core/themes/themes.dart';
-import 'src/module/home/ui/view/home_screen_ui.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() {

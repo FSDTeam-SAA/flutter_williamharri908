@@ -75,14 +75,12 @@ final class ProfileRepoImpl extends ProfileRepo {
   ) async {
     return await asyncTryCatch(
       tryFunc: () async {
-        // First updates the profile
         final response = await appPigeon.patch(
           ApiEndpoints.updateUser,
           data: param.toUpdateProfileDetailsData(),
         );
-        // Then updates the avatar, if avatar file is not null
         if (param.avatar != null) {
-          final response2 = await appPigeon.patch(
+          await appPigeon.patch(
             ApiEndpoints.uploadProfileImage,
             data: await param.toUpdateAvatarData(),
           );

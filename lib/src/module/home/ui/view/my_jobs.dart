@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/component/image_cache/smart_network_image.dart';
 import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/controller/my_scaffold_job_controller.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
@@ -84,8 +85,19 @@ class StaffMyJobs extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Column(
-                          children: [Icon(Icons.image, size: 70), Text("data")],
+                        Column(
+                          children: [
+                            SmartNetworkImage(
+                              imageUrl: job.photos.first,
+                              height: 70,
+                              width: 70,
+                              errorWidget: const Icon(
+                                Icons.image,
+                                size: 70,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(width: 12),
