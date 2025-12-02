@@ -61,13 +61,14 @@ class JobDetailsScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               job.description,
+              maxLines: 5,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Job Photos
             const Text(
@@ -86,6 +87,27 @@ class JobDetailsScreen extends StatelessWidget {
 
             // Staff Submitted Section
             if (job.latestScaffold != null) ...[
+              // Description
+              const Text(
+                'Description',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                job.latestScaffold!.description,
+                maxLines: 5,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 12),
+
               const Text(
                 'Submitted Photos',
                 style: TextStyle(
@@ -98,9 +120,6 @@ class JobDetailsScreen extends StatelessWidget {
 
               _buildPhotoGrid(job.latestScaffold!.photos),
 
-              const SizedBox(height: 32),
-
-              // Signature Section
               const Text(
                 'Signature',
                 style: TextStyle(
@@ -189,7 +208,7 @@ class JobDetailsScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: photos.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
       ),
@@ -209,7 +228,6 @@ class JobDetailsScreen extends StatelessWidget {
     );
   }
 
-  /// Signature Widget
   Widget _buildSignature(String url) {
     if (url.isEmpty) {
       return const Text(
