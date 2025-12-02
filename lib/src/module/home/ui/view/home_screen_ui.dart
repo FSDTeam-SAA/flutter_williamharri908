@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:williamharri/src/core/component/image_cache/smart_network_image.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/controller/staff_all_jobs.controller.dart';
 import 'package:williamharri/src/module/home/ui/view/create_job.dart';
 import 'package:williamharri/src/module/home/ui/view/job_details_ui.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
-import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart'; // <-- StaffController
+import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
 class HomeScreenView extends StatelessWidget {
   const HomeScreenView({super.key});
+
   Widget _buildJobThumbnail({
     required String? thumbnail,
     required List<String> photos,
@@ -25,7 +25,6 @@ class HomeScreenView extends StatelessWidget {
     }
 
     if (url == null || url.isEmpty) {
-      // fallback: icon only
       return Column(
         children: const [
           Icon(Icons.image, size: 70),
@@ -56,13 +55,13 @@ class HomeScreenView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        centerTitle: false,
         backgroundColor: Colors.transparent,
+        centerTitle: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              profileController.profile.value?.username ?? "Unknown",
+              profileController.profile.value?.name ?? "Unknown",
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const Text(
@@ -72,10 +71,11 @@ class HomeScreenView extends StatelessWidget {
           ],
         ),
         actions: [
-          // For Create job
+          // ▶ Manager can create job
           if (profileController.profile.value?.role == "manager")
             IconButton(
               onPressed: () async {
+                // load staff list before open screen
                 if (!Get.isRegistered<StaffController>()) {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
@@ -88,296 +88,288 @@ class HomeScreenView extends StatelessWidget {
               icon: const Icon(Icons.add, color: Colors.white),
             ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ObxValue((profile) {
-              debugPrint("UI avatarUrl: ${profile.value?.avatarUrl}");
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Obx(() {
               return SmartNetworkImage.circle(
                 key: UniqueKey(),
-                imageUrl: profile.value?.avatarUrl ?? "",
+                imageUrl: profileController.profile.value?.avatarUrl ?? "",
                 diameter: 40,
-                errorWidget: Icon(Icons.person, size: 40),
+                errorWidget: const Icon(Icons.person, size: 40),
               );
-            }, profileController.profile),
+            }),
           ),
         ],
       ),
       body: Obx(() {
         final role = profileController.profile.value?.role;
+
         if (role == null) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        // ---------------- STAFF VIEW ----------------
         if (role == "staff") {
-          if (staffJobController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          return RefreshIndicator(
+            onRefresh: () async => staffJobController.fetchJobs(),
+            child: staffJobController.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : staffJobController.staffjobs.isEmpty
+                ? const Center(child: Text("No jobs found"))
+                : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "All Jobs",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: staffJobController.staffjobs.length,
+                            itemBuilder: (context, index) {
+                              final staffjob =
+                                  staffJobController.staffjobs[index];
 
-          if (staffJobController.staffjobs.isEmpty) {
-            return const Center(child: Text("No jobs found"));
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "All Jobs",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: staffJobController.staffjobs.length,
-                    itemBuilder: (context, index) {
-                      final staffjob = staffJobController.staffjobs[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: InkWell(
-                          onTap: () =>
-                              Get.to(() => JobDetailsUi(job: staffjob)),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: Colors.white),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildJobThumbnail(
-                                    thumbnail: staffjob.thumbnail,
-                                    photos: staffjob.photos,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: InkWell(
+                                  onTap: () =>
+                                      Get.to(() => JobDetailsUi(job: staffjob)),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                staffjob.companyName,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              staffjob.status
-                                                      .toString()
-                                                      .trim()
-                                                      .capitalizeFirst ??
-                                                  '',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color:
-                                                    staffjob.status == "active"
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                              ),
-                                            ),
-                                          ],
+                                        _buildJobThumbnail(
+                                          thumbnail: staffjob.thumbnail,
+                                          photos: staffjob.photos,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.business,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                staffjob.title,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      staffjob.companyName,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    staffjob
+                                                            .status
+                                                            .capitalize ??
+                                                        "",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color:
+                                                          staffjob.status
+                                                                  .toLowerCase() ==
+                                                              "active"
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.location_on_outlined,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                staffjob.location,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.business,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      staffjob.title,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      staffjob.location,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
           );
         }
-
-        // ---------------- MANAGER VIEW ----------------
         if (role == "manager") {
-          if (jobController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          return RefreshIndicator(
+            onRefresh: () async => jobController.fetchJobs(),
+            child: jobController.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : jobController.jobs.isEmpty
+                ? const Center(child: Text("No jobs found"))
+                : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "All Jobs",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: jobController.jobs.length,
+                            itemBuilder: (context, index) {
+                              final job = jobController.jobs[index];
 
-          if (jobController.jobs.isEmpty) {
-            return const Center(child: Text("No jobs found"));
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "All Jobs",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: jobController.jobs.length,
-                    itemBuilder: (context, index) {
-                      final job = jobController.jobs[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: InkWell(
-                          onTap: () => Get.to(() => JobDetailsUi(job: job)),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: Colors.white),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildJobThumbnail(
-                                    thumbnail: job.thumbnail,
-                                    photos: job.photos,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: InkWell(
+                                  onTap: () =>
+                                      Get.to(() => JobDetailsUi(job: job)),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
                                       children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                job.companyName,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              job.status
-                                                      .toString()
-                                                      .trim()
-                                                      .capitalizeFirst ??
-                                                  '',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color:
-                                                    job.status.toLowerCase() ==
-                                                        "active"
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                              ),
-                                            ),
-                                          ],
+                                        _buildJobThumbnail(
+                                          thumbnail: job.thumbnail,
+                                          photos: job.photos,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.business,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                job.title,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      job.companyName,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    job.status.capitalize ?? "",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color:
+                                                          job.status
+                                                                  .toLowerCase() ==
+                                                              "active"
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-
-                                        // LOCATION
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.location_on_outlined,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                job.location,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.business,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      job.title,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      job.location,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-
-                                        const SizedBox(height: 8),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
           );
         }
 

@@ -53,7 +53,6 @@ class StaffMyJobs extends StatelessWidget {
         if (role == null) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (role == "staff") {
           if (staffController.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
@@ -63,41 +62,152 @@ class StaffMyJobs extends StatelessWidget {
             return const Center(child: Text("No jobs found"));
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: staffController.jobs.length,
-            itemBuilder: (context, index) {
-              final GetMyScaffoldModel job = staffController.jobs[index];
+          return RefreshIndicator(
+            onRefresh: () async => await staffController.fetchJobs(),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: staffController.jobs.length,
+              itemBuilder: (context, index) {
+                final GetMyScaffoldModel job = staffController.jobs[index];
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: InkWell(
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: InkWell(
+                    onTap: () {
+                      Get.to(() => StaffScaffoldJobDetails(job: job));
+                    },
+
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SmartNetworkImage(
+                            imageUrl: job.photos.first,
+                            height: 70,
+                            width: 70,
+                            errorWidget: const Icon(Icons.image,
+                                size: 70, color: Colors.grey),
+                          ),
+
+                          const SizedBox(width: 12),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        job.job.companyName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      job.scaffoldStatus,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                Row(
+                                  children: [
+                                    const Icon(Icons.business, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      job.job.title,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 4),
+
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      job.job.location,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        }
+        if (role == "manager") {
+          if (managerController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (managerController.jobs.isEmpty) {
+            return const Center(child: Text("No jobs found"));
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async => await managerController.fetchJobs(),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: managerController.jobs.length,
+              itemBuilder: (context, index) {
+                final JobModelManager job = managerController.jobs[index];
+
+                return GestureDetector(
                   onTap: () {
-                    Get.to(() => StaffScaffoldJobDetails(job: job));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JobDetailsScreen(job: job),
+                      ),
+                    );
                   },
-
                   child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          children: [
-                            SmartNetworkImage(
-                              imageUrl: job.photos.first,
-                              height: 70,
-                              width: 70,
-                              errorWidget: const Icon(
-                                Icons.image,
-                                size: 70,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
+                        Container(
+                          width: 60,
+                          height: 60,
+                          color: Colors.grey.shade300,
+                          child: job.thumbnail.isNotEmpty
+                              ? Image.network(job.thumbnail, fit: BoxFit.cover)
+                              : const Icon(Icons.image, size: 40),
                         ),
 
                         const SizedBox(width: 12),
@@ -108,48 +218,51 @@ class StaffMyJobs extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      job.job.companyName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
                                   Text(
-                                    job.scaffoldStatus,
+                                    job.companyName,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(Icons.business, size: 16),
-                                  const SizedBox(width: 4),
+                                  const Spacer(),
                                   Text(
-                                    job.job.title,
+                                    job.scaffoldStatus ?? "Active",
                                     style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: (job.scaffoldStatus ?? "Active") ==
+                                              "Active"
+                                          ? Colors.green
+                                          : Colors.grey,
                                     ),
                                   ),
                                 ],
                               ),
+
                               const SizedBox(height: 4),
+
                               Row(
                                 children: [
-                                  Icon(Icons.location_on, size: 16),
+                                  const Icon(Icons.business,
+                                      size: 16, color: Colors.grey),
                                   const SizedBox(width: 4),
                                   Text(
-                                    job.job.location,
+                                    job.title,
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 4),
+
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on,
+                                      size: 16, color: Colors.grey),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    job.location,
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
@@ -163,122 +276,9 @@ class StaffMyJobs extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              );
-            },
-          );
-        }
-
-        // --------------------------------------------------
-        if (role == "manager") {
-          if (managerController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (managerController.jobs.isEmpty) {
-            return const Center(child: Text("No jobs found"));
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: managerController.jobs.length,
-            itemBuilder: (context, index) {
-              final JobModelManager job = managerController.jobs[index];
-
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => JobDetailsScreen(job: job),
-                    ),
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey.shade300,
-                        child: job.thumbnail.isNotEmpty
-                            ? Image.network(job.thumbnail, fit: BoxFit.cover)
-                            : const Icon(Icons.image, size: 40),
-                      ),
-
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  job.companyName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  job.scaffoldStatus ?? "Active",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        (job.scaffoldStatus ?? "Active") ==
-                                            "Active"
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.business,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(job.title, style: TextStyle(fontSize: 15)),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  job.location,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
 

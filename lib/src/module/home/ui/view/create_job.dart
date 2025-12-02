@@ -15,8 +15,8 @@ import 'package:williamharri/src/module/profile/model/profile_model.dart';
 class EditJobScreen extends StatefulWidget {
   const EditJobScreen({
     super.key,
-    this.jobId, // null = create mode, not null = edit mode
-    this.job, // existing job data to prefill (optional)
+    this.jobId,
+    this.job,
   });
 
   final String? jobId;

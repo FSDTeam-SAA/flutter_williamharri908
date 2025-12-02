@@ -2,6 +2,41 @@ import 'package:get/get.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/repo/job_repo.dart';
 
+// class StaffJobController extends GetxController {
+//   StaffJobController({required this.jobRepo});
+
+//   final JobRepo jobRepo;
+
+//   RxList<JobModel> staffjobs = <JobModel>[].obs;
+//   RxBool isLoading = false.obs;
+
+//   @override
+//   void onInit() {
+//     super.onInit();
+//     fetchJobs();
+//   }
+
+//   Future<void> fetchJobs() async {
+//     isLoading.value = true;
+
+//     final result = await jobRepo.getStaffJobs();
+
+//     result.fold(
+//       (failure) {
+//         isLoading.value = false;
+//         Get.snackbar("Error", failure.uiMessage);
+//       },
+//       (success) {
+//         isLoading.value = false;
+//         staffjobs.value = success;
+//       },
+//     );
+
+//     isLoading.value = false;
+//   }
+// }
+
+
 class StaffJobController extends GetxController {
   StaffJobController({required this.jobRepo});
 
@@ -17,21 +52,21 @@ class StaffJobController extends GetxController {
   }
 
   Future<void> fetchJobs() async {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    final result = await jobRepo.getStaffJobs();
+      final result = await jobRepo.getStaffJobs();
 
-    result.fold(
-      (failure) {
-        isLoading.value = false;
-        Get.snackbar("Error", failure.uiMessage);
-      },
-      (success) {
-        isLoading.value = false;
-        staffjobs.value = success;
-      },
-    );
-
-    isLoading.value = false;
+      result.fold(
+        (failure) {
+          Get.snackbar("Error", failure.uiMessage);
+        },
+        (success) {
+          staffjobs.assignAll(success);
+        },
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

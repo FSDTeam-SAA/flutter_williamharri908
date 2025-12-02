@@ -3,7 +3,10 @@ import 'package:williamharri/app/app_manager.dart';
 import 'package:williamharri/src/core/routing/route_names.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
+import 'package:williamharri/src/module/auth/controller/login_controller.dart';
 import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
+import 'package:williamharri/src/module/home/controller/job_controller.dart';
+import 'package:williamharri/src/module/home/controller/staff_all_jobs.controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
 
@@ -31,42 +34,39 @@ class ProfileController extends GetxController {
 
       final result = await repo.getProfile(userId);
 
-      result.fold(
-        (failure) => print("Error: $failure"),
-        (success) {
-          profile.value = success.data;
-          print("PROFILE LOADED: ${profile.value?.username}, url: ${profile.value?.avatarUrl}");
-        },
-      );
+      result.fold((failure) => print("Error: $failure"), (success) {
+        profile.value = success.data;
+        print(
+          "PROFILE LOADED: ${profile.value?.username}, url: ${profile.value?.avatarUrl}",
+        );
+      });
     }
   }
 
   Future<void> logoutUser() async {
-  isLoading.value = true;
+    isLoading.value = true;
 
-  final result = await Get.find<AuthRepo>().logout();
+    final result = await Get.find<AuthRepo>().logout();
 
-  result.fold(
-    (failure) {
-      isLoading.value = false;
-      Get.snackbar("Error", failure.uiMessage);
-    },
-    (success) async {
-      isLoading.value = false;
+    result.fold(
+      (failure) {
+        isLoading.value = false;
+        Get.snackbar("Error", failure.uiMessage);
+      },
+      (success) async {
+        isLoading.value = false;
+        Get.delete<ProfileController>(force: true);
+        Get.delete<JobController>(force: true);
+        Get.delete<StaffJobController>(force: true);
+        Get.delete<LoginController>(force: true);
+        Get.offAllNamed(RouteNames.login);
 
-      // Clear all saved auth data
-      // await Get.find<AppManager>().logout(); 
-
-      // Go to Login screen
-      Get.offAllNamed(RouteNames.login);
-
-      Get.snackbar(
-        "Success", 
-        success.message,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    },
-  );
-}
-
+        Get.snackbar(
+          "Success",
+          success.message,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+    );
+  }
 }

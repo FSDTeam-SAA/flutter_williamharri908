@@ -23,6 +23,7 @@ final class AuthRepoImpl extends AuthRepo {
           ApiEndpoints.login,
           data: params.toJson(),
         );
+        debugPrint("login response: ${response.data}");
         final body = response.data;
         final loginResponse = LoginResponse.fromMap(body);
         await appPigeon.saveNewAuth(

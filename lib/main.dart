@@ -5,9 +5,7 @@ import 'package:williamharri/src/core/di/external_service_di.dart';
 import 'package:williamharri/src/core/di/interface_dependency_injection.dart';
 import 'package:williamharri/src/core/routing/route_names.dart';
 import 'package:williamharri/src/module/auth/ui/view/login_view.dart';
-import 'package:williamharri/src/module/auth/ui/view/sign_up_view.dart';
 import 'package:williamharri/src/module/nabber_screen.dart';
-import 'app/splash_view.dart';
 import 'src/core/themes/themes.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -44,11 +42,11 @@ class _MyAppState extends State<MyApp> {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case RouteNames.splash:
-            return MaterialPageRoute(builder: (_) => SplashView());
+            // return MaterialPageRoute(builder: (_) => SplashView());
           case RouteNames.login:
             return MaterialPageRoute(builder: (_) => LoginView());
-          case RouteNames.signup:
-            return MaterialPageRoute(builder: (_) => SignUpView());
+          // case RouteNames.signup:
+            // return MaterialPageRoute(builder: (_) => SignUpView());
           case RouteNames.appground:
             return MaterialPageRoute(builder: (_) => const AppGround());
           default:

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
-
-// ⬇️ add these imports
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 
@@ -21,7 +18,6 @@ class JobDetailsUi extends StatelessWidget {
     final controller = Get.find<ProfileController>();
     final jobsController = Get.find<JobController>();
 
-    // ---------------- THUMBNAIL IMAGE ----------------
     ImageProvider? avatarImage;
     if (job.thumbnail != null && job.thumbnail!.isNotEmpty) {
       avatarImage = NetworkImage(job.thumbnail!);
@@ -39,7 +35,6 @@ class JobDetailsUi extends StatelessWidget {
 
             IconButton(
               onPressed: () async {
-                // ✅ make sure StaffController exists before opening EditJobScreen
                 if (!Get.isRegistered<StaffController>()) {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
@@ -133,7 +128,7 @@ class JobDetailsUi extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                job.title,
+                                job.companyName,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -162,7 +157,7 @@ class JobDetailsUi extends StatelessWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                job.companyName,
+                                job.title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

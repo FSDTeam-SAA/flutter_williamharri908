@@ -5,9 +5,9 @@ import 'package:get/get.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/module/auth/controller/login_controller.dart';
 import 'package:williamharri/src/module/auth/ui/view/forgot_password.dart';
+import 'package:williamharri/src/module/auth/ui/view/sign_up_view.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../../core/notifiers/snackbar_notifier.dart';
-import '../../../../core/routing/route_names.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -15,9 +15,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController controller = Get.put(
-      LoginController(
-        SnackbarNotifier(context: context)
-      ),
+      LoginController(SnackbarNotifier(context: context)),
     );
 
     return Scaffold(
@@ -43,8 +41,6 @@ class LoginView extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
-                // Text('Email Address', style: const TextStyle(fontSize: 16)),
-                const SizedBox(height: 8),
                 TextFormField(
                   controller: controller.emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -165,7 +161,12 @@ class LoginView extends StatelessWidget {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, RouteNames.signup);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignUpView(),
+                              ),
+                            );
                           },
                       ),
                     ],
@@ -176,27 +177,6 @@ class LoginView extends StatelessWidget {
           ),
         ),
       ),
-
-      // bottomNavigationBar: Padding(
-      //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 100.0),
-      //   child: Container(
-      //     height: 50,
-      //     decoration: BoxDecoration(
-      //       border: Border.all(color: AppColors.context(context).primaryColor),
-      //       borderRadius: BorderRadius.circular(8),
-      //     ),
-      //     child: Center(
-      //       child: Text(
-      //         'Join As A Manager',
-      //         style: TextStyle(
-      //           color: AppColors.context(context).primaryColor,
-      //           fontWeight: FontWeight.w500,
-      //           fontSize: 16,
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }
