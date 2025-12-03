@@ -73,7 +73,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                   NameTextfield(
                     prefiexIcon: TextfieldPrefixIcon(assetName: Assets.phone),
-                    labelText: "Ener Phone Number",
+                    labelText: "Enter Phone Number",
                     hintText: "Enter Phone Number",
 
                     onChanged: (value) {},
