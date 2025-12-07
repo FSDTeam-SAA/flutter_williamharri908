@@ -14,7 +14,7 @@ abstract base class ApplicationRepo extends BaseRepository {
 
   FutureRequest<List<JobModelManager>> myJobsManager();
 
-  FutureRequest<Success> scaffoldUpdate(
-    UpdateStaffScafoldParam param,
-  );
+  FutureRequest<Success> scaffoldUpdate(UpdateStaffScafoldParam param);
+
+  FutureRequest<String> completeScaffold(JobModelManager param);
 }

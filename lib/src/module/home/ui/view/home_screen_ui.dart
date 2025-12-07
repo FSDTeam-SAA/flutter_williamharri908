@@ -147,7 +147,8 @@ class HomeScreenView extends StatelessWidget {
                                     ),
                                     child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         _buildJobThumbnail(
                                           thumbnail: staffjob.thumbnail,
@@ -180,12 +181,9 @@ class HomeScreenView extends StatelessWidget {
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
-                                                      color:
-                                                          staffjob.status
-                                                                  .toLowerCase() ==
-                                                              "active"
-                                                          ? Colors.green
-                                                          : Colors.red,
+                                                      color: getStatusColor(
+                                                        staffjob.status,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -310,12 +308,9 @@ class HomeScreenView extends StatelessWidget {
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
-                                                      color:
-                                                          job.status
-                                                                  .toLowerCase() ==
-                                                              "active"
-                                                          ? Colors.green
-                                                          : Colors.red,
+                                                      color: getStatusColor(
+                                                        job.status,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -376,5 +371,22 @@ class HomeScreenView extends StatelessWidget {
         return const Center(child: Text("Unknown role"));
       }),
     );
+  }
+}
+
+Color getStatusColor(String? status) {
+  if (status == null) return Colors.grey;
+
+  switch (status.toLowerCase()) {
+    case 'completed':
+      return Colors.green;
+    case 'accepted':
+      return Colors.greenAccent;
+    case 'pending':
+      return Colors.orange;
+    case 'rejected':
+      return Colors.red;
+    default:
+      return Colors.grey;
   }
 }

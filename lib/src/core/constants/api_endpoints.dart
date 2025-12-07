@@ -57,6 +57,8 @@ base class ApiEndpoints {
   static const String submitScaffold = _Application.application;
   static const String myScaffoldList = _Application.myScaffoldList;
   static String scaffoldUpdate(String id) => _Application.scaffoldUpdate(id);
+
+  static String completeScaffold(String id) => _Application.completeScaffold(id);
 }
 
 class _RemoteServer {
@@ -130,5 +132,6 @@ class _Application {
   static const String application = '$_applicationRoute/';
   static const String myScaffoldList = '$_applicationRoute/mine';
   static String scaffoldUpdate(String id) => '$_applicationRoute/$id';
+  static String completeScaffold(String id) => '$_applicationRoute/$id/complete';
 
 }

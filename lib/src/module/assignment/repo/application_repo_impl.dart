@@ -69,4 +69,19 @@ base class ApplicationRepoImpl extends ApplicationRepo {
       },
     );
   }
+
+  @override
+  FutureRequest<String> completeScaffold(JobModelManager param) async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        final response = await appPigeon.patch(
+          ApiEndpoints.completeScaffold(param.latestScaffold!.id),
+          data: {"scaffoldId": param.latestScaffold!.id},
+        );
+        final body = response.data;
+        final status = body["data"]["scaffoldStatus"] ?? "";
+        return status;
+      },
+    );
+  }
 }

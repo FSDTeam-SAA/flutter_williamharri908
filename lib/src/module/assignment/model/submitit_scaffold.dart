@@ -6,6 +6,7 @@ class SubmititScaffoldModel {
   final bool termsAccepted;
   final List<String> photos;
   final String signature;
+  final String? scaffoldStatus;
 
   SubmititScaffoldModel({
     required this.jobid,
@@ -15,6 +16,7 @@ class SubmititScaffoldModel {
     required this.termsAccepted,
     required this.photos,
     required this.signature,
+    this.scaffoldStatus,
   });
 
   Map<String, dynamic> toJson() {
@@ -26,6 +28,7 @@ class SubmititScaffoldModel {
       'termsAccepted': termsAccepted,
       'photos': photos,
       'signatureUrl': signature,
+      'scaffoldStatus': scaffoldStatus,
     };
   }
 }

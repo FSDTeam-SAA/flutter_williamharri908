@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
 import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
 class JobDetailsScreen extends StatelessWidget {
   final JobModelManager job;
 
-  const JobDetailsScreen({super.key, required this.job});
+  JobDetailsScreen({super.key, required this.job});
+  final controller = Get.find<MyJobManagerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +137,28 @@ class JobDetailsScreen extends StatelessWidget {
               SizedBox(height: 32),
               Row(
                 children: [
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: () => Get.back(),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Color(0xFFF99B07),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(12),
+                  //       ),
+                  //     ),
+                  //     child: const Text(
+                  //       'Complete',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 18,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () => controller.markComplete(job),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFF99B07),
                         shape: RoundedRectangleBorder(
@@ -154,6 +175,7 @@ class JobDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
