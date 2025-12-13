@@ -34,8 +34,9 @@ base class BaseRepository {
       );
     } on DioException catch (e) {
       debugPrint(".. \n..\n");
-      debugPrint(e.response?.data["message"].toString());
+      debugPrint(e.toString());
       debugPrint(".. \n..\n");
+      debugPrint("Stack trace: ${e.stackTrace}");
       //debugger?.dekhao("DioFailure $e");
       switch (e.type) {
         case DioExceptionType.connectionTimeout:

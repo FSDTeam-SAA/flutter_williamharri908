@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 base class ApiEndpoints {
-  static const String socketUrl = _LocalHostWifi.socketUrl;
+  static const String socketUrl = _HostedClientServer.socketUrl;
 
-  static const String baseUrl = _LocalHostWifi.baseUrl;
+  static const String baseUrl = _HostedClientServer.baseUrl;
 
   // ---------------------- AUTH -----------------------------
   static const String login = _Auth.login;
@@ -14,7 +14,6 @@ base class ApiEndpoints {
   static const String changePassword = _Auth.changePassword;
   static const String createNewPassword = _Auth.resetPassword;
   static const String refreshToken = _Auth.refreshToken;
-
   static const String logout = _Auth.logout;
 
   // ---------------------- USER -----------------------------
@@ -61,7 +60,7 @@ base class ApiEndpoints {
   static String completeScaffold(String id) => _Application.completeScaffold(id);
 }
 
-class _RemoteServer {
+class _FreeServer {
   static const String socketUrl =
       'https://williamharri-backend-anlh.onrender.com'
       '';
@@ -70,9 +69,12 @@ class _RemoteServer {
       'https://williamharri-backend-anlh.onrender.com/api'
       '';
 
-  // static const String baseUrl =
-  //     'http://10.10.5.89:8001/api'
-  //     ;
+}
+
+class _HostedClientServer {
+  static const String socketUrl = 'https://api.williamjamesscaffoldingapp.com';
+
+  static const String baseUrl = 'https://api.williamjamesscaffoldingapp.com/api';
 }
 
 class _LocalHostWifi {

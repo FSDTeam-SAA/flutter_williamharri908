@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
+import 'package:williamharri/src/module/home/ui/view/job_pdf_viewer.dart';
 import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
 import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
@@ -245,7 +246,8 @@ class JobDetailsUi extends StatelessWidget {
                         onTap: methodUrl == null
                             ? null
                             : () {
-                          Get.to(() => (job: job));
+                          debugPrint("Method URL: $methodUrl");
+                          Get.to(() => JobPdfViewerScreen(url: methodUrl, title: "Method Statement"));
                         },
                       ),
 
@@ -255,7 +257,7 @@ class JobDetailsUi extends StatelessWidget {
                         onTap: riskUrl == null
                             ? null
                             : () {
-                          Get.to(() =>(job: job));
+                          Get.to(() => JobPdfViewerScreen(url: methodUrl!, title: "Risk Assessment"));
                         },
                       ),
                     ],

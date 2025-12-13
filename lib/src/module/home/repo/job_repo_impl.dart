@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:williamharri/src/core/api_handler/request.dart';
+import 'package:williamharri/src/core/api_handler/success.dart';
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
@@ -9,6 +14,12 @@ base class JobRepoImpl extends JobRepo {
   JobRepoImpl({required this.appPigeon});
 
   final AppPigeon appPigeon;
+  final Dio dio = Dio(
+    BaseOptions(
+      connectTimeout: Duration(seconds: 120),
+      receiveTimeout: Duration(seconds: 120),
+    ),
+  );
 
   @override
   FutureRequest<List<JobModel>> getJobs() async {
@@ -95,6 +106,25 @@ base class JobRepoImpl extends JobRepo {
 
         // nothing to return (void)
         return;
+      },
+    );
+  }
+
+  @override
+  FutureRequest<Success<File>> downloadPdf(String url) {
+    return asyncTryCatch(
+      tryFunc: () async {
+        final tempDir = await getApplicationDocumentsDirectory(); 
+        final filepath = '${tempDir.path}/sample${DateTime.now().toIso8601String()}.pdf';
+
+        await dio.download(
+          url,
+          filepath, // Data get saved to this path
+          options: Options(
+            responseType: ResponseType.bytes,
+          ),
+        );
+        return Success(data: File(filepath));
       },
     );
   }
