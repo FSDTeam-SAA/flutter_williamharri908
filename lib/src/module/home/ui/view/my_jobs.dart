@@ -87,7 +87,7 @@ class StaffMyJobs extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SmartNetworkImage(
-                            imageUrl: job.photos.first,
+                            imageUrl: job.job.thumbnail,
                             height: 70,
                             width: 70,
                             errorWidget: const Icon(Icons.image,

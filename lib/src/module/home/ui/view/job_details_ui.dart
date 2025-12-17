@@ -1,23 +1,86 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/module/home/model/job_cart_model.dart';
-import 'package:williamharri/src/module/home/ui/view/job_pdf_viewer.dart';
-import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
+import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
+import 'package:williamharri/src/module/home/model/job_cart_model.dart';
 
-class JobDetailsUi extends StatelessWidget {
-  final JobModel job;
+class FullImageViewScreen extends StatelessWidget {
+  final String imageUrl;
+  const FullImageViewScreen({super.key, required this.imageUrl});
 
-  const JobDetailsUi({super.key, required this.job});
+  bool get isNetwork => imageUrl.startsWith('http');
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ProfileController>();
-    final jobsController = Get.find<JobController>();
+    final image = isNetwork ? Image.network(imageUrl) : Image.file(File(imageUrl));
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: InteractiveViewer(maxScale: 5, child: image),
+      ),
+    );
+  }
+}
+
+class JobPdfViewerScreen extends StatelessWidget {
+  final String url;
+  final String title;
+
+  const JobPdfViewerScreen({super.key, required this.url, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final pdfUrl = "https://docs.google.com/gview?embedded=true&url=$url";
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: WebViewPlaceholder(pdfUrl: pdfUrl),
+    );
+  }
+}
+
+class WebViewPlaceholder extends StatelessWidget {
+  final String pdfUrl;
+  const WebViewPlaceholder({super.key, required this.pdfUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('PDF will load from: $pdfUrl'));
+  }
+}
+
+class JobDetailsUi extends StatelessWidget {
+  final JobModel job;
+  const JobDetailsUi({super.key, required this.job});
+
+  bool isPdf(String url) => url.toLowerCase().endsWith('.pdf');
+  bool isImage(String url) =>
+      url.toLowerCase().endsWith('.png') ||
+      url.toLowerCase().endsWith('.jpg') ||
+      url.toLowerCase().endsWith('.jpeg') ||
+      url.toLowerCase().endsWith('.webp');
+
+  void openAttachment({required String url, required String title}) {
+    if (isPdf(url)) {
+      Get.to(() => JobPdfViewerScreen(url: url, title: title));
+    } else if (isImage(url)) {
+      Get.to(() => FullImageViewScreen(imageUrl: url));
+    } else {
+      Get.snackbar("Unsupported file", "Cannot open this file type");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profileController = Get.find<ProfileController>();
 
     ImageProvider? avatarImage;
     if (job.thumbnail != null && job.thumbnail!.isNotEmpty) {
@@ -26,349 +89,151 @@ class JobDetailsUi extends StatelessWidget {
       avatarImage = NetworkImage(job.photos.first);
     }
 
+    final attachments = <Map<String, String>>[];
+    if (job.methodStatementUrl.isNotEmpty) attachments.add({'Method Statement': job.methodStatementUrl});
+    if (job.riskAssessmentUrl.isNotEmpty) attachments.add({'Risk Assessment': job.riskAssessmentUrl});
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Job Details"),
         backgroundColor: Colors.transparent,
         actions: [
-          if (controller.profile.value?.role == "manager")
-
-
+          if (profileController.profile.value?.role == "manager")
             IconButton(
+              icon: const Icon(Icons.edit_outlined, color: Colors.orange),
               onPressed: () async {
                 if (!Get.isRegistered<StaffController>()) {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
                 }
                 final updated = await Get.to<bool>(() => EditJobScreen(job: job));
-
                 if (updated == true) {
-
                   Get.snackbar(
                     'Job updated',
                     'Job has been updated successfully.',
                     snackPosition: SnackPosition.TOP,
                     backgroundColor: Colors.green.shade600,
                     colorText: Colors.white,
-                    margin: const EdgeInsets.all(16),
-                    borderRadius: 8,
                   );
                 }
               },
-              icon: const Icon(
-                Icons.edit_outlined,
-                color: Colors.orange,
-              ),
             ),
-
-
-
-          if (controller.profile.value?.role == "manager")
+          if (profileController.profile.value?.role == "manager")
             IconButton(
-              icon: const Icon(
-                Icons.delete_forever_outlined,
-                color: Colors.red,
-              ),
+              icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
               onPressed: () async {
                 final confirm = await Get.dialog<bool>(
                   AlertDialog(
                     title: const Text('Delete job'),
-                    content: const Text(
-                      'Are you sure you want to delete this job?',
-                    ),
+                    content: const Text('Are you sure you want to delete this job?'),
                     actions: [
-                      TextButton(
-                        onPressed: () => Get.back(result: false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Get.back(result: true),
-                        child: const Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
+                      TextButton(onPressed: () => Get.back(result: false), child: const Text('Cancel')),
+                      TextButton(onPressed: () => Get.back(result: true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
                     ],
                   ),
                 );
-
-                if (confirm != true) return;
-
-                await jobsController.deleteJob(job.id);
+                if (confirm == true) {
+                  Get.find<JobController>().deleteJob(job.id);
+                }
               },
             ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            spacing: 15,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-
-              // HEADER INFO
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundColor: avatarImage == null
-                        ? Colors.blue
-                        : Colors.transparent,
-                    backgroundImage: avatarImage,
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title + Price
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                job.companyName,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "£ ${job.price}",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        // Company
-                        Row(
-                          children: [
-                            const Icon(Icons.business),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                job.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        // Location
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                job.location,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // DESCRIPTION
-              const Text(
-                "Description",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                job.description.isEmpty
-                    ? "No description available"
-                    : job.description,
-                textAlign: TextAlign.justify,
-                maxLines: 40,
-                style: const TextStyle(fontSize: 14),
-              ),
-
-              const SizedBox(height: 20),
-
-
-              // ---------------- RAMS DOCUMENTS (PDFs) ----------------
-              Builder(
-                builder: (_) {
-                  // figure out effective URLs (prefer the nullable fields, fall back to *Url)
-                  final String? methodUrl = (job.methodStatement != null &&
-                      job.methodStatement!.trim().isNotEmpty)
-                      ? job.methodStatement!.trim()
-                      : (job.methodStatementUrl.trim().isNotEmpty
-                      ? job.methodStatementUrl.trim()
-                      : null);
-
-                  final String? riskUrl = (job.riskAssessment != null &&
-                      job.riskAssessment!.trim().isNotEmpty)
-                      ? job.riskAssessment!.trim()
-                      : (job.riskAssessmentUrl.trim().isNotEmpty
-                      ? job.riskAssessmentUrl.trim()
-                      : null);
-
-                  // if both are null/empty, you can hide the whole block
-                  if (methodUrl == null && riskUrl == null) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return Column(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // HEADER
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(radius: 35, backgroundImage: avatarImage, backgroundColor: avatarImage == null ? Colors.blue : null),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Documents",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 10),
-
-                      _pdfTile(
-                        label: "Method Statement",
-                        enabled: methodUrl != null,
-                        onTap: methodUrl == null
-                            ? null
-                            : () {
-                          debugPrint("Method URL: $methodUrl");
-                          Get.to(() => JobPdfViewerScreen(url: methodUrl, title: "Method Statement"));
-                        },
-                      ),
-
-                      _pdfTile(
-                        label: "Risk Assessment",
-                        enabled: riskUrl != null,
-                        onTap: riskUrl == null
-                            ? null
-                            : () {
-                          Get.to(() => JobPdfViewerScreen(url: methodUrl!, title: "Risk Assessment"));
-                        },
-                      ),
+                      Text(job.companyName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Text(job.title, style: const TextStyle(fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text(job.location, style: const TextStyle(fontSize: 14)),
                     ],
-                  );
-                },
-              ),
-
-
-              const SizedBox(height: 20),
-
-              // PHOTOS
-              const Text(
-                "Photos",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 100,
-                child: job.photos.isEmpty
-                    ? const Text("No photos available")
-                    : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: job.photos.length,
-                  itemBuilder: (_, index) {
-                    final photoUrl = job.photos[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Container(
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.grey.shade300,
-                        ),
-                        child: Image.network(photoUrl, fit: BoxFit.cover),
-                      ),
-                    );
-                  },
+                  ),
                 ),
-              ),
+              ],
+            ),
+            const SizedBox(height: 20),
 
-              const SizedBox(height: 20),
+            const Text("Description", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Text(job.description.isEmpty ? "No description available" : job.description, style: const TextStyle(fontSize: 14)),
 
-              if (controller.profile.value?.role == "staff")
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF99B07),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          Get.to(() => RamsDocumentScreen(job: job));
-                        },
-                        child: const Text(
-                          "Accept",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+            const SizedBox(height: 20),
+            // ATTACHMENTS
+            if (attachments.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Documents", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  for (var map in attachments)
+                    _pdfTile(
+                      label: map.keys.first,
+                      enabled: map.values.first.isNotEmpty,
+                      onTap: () => openAttachment(url: map.values.first, title: map.keys.first),
                     ),
-                    const SizedBox(width: 10),
-                  ],
-                ),
-            ],
-          ),
+                ],
+              ),
+            const SizedBox(height: 20),
+            // PHOTOS
+            const Text("Photos", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 100,
+              child: job.photos.isEmpty
+                  ? const Text("No photos available")
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: job.photos.length,
+                      itemBuilder: (_, index) {
+                        final photoUrl = job.photos[index];
+                        return GestureDetector(
+                          onTap: () => openAttachment(url: photoUrl, title: "Photo ${index + 1}"),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(photoUrl, width: 100, height: 100, fit: BoxFit.cover),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-
-Widget _pdfTile({
-  required String label,
-  required bool enabled,
-  required VoidCallback? onTap,
-}) {
+// PDF Tile widget
+Widget _pdfTile({required String label, required bool enabled, required VoidCallback? onTap}) {
   return Opacity(
     opacity: enabled ? 1 : 0.5,
     child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F1F1F),
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: BoxDecoration(color: const Color(0xFF1F1F1F), borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
-          const Icon(
-            Icons.picture_as_pdf,
-            color: Colors.red,
-          ),
+          const Icon(Icons.picture_as_pdf, color: Colors.red),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500))),
           IconButton(
-            icon: Icon(
-              Icons.remove_red_eye_outlined,
-              color: enabled ? Colors.green : Colors.grey,
-            ),
+            icon: Icon(Icons.remove_red_eye_outlined, color: enabled ? Colors.green : Colors.grey),
             onPressed: enabled ? onTap : null,
           ),
         ],

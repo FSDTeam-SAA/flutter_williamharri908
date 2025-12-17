@@ -10,7 +10,7 @@ import 'package:williamharri/src/module/auth/repo/auth_repo.dart';
 class LoginController extends GetxController {
   // UI Notifiers
   final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
-    initialStatus: DisabledStatus(),
+    initialStatus: EnabledStatus(),
   );
   final SnackbarNotifier snackbarNotifier;
 
@@ -75,35 +75,37 @@ class LoginController extends GetxController {
   void toggleKeepSignedIn(bool value) {
     keepSignedIn.value = value;
   }
-
   Future<void> login({required VoidCallback needVerifyAccount}) async {
-    if (!formKey.currentState!.validate()) return;
+  if (!formKey.currentState!.validate()) return;
 
-    isLoading.value = true;
-    processStatusNotifier.setLoading();
+  isLoading.value = true;
+  processStatusNotifier.setLoading();
 
-    try {
-      final lr = await Get.find<AuthRepo>().login(
-        LoginRequestParams(email: email, password: password),
-      );
+  try {
+    final lr = await Get.find<AuthRepo>().login(
+      LoginRequestParams(
+        email: email,
+        password: password,
+      ),
+    );
 
-      lr.fold(
-        (error) {
-          // Handle errors
-          processStatusNotifier.setError();
-          snackbarNotifier.notifyError(message: error.uiMessage);
-          isLoading.value = false;
-        },
-        (success) {
-          // Handle success
-          processStatusNotifier.setSuccess(message: success.message);
-          // Navigate to dashboard/home
-          Get.offAllNamed(RouteNames.appground);
-          
-        },
-      );
-    } finally {
-      isLoading.value = false;
-    }
+    lr.fold(
+      (error) {
+        processStatusNotifier.setError();
+        snackbarNotifier.notifyError(message: error.uiMessage);
+      },
+      (success) {
+        processStatusNotifier.setSuccess(message: success.message);
+        snackbarNotifier.notifySuccess(message: success.message);
+        Get.offAllNamed(RouteNames.appground);
+      },
+    );
+  } catch (e) {
+    processStatusNotifier.setError();
+    snackbarNotifier.notifyError(message: "Something went wrong");
+  } finally {
+    isLoading.value = false;
   }
+}
+
 }

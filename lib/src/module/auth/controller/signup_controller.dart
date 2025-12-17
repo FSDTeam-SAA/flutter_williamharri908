@@ -60,32 +60,30 @@ class SignupController extends GetxController {
 
   // --- Signup method ---
   Future<void> signup({
-  ProcessStatusNotifier? buttonNotifier,
-  SnackbarNotifier? snackbarNotifier,
-  VoidCallback? onDone,
-}) async {
-  buttonNotifier?.setLoading();
-  final result = await Get.find<AuthRepo>().signup(signupModel);
+    ProcessStatusNotifier? buttonNotifier,
+    SnackbarNotifier? snackbarNotifier,
+    VoidCallback? onDone,
+  }) async {
+    buttonNotifier?.setLoading();
+    final result = await Get.find<AuthRepo>().signup(signupModel);
 
-  handleFold(
-    either: result,
-    errorSnackbarNotifier: snackbarNotifier,
-    successSnackbarNotifier: snackbarNotifier,
-    onError: (failure) {
-      buttonNotifier?.setError();
-      snackbarNotifier?.notifyError(message: failure.uiMessage);
-    },
-    onSuccess: (success) {
-      buttonNotifier?.setSuccess();
+    handleFold(
+      either: result,
+      errorSnackbarNotifier: snackbarNotifier,
+      successSnackbarNotifier: snackbarNotifier,
+      onError: (failure) {
+        buttonNotifier?.setError();
+        snackbarNotifier?.notifyError(message: failure.uiMessage);
+      },
+      onSuccess: (success) {
+        buttonNotifier?.setSuccess();
 
-      // Navigate to OTP screen if needed
-      Get.to(() => OtpCodeView(email: email.value,));
-      snackbarNotifier?.notifySuccess(message: success);
-      onDone?.call();
-    },
-    processStatusNotifier: buttonNotifier,
-    
-  );
-}
-
+        // Navigate to OTP screen if needed
+        Get.to(() => OtpCodeView(email: email.value));
+        snackbarNotifier?.notifySuccess(message: success);
+        onDone?.call();
+      },
+      processStatusNotifier: buttonNotifier,
+    );
+  }
 }

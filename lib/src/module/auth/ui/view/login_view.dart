@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/module/auth/controller/login_controller.dart';
 import 'package:williamharri/src/module/auth/ui/view/forgot_password.dart';
@@ -122,28 +123,20 @@ class LoginView extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.context(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    onPressed: controller.isLoading.value
-                        ? null
-                        : () => controller.login(needVerifyAccount: () {}),
-                    child: controller.isLoading.value
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Log In',
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                  ),
-                ),
+                RSaveButton(
+                height: 52,
+                key: UniqueKey(),
+                buttonStatusNotifier: controller.processStatusNotifier,
+                saveText: "Login",
+                doneText: "Done",
+                loadingText: "Loading...",
+                onSave: (processNotifier) async {
+                  await controller.login(
+                    needVerifyAccount: () {},
+                  );
+                },
+                onDone: () {},
+              ),
 
                 const SizedBox(height: 30),
 

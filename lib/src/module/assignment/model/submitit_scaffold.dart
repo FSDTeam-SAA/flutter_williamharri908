@@ -1,11 +1,13 @@
+import 'dart:io';
+
 class SubmititScaffoldModel {
   final String jobid;
   final String description;
   final bool methodStatementAgreed;
   final bool riskAssessmentAgreed;
   final bool termsAccepted;
-  final List<String> photos;
-  final String signature;
+  final List<File> photos;
+  final File? signature;
   final String? scaffoldStatus;
 
   SubmititScaffoldModel({
