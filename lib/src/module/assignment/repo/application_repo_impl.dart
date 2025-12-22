@@ -18,7 +18,7 @@ base class ApplicationRepoImpl extends ApplicationRepo {
       tryFunc: () async {
         final response = await appPigeon.post(
           ApiEndpoints.submitScaffold,
-          data: param.toJson(),
+          data: await param.toFormData(),
         );
         return Success(message: extractSuccessMessage(response));
       },

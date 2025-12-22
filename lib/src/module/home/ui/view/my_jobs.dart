@@ -7,7 +7,7 @@ import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.d
 import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.dart';
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 import 'package:williamharri/src/module/home/ui/view/manager_my_job_details.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/staff_scaffold_job_details.dart';
 
 class StaffMyJobs extends StatelessWidget {
@@ -15,7 +15,7 @@ class StaffMyJobs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final profileController = Get.find<ProfileController>();
+    final profileController = Get.find<ProfileDataController>();
 
     // Manager Controller
     final managerController = Get.put(
@@ -90,8 +90,11 @@ class StaffMyJobs extends StatelessWidget {
                             imageUrl: job.job.thumbnail,
                             height: 70,
                             width: 70,
-                            errorWidget: const Icon(Icons.image,
-                                size: 70, color: Colors.grey),
+                            errorWidget: const Icon(
+                              Icons.image,
+                              size: 70,
+                              color: Colors.grey,
+                            ),
                           ),
 
                           const SizedBox(width: 12),
@@ -231,7 +234,8 @@ class StaffMyJobs extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: (job.scaffoldStatus ?? "Active") ==
+                                      color:
+                                          (job.scaffoldStatus ?? "Active") ==
                                               "Active"
                                           ? Colors.green
                                           : Colors.grey,
@@ -244,8 +248,11 @@ class StaffMyJobs extends StatelessWidget {
 
                               Row(
                                 children: [
-                                  const Icon(Icons.business,
-                                      size: 16, color: Colors.grey),
+                                  const Icon(
+                                    Icons.business,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     job.title,
@@ -258,8 +265,11 @@ class StaffMyJobs extends StatelessWidget {
 
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on,
-                                      size: 16, color: Colors.grey),
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     job.location,

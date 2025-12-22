@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/home/model/job_cart_model.dart';
@@ -16,7 +19,9 @@ class FullImageViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = isNetwork ? Image.network(imageUrl) : Image.file(File(imageUrl));
+    final image = isNetwork
+        ? Image.network(imageUrl)
+        : Image.file(File(imageUrl));
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -24,9 +29,7 @@ class FullImageViewScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: InteractiveViewer(maxScale: 5, child: image),
-      ),
+      body: Center(child: InteractiveViewer(maxScale: 5, child: image)),
     );
   }
 }
@@ -80,7 +83,7 @@ class JobDetailsUi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final profileController = Get.find<ProfileController>();
+    final profileController = Get.find<ProfileDataController>();
 
     ImageProvider? avatarImage;
     if (job.thumbnail != null && job.thumbnail!.isNotEmpty) {
@@ -90,8 +93,10 @@ class JobDetailsUi extends StatelessWidget {
     }
 
     final attachments = <Map<String, String>>[];
-    if (job.methodStatementUrl.isNotEmpty) attachments.add({'Method Statement': job.methodStatementUrl});
-    if (job.riskAssessmentUrl.isNotEmpty) attachments.add({'Risk Assessment': job.riskAssessmentUrl});
+    if (job.methodStatementUrl.isNotEmpty)
+      attachments.add({'Method Statement': job.methodStatementUrl});
+    if (job.riskAssessmentUrl.isNotEmpty)
+      attachments.add({'Risk Assessment': job.riskAssessmentUrl});
 
     return Scaffold(
       appBar: AppBar(
@@ -106,7 +111,9 @@ class JobDetailsUi extends StatelessWidget {
                   final profileRepo = Get.find<ProfileRepo>();
                   Get.put(StaffController(repo: profileRepo));
                 }
-                final updated = await Get.to<bool>(() => EditJobScreen(job: job));
+                final updated = await Get.to<bool>(
+                  () => EditJobScreen(job: job),
+                );
                 if (updated == true) {
                   Get.snackbar(
                     'Job updated',
@@ -120,15 +127,29 @@ class JobDetailsUi extends StatelessWidget {
             ),
           if (profileController.profile.value?.role == "manager")
             IconButton(
-              icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
+              icon: const Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.red,
+              ),
               onPressed: () async {
                 final confirm = await Get.dialog<bool>(
                   AlertDialog(
                     title: const Text('Delete job'),
-                    content: const Text('Are you sure you want to delete this job?'),
+                    content: const Text(
+                      'Are you sure you want to delete this job?',
+                    ),
                     actions: [
-                      TextButton(onPressed: () => Get.back(result: false), child: const Text('Cancel')),
-                      TextButton(onPressed: () => Get.back(result: true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+                      TextButton(
+                        onPressed: () => Get.back(result: false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Get.back(result: true),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -148,13 +169,23 @@ class JobDetailsUi extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(radius: 35, backgroundImage: avatarImage, backgroundColor: avatarImage == null ? Colors.blue : null),
+                CircleAvatar(
+                  radius: 35,
+                  backgroundImage: avatarImage,
+                  backgroundColor: avatarImage == null ? Colors.blue : null,
+                ),
                 const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(job.companyName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(
+                        job.companyName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Text(job.title, style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 8),
@@ -166,9 +197,17 @@ class JobDetailsUi extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            const Text("Description", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text(
+              "Description",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
-            Text(job.description.isEmpty ? "No description available" : job.description, style: const TextStyle(fontSize: 14)),
+            Text(
+              job.description.isEmpty
+                  ? "No description available"
+                  : job.description,
+              style: const TextStyle(fontSize: 14),
+            ),
 
             const SizedBox(height: 20),
             // ATTACHMENTS
@@ -176,19 +215,28 @@ class JobDetailsUi extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Documents", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text(
+                    "Documents",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 8),
                   for (var map in attachments)
                     _pdfTile(
                       label: map.keys.first,
                       enabled: map.values.first.isNotEmpty,
-                      onTap: () => openAttachment(url: map.values.first, title: map.keys.first),
+                      onTap: () => openAttachment(
+                        url: map.values.first,
+                        title: map.keys.first,
+                      ),
                     ),
                 ],
               ),
             const SizedBox(height: 20),
             // PHOTOS
-            const Text("Photos", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text(
+              "Photos",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             SizedBox(
               height: 100,
@@ -200,18 +248,58 @@ class JobDetailsUi extends StatelessWidget {
                       itemBuilder: (_, index) {
                         final photoUrl = job.photos[index];
                         return GestureDetector(
-                          onTap: () => openAttachment(url: photoUrl, title: "Photo ${index + 1}"),
+                          onTap: () => openAttachment(
+                            url: photoUrl,
+                            title: "Photo ${index + 1}",
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(photoUrl, width: 100, height: 100, fit: BoxFit.cover),
+                              child: Image.network(
+                                photoUrl,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         );
                       },
                     ),
             ),
+            const SizedBox(height: 60),
+            if (profileController.profile.value?.role == "staff")
+              Column(
+                children: [
+                  RSaveButton(
+                    height: 52,
+                    key: UniqueKey(),
+                    buttonStatusNotifier: ProcessStatusNotifier(
+                      initialStatus: EnabledStatus(),
+                    ),
+                    saveText: "Accept",
+                    doneText: "Accepted",
+                    loadingText: "Accepting...",
+                    onDone: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RamsDocumentScreen(job: job),
+                        ),
+                      );
+                    },
+                    onSave: (ProcessStatusNotifier processNotifier) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RamsDocumentScreen(job: job),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -220,20 +308,39 @@ class JobDetailsUi extends StatelessWidget {
 }
 
 // PDF Tile widget
-Widget _pdfTile({required String label, required bool enabled, required VoidCallback? onTap}) {
+Widget _pdfTile({
+  required String label,
+  required bool enabled,
+  required VoidCallback? onTap,
+}) {
   return Opacity(
     opacity: enabled ? 1 : 0.5,
     child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(color: const Color(0xFF1F1F1F), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
           const Icon(Icons.picture_as_pdf, color: Colors.red),
           const SizedBox(width: 12),
-          Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500))),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
           IconButton(
-            icon: Icon(Icons.remove_red_eye_outlined, color: enabled ? Colors.green : Colors.grey),
+            icon: Icon(
+              Icons.remove_red_eye_outlined,
+              color: enabled ? Colors.green : Colors.grey,
+            ),
             onPressed: enabled ? onTap : null,
           ),
         ],

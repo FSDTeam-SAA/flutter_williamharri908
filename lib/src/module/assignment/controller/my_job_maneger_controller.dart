@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
-import 'package:williamharri/src/module/assignment/model/submitit_scaffold.dart';
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 
 class MyJobManagerController extends GetxController {

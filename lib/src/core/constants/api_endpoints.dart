@@ -19,10 +19,8 @@ base class ApiEndpoints {
   // ---------------------- USER -----------------------------
   /// ### get
   static String getuserbyId(String id) => _User.getuserbyId(id);
-
   /// ### patch
   static const String updateUser = _User.updateUser;
-
   /// ### patch
   static const String uploadProfileImage = _User.uploadProfileImage;
   //Get
@@ -58,6 +56,9 @@ base class ApiEndpoints {
   static String scaffoldUpdate(String id) => _Application.scaffoldUpdate(id);
 
   static String completeScaffold(String id) => _Application.completeScaffold(id);
+
+
+  static const String allClient = _Client.allClient;
 }
 
 class _FreeServer {
@@ -136,4 +137,10 @@ class _Application {
   static String scaffoldUpdate(String id) => '$_applicationRoute/$id';
   static String completeScaffold(String id) => '$_applicationRoute/$id/complete';
 
+}
+
+// ---------------------- client -------------------------------------
+class _Client {
+  static const String _clientRoute = '${ApiEndpoints.baseUrl}/clients';
+  static const String allClient = '$_clientRoute/';
 }

@@ -10,8 +10,8 @@ import 'package:williamharri/src/module/home/controller/staff_all_jobs.controlle
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
 
-class ProfileController extends GetxController {
-  ProfileController({required this.repo});
+class ProfileDataController extends GetxController {
+  ProfileDataController({required this.repo});
 
   final ProfileRepo repo;
 
@@ -55,7 +55,7 @@ class ProfileController extends GetxController {
       },
       (success) async {
         isLoading.value = false;
-        Get.delete<ProfileController>(force: true);
+        Get.delete<ProfileDataController>(force: true);
         Get.delete<JobController>(force: true);
         Get.delete<StaffJobController>(force: true);
         Get.delete<LoginController>(force: true);

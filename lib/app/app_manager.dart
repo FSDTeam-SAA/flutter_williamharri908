@@ -7,7 +7,7 @@ import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/core/utils/utils.dart';
 import 'package:williamharri/src/module/auth/ui/view/sign_up_view.dart';
 import 'package:williamharri/src/module/nabber_screen.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 
 class AppManager extends GetxController {
   AuthStatus _authStatus = AuthLoading();
@@ -47,10 +47,10 @@ class AppManager extends GetxController {
       );
       _authStatus = authStatus;
       await _initializeControllers();
-      if (Get.isRegistered<ProfileController>()) {
-        Get.delete<ProfileController>();
+      if (Get.isRegistered<ProfileDataController>()) {
+        Get.delete<ProfileDataController>();
       }
-      Get.put(ProfileController(repo: Get.find()));
+      Get.put(ProfileDataController(repo: Get.find()));
       Get.to(() => AppGround());
 
       // navigatorKey.currentState?.pushNamedAndRemoveUntil(

@@ -130,7 +130,7 @@ final class AuthRepoImpl extends AuthRepo {
     return await asyncTryCatch(
       tryFunc: () async {
         final response = await appPigeon.post(
-          ApiEndpoints.verifyCode, // your backend route
+          ApiEndpoints.verifyCode,
           data: param.toJson(),
         );
         final body = response.data;
@@ -138,13 +138,13 @@ final class AuthRepoImpl extends AuthRepo {
       },
     );
   }
-  
+
   @override
   FutureRequest<Success> changePassword(ChangePasswordModel param) async {
     return await asyncTryCatch(
       tryFunc: () async {
         final response = await appPigeon.post(
-          ApiEndpoints.changePassword, // your backend route
+          ApiEndpoints.changePassword,
           data: param.toJson(),
         );
         final body = response.data;
@@ -152,9 +152,4 @@ final class AuthRepoImpl extends AuthRepo {
       },
     );
   }
-
-
-
-
-  
 }

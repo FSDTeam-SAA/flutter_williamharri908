@@ -124,19 +124,17 @@ class LoginView extends StatelessWidget {
 
                 const SizedBox(height: 20),
                 RSaveButton(
-                height: 52,
-                key: UniqueKey(),
-                buttonStatusNotifier: controller.processStatusNotifier,
-                saveText: "Login",
-                doneText: "Done",
-                loadingText: "Loading...",
-                onSave: (processNotifier) async {
-                  await controller.login(
-                    needVerifyAccount: () {},
-                  );
-                },
-                onDone: () {},
-              ),
+                  height: 52,
+                  key: UniqueKey(),
+                  buttonStatusNotifier: controller.processStatusNotifier,
+                  saveText: "Login",
+                  doneText: "Done",
+                  loadingText: "Loading...",
+                  onSave: (processNotifier) async {
+                    await controller.login(needVerifyAccount: () {});
+                  },
+                  onDone: () {},
+                ),
 
                 const SizedBox(height: 30),
 
