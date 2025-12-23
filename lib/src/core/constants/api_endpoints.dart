@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 base class ApiEndpoints {
   static const String socketUrl = _HostedClientServer.socketUrl;
+  static const String clients='https://api.williamjamesscaffoldingapp.com/api/clients';
 
   static const String baseUrl = _HostedClientServer.baseUrl;
 
@@ -63,12 +64,13 @@ base class ApiEndpoints {
 
 class _FreeServer {
   static const String socketUrl =
-      'https://williamharri-backend-anlh.onrender.com'
+      'https://api.williamjamesscaffoldingapp.com'
       '';
 
   static const String baseUrl =
-      'https://williamharri-backend-anlh.onrender.com/api'
-      '';
+      // 'https://williamharri-backend-anlh.onrender.com/api'
+      // '';
+'https://api.williamjamesscaffoldingapp.com/api';
 
 }
 
