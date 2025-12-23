@@ -68,8 +68,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
       return Column(
         children: const [
           Icon(Icons.image, size: 70),
-          SizedBox(height: 4),
-          Text("data"),
+
         ],
       );
     }
