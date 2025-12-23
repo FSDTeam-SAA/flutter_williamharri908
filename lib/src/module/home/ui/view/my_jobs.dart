@@ -36,7 +36,7 @@ class StaffMyJobs extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              profileController.profile.value?.username ?? "User",
+              profileController.profile.value?.name ?? "User",
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const Text(

@@ -42,7 +42,7 @@ class ProfileView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      controller.profile.value?.username ?? "Unknown",
+                      controller.profile.value?.name ?? "Unknown",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
