@@ -29,7 +29,7 @@ class ClientItem {
     );
   }
 
-  String get display => '$clientName - $clientEmail'; // ✅ required format
+  String get display => '$clientName - $clientEmail';
 }
 
 class EditJobScreen extends StatefulWidget {
@@ -52,13 +52,16 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  // ✅ Company/Agency REMOVED
-  late final TextEditingController _designationController; // hidden in UI, still used for title
+  late final TextEditingController _designationController; // hidden (title)
   late final TextEditingController _locationController;
   late final TextEditingController _priceController;
   late final TextEditingController _descriptionController;
 
-  // ✅ Client list from /api/clients
+  // ✅ NEW
+  late final TextEditingController _quotationNoController;
+  late final TextEditingController _latController;
+  late final TextEditingController _langController;
+
   bool _clientsLoading = false;
   final List<ClientItem> _clients = [];
   ClientItem? _selectedClient;
@@ -80,17 +83,20 @@ class _EditJobScreenState extends State<EditJobScreen> {
   void initState() {
     super.initState();
 
-    _designationController =
-        TextEditingController(text: widget.job?.title ?? '');
-    _locationController =
-        TextEditingController(text: widget.job?.location ?? '');
+    _designationController = TextEditingController(text: widget.job?.title ?? '');
+    _locationController = TextEditingController(text: widget.job?.location ?? '');
     _priceController = TextEditingController(text: widget.job?.price ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.job?.description ?? '');
+    _descriptionController = TextEditingController(text: widget.job?.description ?? '');
 
-    // preselect staff for edit (existing behavior)
+    // ✅ NEW prefill
+    _quotationNoController = TextEditingController(text: widget.job?.quotationNo ?? '');
+    _latController = TextEditingController(text: widget.job?.lat?.toString() ?? '');
+    _langController = TextEditingController(text: widget.job?.lang?.toString() ?? '');
+
     if (_isEditing && widget.job != null) {
       final job = widget.job!;
+
+      // staff preselect
       String? staffId = job.staffId;
       if (staffId == null && job.assignedTo.isNotEmpty) {
         staffId = job.assignedTo.first;
@@ -104,7 +110,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         }
       }
 
-      // try read clientId from job model (if present)
+      // clientId (dynamic if present)
       try {
         final dynamic anyJob = job;
         _initialClientId = anyJob.clientId as String?;
@@ -122,7 +128,18 @@ class _EditJobScreenState extends State<EditJobScreen> {
     _locationController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
+
+    _quotationNoController.dispose();
+    _latController.dispose();
+    _langController.dispose();
+
     super.dispose();
+  }
+
+  double? _parseDouble(String v) {
+    final t = v.trim();
+    if (t.isEmpty) return null;
+    return double.tryParse(t);
   }
 
   Future<void> _fetchClients() async {
@@ -145,7 +162,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
         ..clear()
         ..addAll(parsed);
 
-      // edit preselect
       if (_initialClientId != null) {
         for (final c in _clients) {
           if (c.id == _initialClientId) {
@@ -169,16 +185,12 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
   Future<void> _pickThumbnail() async {
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() => _thumbnailFile = File(picked.path));
-    }
+    if (picked != null) setState(() => _thumbnailFile = File(picked.path));
   }
 
   Future<void> _addPhoto() async {
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() => _photos.add(File(picked.path)));
-    }
+    if (picked != null) setState(() => _photos.add(File(picked.path)));
   }
 
   Future<void> _pickMethodStatementPdf() async {
@@ -206,7 +218,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
     final clientId = _selectedClient?.id.trim() ?? '';
 
-    // ✅ Dummy title (since title field UI is not shown)
     final title = _designationController.text.trim().isNotEmpty
         ? _designationController.text.trim()
         : 'Job';
@@ -223,9 +234,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       return;
     }
 
-    final description = _descriptionController.text.trim();
-    final price = _priceController.text.trim();
-
     final staff = staffController.selectedStaff.value;
     if (staff == null || staff.id == null) {
       Get.snackbar(
@@ -239,6 +247,11 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
     setState(() => _isSaving = true);
 
+    // ✅ NEW values
+    final quotationNo = _quotationNoController.text.trim();
+    final lat = _parseDouble(_latController.text);
+    final lang = _parseDouble(_langController.text); // backend uses "lang"
+
     try {
       if (_isEditing) {
         await _updateJob(
@@ -246,26 +259,34 @@ class _EditJobScreenState extends State<EditJobScreen> {
           clientId: clientId,
           title: title,
           location: location,
-          description: description,
-          price: price,
+          description: _descriptionController.text.trim(),
+          price: _priceController.text.trim(),
           assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
           methodStatement: _methodStatementFile,
           riskAssessment: _riskAssessmentFile,
+
+          quotationNo: quotationNo,
+          lat: lat,
+          lang: lang,
         );
       } else {
         await _createJob(
           clientId: clientId,
           title: title,
           location: location,
-          description: description,
-          price: price,
+          description: _descriptionController.text.trim(),
+          price: _priceController.text.trim(),
           assigneeId: staff.id!,
           thumbnail: _thumbnailFile,
           photos: _photos,
           methodStatement: _methodStatementFile,
           riskAssessment: _riskAssessmentFile,
+
+          quotationNo: quotationNo,
+          lat: lat,
+          lang: lang,
         );
       }
 
@@ -289,7 +310,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
     }
   }
 
-  /// ✅ Create Job (multipart/form-data)
   Future<String> _createJob({
     required String clientId,
     required String title,
@@ -301,37 +321,49 @@ class _EditJobScreenState extends State<EditJobScreen> {
     List<File> photos = const [],
     File? methodStatement,
     File? riskAssessment,
+
+    // ✅ NEW
+    String? quotationNo,
+    double? lat,
+    double? lang,
   }) async {
     final cleanedPrice = price?.replaceAll('\$', '').trim();
 
     final formDataMap = <String, dynamic>{
       'clientId': clientId,
-      'client': clientId, // ✅ backend fallback
+      'client': clientId,
       'title': title,
       'location': location,
       'description': description,
       'price': cleanedPrice,
       'assigneTo': assigneeId,
       'assignedTo': [assigneeId],
+
+      // ✅ NEW
+      'quotationNo': quotationNo,
     };
+
+    // ✅ NEW coordinates (multipart-safe)
+    if (lat != null) {
+      formDataMap['coordinates[lat]'] = lat;
+      formDataMap['coordinates.lat'] = lat; // fallback
+    }
+    if (lang != null) {
+      formDataMap['coordinates[lang]'] = lang;
+      formDataMap['coordinates.lang'] = lang; // fallback
+    }
 
     if (thumbnail != null) {
       formDataMap['thumbnail'] = dio.MultipartFile.fromFileSync(thumbnail.path);
     }
-
     if (photos.isNotEmpty) {
-      formDataMap['photos'] =
-          photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
+      formDataMap['photos'] = photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
     }
-
     if (methodStatement != null) {
-      formDataMap['methodStatement'] =
-          dio.MultipartFile.fromFileSync(methodStatement.path);
+      formDataMap['methodStatement'] = dio.MultipartFile.fromFileSync(methodStatement.path);
     }
-
     if (riskAssessment != null) {
-      formDataMap['riskAssessment'] =
-          dio.MultipartFile.fromFileSync(riskAssessment.path);
+      formDataMap['riskAssessment'] = dio.MultipartFile.fromFileSync(riskAssessment.path);
     }
 
     final formData = dio.FormData.fromMap(formDataMap);
@@ -359,37 +391,49 @@ class _EditJobScreenState extends State<EditJobScreen> {
     List<File> photos = const [],
     File? methodStatement,
     File? riskAssessment,
+
+    // ✅ NEW
+    String? quotationNo,
+    double? lat,
+    double? lang,
   }) async {
     final cleanedPrice = price?.replaceAll('\$', '').trim();
 
     final formDataMap = <String, dynamic>{
       'clientId': clientId,
-      'client': clientId, // ✅ backend fallback
+      'client': clientId,
       'title': title,
       'location': location,
       'description': description,
       'price': cleanedPrice,
       'assigneTo': assigneeId,
       'assignedTo': [assigneeId],
+
+      // ✅ NEW
+      'quotationNo': quotationNo,
     };
+
+    // ✅ NEW coordinates (multipart-safe)
+    if (lat != null) {
+      formDataMap['coordinates[lat]'] = lat;
+      formDataMap['coordinates.lat'] = lat;
+    }
+    if (lang != null) {
+      formDataMap['coordinates[lang]'] = lang;
+      formDataMap['coordinates.lang'] = lang;
+    }
 
     if (thumbnail != null) {
       formDataMap['thumbnail'] = dio.MultipartFile.fromFileSync(thumbnail.path);
     }
-
     if (photos.isNotEmpty) {
-      formDataMap['photos'] =
-          photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
+      formDataMap['photos'] = photos.map((f) => dio.MultipartFile.fromFileSync(f.path)).toList();
     }
-
     if (methodStatement != null) {
-      formDataMap['methodStatement'] =
-          dio.MultipartFile.fromFileSync(methodStatement.path);
+      formDataMap['methodStatement'] = dio.MultipartFile.fromFileSync(methodStatement.path);
     }
-
     if (riskAssessment != null) {
-      formDataMap['riskAssessment'] =
-          dio.MultipartFile.fromFileSync(riskAssessment.path);
+      formDataMap['riskAssessment'] = dio.MultipartFile.fromFileSync(riskAssessment.path);
     }
 
     final formData = dio.FormData.fromMap(formDataMap);
@@ -401,7 +445,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   // ==========================
-  // ✅ CLIENT UI (no change style)
+  // UI
   // ==========================
 
   Widget _clientField() {
@@ -415,11 +459,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
           suffixIcon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
         ),
-        child: Text(
-          text,
-          style: _fieldTextStyle,
-          overflow: TextOverflow.ellipsis,
-        ),
+        child: Text(text, style: _fieldTextStyle, overflow: TextOverflow.ellipsis),
       ),
     );
   }
@@ -469,29 +509,22 @@ class _EditJobScreenState extends State<EditJobScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search client...',
-                      hintStyle:
-                      const TextStyle(color: Colors.white70, fontSize: 14),
-                      prefixIcon:
-                      const Icon(Icons.search, color: Colors.white70),
+                      hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
+                      prefixIcon: const Icon(Icons.search, color: Colors.white70),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                        const BorderSide(color: Colors.white70, width: 1),
+                        borderSide: const BorderSide(color: Colors.white70, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                        const BorderSide(color: Colors.orange, width: 1.2),
+                        borderSide: const BorderSide(color: Colors.orange, width: 1.2),
                       ),
                     ),
                     onChanged: (q) {
                       setModalState(() {
-                        if (q.trim().isEmpty) {
-                          filtered = List<ClientItem>.from(_clients);
-                        } else {
-                          filtered =
-                              _clients.where((c) => matches(c, q)).toList();
-                        }
+                        filtered = q.trim().isEmpty
+                            ? List<ClientItem>.from(_clients)
+                            : _clients.where((c) => matches(c, q)).toList();
                       });
                     },
                   ),
@@ -505,13 +538,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                         final isSelected = _selectedClient?.id == c.id;
 
                         return ListTile(
-                          tileColor: isSelected
-                              ? Colors.orange.withOpacity(0.22)
-                              : null,
-                          title: Text(
-                            c.display,
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                          tileColor: isSelected ? Colors.orange.withOpacity(0.22) : null,
+                          title: Text(c.display, style: const TextStyle(color: Colors.white)),
                           onTap: () {
                             setState(() => _selectedClient = c);
                             Navigator.pop(ctx);
@@ -529,19 +557,12 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  // ==========================
-  // ✅ STAFF UI (same style)
-  // ==========================
-
   Widget _staffField() {
     return Obx(() {
-      if (staffController.isLoading.value) {
-        return _loadingDropdown();
-      }
+      if (staffController.isLoading.value) return _loadingDropdown();
 
       final selected = staffController.selectedStaff.value;
-      final selectedText =
-          selected?.name ?? selected?.username ?? 'Select from here';
+      final selectedText = selected?.name ?? selected?.username ?? 'Select from here';
 
       return InkWell(
         onTap: () => _openStaffSearchSheet(staffController),
@@ -551,11 +572,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
             hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
             suffixIcon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
           ),
-          child: Text(
-            selectedText,
-            style: _fieldTextStyle,
-            overflow: TextOverflow.ellipsis,
-          ),
+          child: Text(selectedText, style: _fieldTextStyle, overflow: TextOverflow.ellipsis),
         ),
       );
     });
@@ -571,17 +588,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
       ),
       builder: (ctx) {
         final searchCtrl = TextEditingController();
-        List<ProfileModel> filtered =
-        List<ProfileModel>.from(controller.staffList);
+        List<ProfileModel> filtered = List<ProfileModel>.from(controller.staffList);
 
         bool matches(ProfileModel s, String q) {
           final query = q.toLowerCase().trim();
           final name = (s.name ?? '').toLowerCase();
           final username = (s.username ?? '').toLowerCase();
           final email = (s.email ?? '').toLowerCase();
-          return name.contains(query) ||
-              username.contains(query) ||
-              email.contains(query);
+          return name.contains(query) || username.contains(query) || email.contains(query);
         }
 
         return StatefulBuilder(
@@ -611,31 +625,22 @@ class _EditJobScreenState extends State<EditJobScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search staff...',
-                      hintStyle:
-                      const TextStyle(color: Colors.white70, fontSize: 14),
-                      prefixIcon:
-                      const Icon(Icons.search, color: Colors.white70),
+                      hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
+                      prefixIcon: const Icon(Icons.search, color: Colors.white70),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                        const BorderSide(color: Colors.white70, width: 1),
+                        borderSide: const BorderSide(color: Colors.white70, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                        const BorderSide(color: Colors.orange, width: 1.2),
+                        borderSide: const BorderSide(color: Colors.orange, width: 1.2),
                       ),
                     ),
                     onChanged: (q) {
                       setModalState(() {
-                        if (q.trim().isEmpty) {
-                          filtered =
-                          List<ProfileModel>.from(controller.staffList);
-                        } else {
-                          filtered = controller.staffList
-                              .where((s) => matches(s, q))
-                              .toList();
-                        }
+                        filtered = q.trim().isEmpty
+                            ? List<ProfileModel>.from(controller.staffList)
+                            : controller.staffList.where((s) => matches(s, q)).toList();
                       });
                     },
                   ),
@@ -647,18 +652,11 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       itemBuilder: (_, i) {
                         final s = filtered[i];
                         final title = s.name ?? s.username ?? 'Unknown Staff';
-                        final isSelected =
-                            controller.selectedStaff.value?.id != null &&
-                                controller.selectedStaff.value?.id == s.id;
+                        final isSelected = controller.selectedStaff.value?.id == s.id;
 
                         return ListTile(
-                          tileColor: isSelected
-                              ? Colors.orange.withOpacity(0.22)
-                              : null,
-                          title: Text(
-                            title,
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                          tileColor: isSelected ? Colors.orange.withOpacity(0.22) : null,
+                          title: Text(title, style: const TextStyle(color: Colors.white)),
                           onTap: () {
                             controller.selectStaff(s);
                             Navigator.pop(ctx);
@@ -675,10 +673,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
       },
     );
   }
-
-  // ==========================
-  // ✅ UI Layout (Company removed)
-  // ==========================
 
   @override
   Widget build(BuildContext context) {
@@ -698,16 +692,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
           style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         centerTitle: true,
-        actions: [
-          if (_isEditing)
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red, size: 24),
-                onPressed: () {},
-              ),
-            ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -723,8 +707,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       radius: 45,
                       backgroundImage: _thumbnailFile != null
                           ? FileImage(_thumbnailFile!)
-                          : const AssetImage('assets/icons/istockphoto.jpg')
-                      as ImageProvider,
+                          : const AssetImage('assets/icons/istockphoto.jpg') as ImageProvider,
                     ),
                     const SizedBox(height: 10),
                     TextButton(
@@ -745,6 +728,56 @@ class _EditJobScreenState extends State<EditJobScreen> {
               _label('Client Name'),
               labelSpacing,
               _clientsLoading ? _loadingLikeField('Loading...') : _clientField(),
+
+              const SizedBox(height: 16),
+              _label('Quotation No'),
+              labelSpacing,
+              TextFormField(
+                controller: _quotationNoController,
+                style: _fieldTextStyle,
+                decoration: _inputDecoration().copyWith(
+                  hintText: 'QTN-12345',
+                  hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              _label('Latitude'),
+              labelSpacing,
+              TextFormField(
+                controller: _latController,
+                style: _fieldTextStyle,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                decoration: _inputDecoration().copyWith(
+                  hintText: '51.5074',
+                  hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                validator: (v) {
+                  final t = v?.trim() ?? '';
+                  if (t.isEmpty) return null;
+                  if (double.tryParse(t) == null) return 'Enter valid latitude';
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+              _label('Longitude'),
+              labelSpacing,
+              TextFormField(
+                controller: _langController,
+                style: _fieldTextStyle,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                decoration: _inputDecoration().copyWith(
+                  hintText: '-0.1278',
+                  hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                validator: (v) {
+                  final t = v?.trim() ?? '';
+                  if (t.isEmpty) return null;
+                  if (double.tryParse(t) == null) return 'Enter valid longitude';
+                  return null;
+                },
+              ),
 
               const SizedBox(height: 16),
               _label('Location'),
@@ -781,7 +814,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
               ),
 
               const SizedBox(height: 20),
-              _label('Method Statement'),
+              _label('Method Statement (PDF)'),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -849,19 +882,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                   onPressed: _isSaving ? null : _onSave,
                   child: _isSaving
                       ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
                       : Text(
                     _isEditing ? 'Save' : 'Create',
@@ -876,8 +904,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  static const TextStyle _fieldTextStyle =
-  TextStyle(color: Colors.white, fontSize: 14);
+  static const TextStyle _fieldTextStyle = TextStyle(color: Colors.white, fontSize: 14);
 
   static String? _requiredValidator(String? value) {
     if (value == null || value.trim().isEmpty) return 'This field is required';
@@ -896,10 +923,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   static InputDecoration _inputDecoration({bool isBig = false}) {
     return InputDecoration(
       isDense: true,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: isBig ? 10 : 12,
-      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: isBig ? 10 : 12),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Colors.white70, width: 1),
@@ -952,7 +976,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
   );
 }
 
-/// Thumbnail with close button for photos list
 Widget _removablePhotoItem({
   required ImageProvider image,
   required VoidCallback onRemove,

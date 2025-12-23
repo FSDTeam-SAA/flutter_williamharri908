@@ -7,26 +7,24 @@ class UpdateJobModel {
   final String? description;
   final num? price;
 
-  /// URL string (if you ever send existing thumb URL as text)
-  /// For new thumbnail image files you will still use FormData.
-  final String? thumbnail;
+  final String? thumbnail; // url text only
+  final List<String>? photos; // url list only
 
-  /// Existing photo URLs you want to keep (optional).
-  /// New images you upload as files in FormData.
-  final List<String>? photos;
-
-  /// RAMS docs (if you allow editing them from UI)
   final String? methodStatementUrl;
   final String? riskAssessmentUrl;
 
-  /// List of staff IDs assigned to this job
   final List<String>? assignedToIds;
 
-  final String? jobStatus;        // e.g. "active", "assignedToStaffs"
-  final DateTime? targetDate;     // "2026-01-15T00:00:00.000Z"
+  final String? jobStatus;
+  final DateTime? targetDate;
   final bool? isDeleted;
 
-  UpdateJobModel({
+  // ✅ NEW
+  final String? quotationNo;
+  final double? lat;
+  final double? lang; // backend uses "lang"
+
+  const UpdateJobModel({
     this.companyName,
     this.title,
     this.location,
@@ -40,11 +38,41 @@ class UpdateJobModel {
     this.jobStatus,
     this.targetDate,
     this.isDeleted,
+
+    // ✅ NEW
+    this.quotationNo,
+    this.lat,
+    this.lang,
   });
 
-  /// Handy constructor: create an UpdateJobModel from an existing JobModel
-  /// and then change only what you want before calling toJson().
   factory UpdateJobModel.fromJob(JobModel job) {
+    double? _toDouble(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toDouble();
+      return double.tryParse(v.toString());
+    }
+
+    String? qNo;
+    double? lat;
+    double? lang;
+
+    try {
+      final dynamic j = job;
+
+      qNo = j.quotationNo?.toString();
+
+      final dynamic coords = j.coordinates;
+      if (coords is Map) {
+        lat = _toDouble(coords['lat']);
+        lang = _toDouble(coords['lang']);
+      } else {
+        try {
+          lat = _toDouble(coords?.lat);
+          lang = _toDouble(coords?.lang);
+        } catch (_) {}
+      }
+    } catch (_) {}
+
     return UpdateJobModel(
       companyName: job.companyName,
       title: job.title,
@@ -53,16 +81,16 @@ class UpdateJobModel {
       price: num.tryParse(job.price.toString()),
       thumbnail: job.thumbnail,
       photos: job.photos,
-      // if you add assignedTo list & jobStatus/targetDate to JobModel,
-      // you can map them here too.
+
+      quotationNo: qNo,
+      lat: lat,
+      lang: lang,
     );
   }
 
-  /// Convert to JSON for PATCH /jobs/{id}
-  ///
-  /// Important: we remove all `null` fields so PATCH only sends
-  /// what you actually want to update.
-  Map<String, dynamic> toJson() {
+  /// ✅ Remove nulls so PATCH updates only sent fields
+  /// includeBracketCoordinates=true makes it safe for multipart patch too.
+  Map<String, dynamic> toJson({bool includeBracketCoordinates = true}) {
     final Map<String, dynamic> data = {};
 
     if (companyName != null) data['companyName'] = companyName;
@@ -70,22 +98,41 @@ class UpdateJobModel {
     if (location != null) data['location'] = location;
     if (description != null) data['description'] = description;
     if (price != null) data['price'] = price;
+
     if (thumbnail != null) data['thumbnail'] = thumbnail;
     if (photos != null) data['photos'] = photos;
-    if (methodStatementUrl != null) {
-      data['methodStatementUrl'] = methodStatementUrl;
-    }
-    if (riskAssessmentUrl != null) {
-      data['riskAssessmentUrl'] = riskAssessmentUrl;
-    }
-    if (assignedToIds != null) {
-      data['assignedTo'] = assignedToIds;
-    }
+
+    if (methodStatementUrl != null) data['methodStatementUrl'] = methodStatementUrl;
+    if (riskAssessmentUrl !=null) data['riskAssessmentUrl'] = riskAssessmentUrl;
+
+    if (assignedToIds != null) data['assignedTo'] = assignedToIds;
+
     if (jobStatus != null) data['jobStatus'] = jobStatus;
-    if (targetDate != null) {
-      data['targetDate'] = targetDate!.toUtc().toIso8601String();
-    }
+    if (targetDate != null) data['targetDate'] = targetDate!.toUtc().toIso8601String();
     if (isDeleted != null) data['isDeleted'] = isDeleted;
+
+    // ✅ NEW
+    if (quotationNo != null) data['quotationNo'] = quotationNo;
+
+    // JSON style
+    if (lat != null || lang != null) {
+      data['coordinates'] = {
+        'lat': lat,
+        'lang': lang,
+      };
+    }
+
+    // multipart-safe style
+    if (includeBracketCoordinates) {
+      if (lat != null) {
+        data['coordinates[lat]'] = lat;
+        data['coordinates.lat'] = lat; // fallback
+      }
+      if (lang != null) {
+        data['coordinates[lang]'] = lang;
+        data['coordinates.lang'] = lang; // fallback
+      }
+    }
 
     return data;
   }
@@ -104,6 +151,11 @@ class UpdateJobModel {
     String? jobStatus,
     DateTime? targetDate,
     bool? isDeleted,
+
+    // ✅ NEW
+    String? quotationNo,
+    double? lat,
+    double? lang,
   }) {
     return UpdateJobModel(
       companyName: companyName ?? this.companyName,
@@ -119,6 +171,10 @@ class UpdateJobModel {
       jobStatus: jobStatus ?? this.jobStatus,
       targetDate: targetDate ?? this.targetDate,
       isDeleted: isDeleted ?? this.isDeleted,
+
+      quotationNo: quotationNo ?? this.quotationNo,
+      lat: lat ?? this.lat,
+      lang: lang ?? this.lang,
     );
   }
 }
