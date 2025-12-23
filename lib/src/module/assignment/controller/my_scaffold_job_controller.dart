@@ -3,9 +3,9 @@ import 'package:williamharri/src/module/assignment/model/get_my_scaffold_model.d
 import 'package:williamharri/src/module/assignment/repo/application_repo.dart';
 
 class MyScaffoldJobController extends GetxController {
-  MyScaffoldJobController({required this.submitRepo});
-
   final ApplicationRepo submitRepo;
+
+  MyScaffoldJobController({required this.submitRepo});
 
   RxList<GetMyScaffoldModel> jobs = <GetMyScaffoldModel>[].obs;
   RxBool isLoading = false.obs;
@@ -13,6 +13,12 @@ class MyScaffoldJobController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchJobs();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
     fetchJobs();
   }
 
@@ -24,14 +30,11 @@ class MyScaffoldJobController extends GetxController {
     result.fold(
       (failure) {
         isLoading.value = false;
-        Get.snackbar("Error", failure.uiMessage);
       },
       (success) {
-        isLoading.value = false;
         jobs.value = success;
+        isLoading.value = false;
       },
     );
-
-    isLoading.value = false;
   }
 }

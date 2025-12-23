@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import '../../../../core/constants/assets.dart';
 import '../widgets/widgets.dart';
 import 'edit_profile_view.dart';
@@ -10,7 +10,7 @@ class PersonalInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ProfileController>();
+    final controller = Get.find<ProfileDataController>();
 
     return Scaffold(
       appBar: AppBar(

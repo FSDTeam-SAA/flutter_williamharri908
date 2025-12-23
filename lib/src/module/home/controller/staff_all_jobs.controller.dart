@@ -17,21 +17,21 @@ class StaffJobController extends GetxController {
   }
 
   Future<void> fetchJobs() async {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    final result = await jobRepo.getStaffJobs();
+      final result = await jobRepo.getStaffJobs();
 
-    result.fold(
-      (failure) {
-        isLoading.value = false;
-        Get.snackbar("Error", failure.uiMessage);
-      },
-      (success) {
-        isLoading.value = false;
-        staffjobs.value = success;
-      },
-    );
-
-    isLoading.value = false;
+      result.fold(
+        (failure) {
+          Get.snackbar("Error", failure.uiMessage);
+        },
+        (success) {
+          staffjobs.assignAll(success);
+        },
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

@@ -76,7 +76,6 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
     }
 
     isLoading.value = true;
-
     try {
       final model = SubmititScaffoldModel(
         jobid: job.id,
@@ -84,8 +83,8 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
         methodStatementAgreed: true,
         riskAssessmentAgreed: true,
         termsAccepted: true,
-        photos: uploadedPhotos.map((file) => file.path).toList(),
-        signature: signatureFile?.path ?? signaturePath ?? "",
+        photos: uploadedPhotos.toList(),
+        signature: signatureFile,
       );
 
       final repo = Get.find<ApplicationRepo>();

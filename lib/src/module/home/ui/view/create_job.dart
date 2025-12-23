@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:williamharri/src/core/constants/api_endpoints.dart';
 import 'package:williamharri/src/core/services/app_pigeon/app_pigeon.dart';
 import 'package:williamharri/src/module/home/model/create_job_model.dart';
@@ -15,8 +13,8 @@ import 'package:williamharri/src/module/profile/model/profile_model.dart';
 class EditJobScreen extends StatefulWidget {
   const EditJobScreen({
     super.key,
-    this.jobId, // null = create mode, not null = edit mode
-    this.job, // existing job data to prefill (optional)
+    this.jobId,
+    this.job,
   });
 
   final String? jobId;
@@ -81,9 +79,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
           }
         }
       }
-
-      // NOTE: if your CreateJobModel has methodStatement / riskAssessment URLs,
-      // you could show their names here, but it's optional since picking PDFs is manual.
     }
   }
 
@@ -201,8 +196,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
         backgroundColor: Colors.green.shade600,
         colorText: Colors.white,
       );
-
-      //  IMPORTANT: return `true` so HomeScreen knows to refresh
       Navigator.pop(context, true);
     } catch (e, st) {
       debugPrint('Error while saving job: $e\n$st');
@@ -220,18 +213,18 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Future<String> _createJob({
-    required String company,
-    required String designation,
-    required String location,
-    required String price,
-    required String description,
-    required String assigneeId,
+    String? company,
+    String? designation,
+    String? location,
+    String? price,
+    String? description,
+    String? assigneeId,
     File? thumbnail,
     List<File> photos = const [],
     File? methodStatement,
     File? riskAssessment,
   }) async {
-    final cleanedPrice = price.replaceAll('\$', '').trim();
+    final cleanedPrice = price?.replaceAll('\$', '').trim();
 
     final formDataMap = <String, dynamic>{
       'companyName': company,
@@ -297,19 +290,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Future<void> _updateJob({
-    required String jobId,
-    required String company,
-    required String designation,
-    required String location,
-    required String price,
-    required String description,
-    required String assigneeId,
+    String? jobId,
+    String? company,
+    String? designation,
+    String? location,
+    String? price,
+    String? description,
+    String? assigneeId,
     File? thumbnail,
     List<File> photos = const [],
     File? methodStatement,
     File? riskAssessment,
   }) async {
-    final cleanedPrice = price.replaceAll('\$', '').trim();
+    final cleanedPrice = price?.replaceAll('\$', '').trim();
 
     final formDataMap = <String, dynamic>{
       'companyName': company,
@@ -346,7 +339,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
     try {
       await appPigeon.patch(
-        ApiEndpoints.updateJob(jobId),
+        ApiEndpoints.updateJob(jobId!),
         data: formData,
       );
     } on dio.DioException catch (e) {
@@ -390,7 +383,6 @@ class _EditJobScreenState extends State<EditJobScreen> {
               child: IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red, size: 24),
                 onPressed: () {
-                  // TODO: implement delete using ApiEndpoints.deleteJob(jobId)
                 },
               ),
             ),
@@ -428,6 +420,16 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 ),
               ),
               const SizedBox(height: 18),
+
+              _label('Client Name'),
+              labelSpacing,
+              Obx(() {
+                if (staffController.isLoading.value) {
+                  return _loadingDropdown();
+                }
+                return _staffDropdown(staffController);
+              }),
+              const SizedBox(height: 18),
               _label('Company/Agency Name'),
               labelSpacing,
               TextFormField(
@@ -441,19 +443,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 validator: _requiredValidator,
               ),
               const SizedBox(height: 16),
-              _label('Job designation'),
-              labelSpacing,
-              TextFormField(
-                controller: _designationController,
-                style: _fieldTextStyle,
-                decoration: _inputDecoration().copyWith(
-                  hintText: 'Real estate agent needed',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-                validator: _requiredValidator,
-              ),
-              const SizedBox(height: 16),
+              // _label('Job designation'),
+              // labelSpacing,
+              // TextFormField(
+              //   controller: _designationController,
+              //   style: _fieldTextStyle,
+              //   decoration: _inputDecoration().copyWith(
+              //     hintText: 'Real estate agent needed',
+              //     hintStyle:
+              //     const TextStyle(color: Colors.white70, fontSize: 14),
+              //   ),
+              //   validator: _requiredValidator,
+              // ),
+              // const SizedBox(height: 16),
               _label('Location'),
               labelSpacing,
               TextFormField(
@@ -467,29 +469,29 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 validator: _requiredValidator,
               ),
               const SizedBox(height: 16),
-              _label('Price'),
-              labelSpacing,
-              TextFormField(
-                controller: _priceController,
-                style: _fieldTextStyle,
-                keyboardType: TextInputType.number,
-                decoration: _inputDecoration().copyWith(
-                  hintText: '\$ 199',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Price is required';
-                  }
-                  final v = value.replaceAll('\$', '').trim();
-                  if (double.tryParse(v) == null) {
-                    return 'Enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+              // _label('Price'),
+              // labelSpacing,
+              // TextFormField(
+              //   controller: _priceController,
+              //   style: _fieldTextStyle,
+              //   keyboardType: TextInputType.number,
+              //   decoration: _inputDecoration().copyWith(
+              //     hintText: '\$ 199',
+              //     hintStyle:
+              //     const TextStyle(color: Colors.white70, fontSize: 14),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.trim().isEmpty) {
+              //       return 'Price is required';
+              //     }
+              //     final v = value.replaceAll('\$', '').trim();
+              //     if (double.tryParse(v) == null) {
+              //       return 'Enter a valid number';
+              //     }
+              //     return null;
+              //   },
+              // ),
+              // const SizedBox(height: 16),
               _label('Assign to Staff'),
               labelSpacing,
               Obx(() {
@@ -648,15 +650,15 @@ class _EditJobScreenState extends State<EditJobScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
-        borderSide: const BorderSide(color: Colors.white70, width: 1),
+        borderSide: BorderSide(color: Colors.white70, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
-        borderSide: const BorderSide(color: Colors.orange, width: 1.2),
+        borderSide: BorderSide(color: Colors.orange, width: 1.2),
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
-        borderSide: const BorderSide(color: Colors.white70, width: 1),
+        borderSide: BorderSide(color: Colors.white70, width: 1),
       ),
     );
   }
@@ -693,7 +695,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
       dropdownColor: Colors.black,
       style: _fieldTextStyle,
       decoration: _inputDecoration().copyWith(
-        hintText: 'Select a staff',
+        hintText: 'Select from here',
         hintStyle: const TextStyle(color: Colors.white70, fontSize: 14),
       ),
       isExpanded: true,

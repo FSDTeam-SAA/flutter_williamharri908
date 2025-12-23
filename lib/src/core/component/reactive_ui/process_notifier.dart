@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 
-sealed class ButtonStatus {
+sealed class ProcessStatus {
   String message;
-  ButtonStatus({this.message = ""});
+  ProcessStatus({this.message = ""});
 }
 
-class EnabledStatus extends ButtonStatus {
+class EnabledStatus extends ProcessStatus {
   EnabledStatus({String? message })
       : super(message: message ?? "Enabled");
 }
 
-class DisabledStatus extends ButtonStatus {
+class DisabledStatus extends ProcessStatus {
   DisabledStatus({String? message })
       : super(message: message ?? "Disabled");
 }
 
-class LoadingStatus extends ButtonStatus {
+class LoadingStatus extends ProcessStatus {
   LoadingStatus({String? message })
       : super(message: message ?? "Loading");
 }
 
-class ErrorStatus extends ButtonStatus {
+class ErrorStatus extends ProcessStatus {
   ErrorStatus({String? message })
       : super(message: message ?? "Error");
 }
 
-class SuccessStatus extends ButtonStatus {
+class SuccessStatus extends ProcessStatus {
   SuccessStatus({String? message })
       : super(message: message ?? "Success");
 }
@@ -34,11 +34,11 @@ class ProcessStatusNotifier extends ChangeNotifier{
 
   /// By default the button status is set to DisabledStatus.
   /// If you want to set the initial button status to a different status, pass it in the constructor
-  ProcessStatusNotifier({ButtonStatus? initialStatus}) {
+  ProcessStatusNotifier({ProcessStatus? initialStatus}) {
     _status = initialStatus ?? DisabledStatus();
   }
-  ButtonStatus _status = DisabledStatus();
-  ButtonStatus get status => _status;
+  ProcessStatus _status = DisabledStatus();
+  ProcessStatus get status => _status;
 
   void setLoading({String? message}) {
     _status = LoadingStatus(message: message);

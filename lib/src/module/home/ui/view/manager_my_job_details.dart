@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
 import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
 class JobDetailsScreen extends StatelessWidget {
   final JobModelManager job;
 
-  const JobDetailsScreen({super.key, required this.job});
+  JobDetailsScreen({super.key, required this.job});
+  final controller = Get.find<MyJobManagerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +63,14 @@ class JobDetailsScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               job.description,
+              maxLines: 5,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Job Photos
             const Text(
@@ -86,6 +89,27 @@ class JobDetailsScreen extends StatelessWidget {
 
             // Staff Submitted Section
             if (job.latestScaffold != null) ...[
+              // Description
+              const Text(
+                'Description',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                job.latestScaffold!.description,
+                maxLines: 5,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 12),
+
               const Text(
                 'Submitted Photos',
                 style: TextStyle(
@@ -98,9 +122,6 @@ class JobDetailsScreen extends StatelessWidget {
 
               _buildPhotoGrid(job.latestScaffold!.photos),
 
-              const SizedBox(height: 32),
-
-              // Signature Section
               const Text(
                 'Signature',
                 style: TextStyle(
@@ -116,9 +137,28 @@ class JobDetailsScreen extends StatelessWidget {
               SizedBox(height: 32),
               Row(
                 children: [
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: () => Get.back(),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Color(0xFFF99B07),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(12),
+                  //       ),
+                  //     ),
+                  //     child: const Text(
+                  //       'Complete',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 18,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () => controller.markComplete(job),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFF99B07),
                         shape: RoundedRectangleBorder(
@@ -135,6 +175,7 @@ class JobDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
@@ -189,7 +230,7 @@ class JobDetailsScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: photos.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
       ),
@@ -209,7 +250,6 @@ class JobDetailsScreen extends StatelessWidget {
     );
   }
 
-  /// Signature Widget
   Widget _buildSignature(String url) {
     if (url.isEmpty) {
       return const Text(

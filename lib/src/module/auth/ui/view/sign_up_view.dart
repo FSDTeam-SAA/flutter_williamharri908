@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:williamharri/src/module/account/ui/terms_condition_view.dart';
 
 import '../../../../core/component/reactive_ui/widget/save_button.dart';
 import '../../../../core/common/textfields/email_textfield.dart';
@@ -70,6 +71,7 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 2),
 
                   NameTextfield(
                     prefiexIcon: TextfieldPrefixIcon(assetName: Assets.phone),
@@ -82,6 +84,7 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 2),
                   NameTextfield(
                     prefiexIcon: TextfieldPrefixIcon(assetName: Assets.user),
                     labelText: "Username",
@@ -92,6 +95,7 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 2),
 
                   EmailTextfield(
                     onChanged: signupController.setEmail,
@@ -101,6 +105,7 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 2),
 
                   PasswordTextfield(
                     labelText: "Password",
@@ -111,6 +116,7 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 2),
 
                   PasswordTextfield(
                     labelText: "Confirm Password",
@@ -125,33 +131,38 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                 ],
               ),
-
-              // terms and condition
+              SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15.0),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.check_box, color: Colors.orange),
-                    SizedBox(width: 8),
+                    const Icon(Icons.check_box, color: Colors.orange),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          text: "I agree to the ",
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                           children: [
+                            const TextSpan(text: "I agree to the "),
                             TextSpan(
                               text: "Terms & Conditions",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.blueAccent,
-                                //decoration: TextDecoration.underline,
-                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.pushNamed(
+                                  Navigator.push(
                                     context,
-                                    RouteNames.terms,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TermsConditionView(),
+                                    ),
                                   );
                                 },
                             ),
@@ -163,7 +174,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
               ),
 
-              // sign up button
+              SizedBox(height: 24),
+
               RSaveButton(
                 height: 52,
                 key: UniqueKey(),
@@ -172,37 +184,15 @@ class _SignUpViewState extends State<SignUpView> {
                 doneText: "Successful",
                 loadingText: "Signing Up...",
                 onSave: (processNotifier) async {
-                  signupController.signup();
+                  await signupController.signup(
+                    buttonNotifier: processNotifier,
+                    snackbarNotifier: signupController.snackbarNotifier,
+                  );
                 },
                 onDone: () {},
               ),
-              // Add other text fields like EmailTextfield, PasswordTextfield here
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  //horizontal: 16.0,
-                  vertical: 15.0,
-                ),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColors.context(context).primaryColor,
-                    ),
-                    //color: AppColors.context(context).primaryColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Join As A Manager',
-                      style: TextStyle(
-                        color: AppColors.context(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+
+              SizedBox(height: 12),
               Center(
                 child: RichText(
                   textAlign: TextAlign.center,
@@ -219,7 +209,7 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, RouteNames.login);
+                            Navigator.pop(context, RouteNames.login);
                           },
                       ),
                     ],

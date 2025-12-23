@@ -25,7 +25,6 @@
 
 //   @override
 //   void dispose() {
-//     // TODO: implement dispose
 //     super.dispose();
 //     timer.cancel();
 //   }
@@ -90,7 +89,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(seconds: 1), _navigateNext);
+    timer = Timer(const Duration(milliseconds: 1000), _navigateNext);
   }
 
   void _navigateNext() {

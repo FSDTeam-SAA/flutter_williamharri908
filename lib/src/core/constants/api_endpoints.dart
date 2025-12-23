@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 base class ApiEndpoints {
-  static const String socketUrl = _LocalHostWifi.socketUrl;
+  static const String socketUrl = _HostedClientServer.socketUrl;
 
-  static const String baseUrl = _LocalHostWifi.baseUrl;
+  static const String baseUrl = _HostedClientServer.baseUrl;
 
   // ---------------------- AUTH -----------------------------
   static const String login = _Auth.login;
@@ -14,16 +14,13 @@ base class ApiEndpoints {
   static const String changePassword = _Auth.changePassword;
   static const String createNewPassword = _Auth.resetPassword;
   static const String refreshToken = _Auth.refreshToken;
-
   static const String logout = _Auth.logout;
 
   // ---------------------- USER -----------------------------
   /// ### get
   static String getuserbyId(String id) => _User.getuserbyId(id);
-
   /// ### patch
   static const String updateUser = _User.updateUser;
-
   /// ### patch
   static const String uploadProfileImage = _User.uploadProfileImage;
   //Get
@@ -57,20 +54,28 @@ base class ApiEndpoints {
   static const String submitScaffold = _Application.application;
   static const String myScaffoldList = _Application.myScaffoldList;
   static String scaffoldUpdate(String id) => _Application.scaffoldUpdate(id);
+
+  static String completeScaffold(String id) => _Application.completeScaffold(id);
+
+
+  static const String allClient = _Client.allClient;
 }
 
-class _RemoteServer {
+class _FreeServer {
   static const String socketUrl =
       'https://williamharri-backend-anlh.onrender.com'
       '';
 
-  // static const String baseUrl =
-  //     'https://williamharri-backend-anlh.onrender.com/api'
-  //     '';
-
   static const String baseUrl =
-      'http://10.10.5.89:8001/api'
-      ;
+      'https://williamharri-backend-anlh.onrender.com/api'
+      '';
+
+}
+
+class _HostedClientServer {
+  static const String socketUrl = 'https://api.williamjamesscaffoldingapp.com';
+
+  static const String baseUrl = 'https://api.williamjamesscaffoldingapp.com/api';
 }
 
 class _LocalHostWifi {
@@ -130,5 +135,12 @@ class _Application {
   static const String application = '$_applicationRoute/';
   static const String myScaffoldList = '$_applicationRoute/mine';
   static String scaffoldUpdate(String id) => '$_applicationRoute/$id';
+  static String completeScaffold(String id) => '$_applicationRoute/$id/complete';
 
+}
+
+// ---------------------- client -------------------------------------
+class _Client {
+  static const String _clientRoute = '${ApiEndpoints.baseUrl}/clients';
+  static const String allClient = '$_clientRoute/';
 }

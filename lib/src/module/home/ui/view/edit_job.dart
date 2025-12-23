@@ -42,11 +42,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
   late List<String> _existingPhotos;
 
   /// NEW: PDFs
-  File? _methodStatementFile;          // new picked file (if any)
-  File? _riskAssessmentFile;           // new picked file (if any)
-
-  String? _existingMethodStatementUrl; // existing pdf url from backend
-  String? _existingRiskAssessmentUrl;  // existing pdf url from backend
+  File? _methodStatementFile;
+  File? _riskAssessmentFile;
+  String? _existingMethodStatementUrl;
+  String? _existingRiskAssessmentUrl;
 
   bool _isSaving = false;
 
@@ -58,12 +57,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
     _locationCtrl = TextEditingController(text: widget.job.location);
     _descriptionCtrl = TextEditingController(text: widget.job.description);
     _priceCtrl = TextEditingController(text: widget.job.price.toString());
-
     _existingPhotos = List<String>.from(widget.job.photos);
-
-    // ✅ Get existing PDF URLs from JobModel
-    _existingMethodStatementUrl = widget.job.methodStatement;   // <--- make sure JobModel has this
-    _existingRiskAssessmentUrl = widget.job.riskAssessment;     // <--- and this
+    _existingMethodStatementUrl = widget.job.methodStatement;
+    _existingRiskAssessmentUrl = widget.job.riskAssessment;
   }
 
   @override
@@ -164,8 +160,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
     };
 
     if (_thumbnailFile != null) {
-      dataMap['thumbnail'] =
-          dio.MultipartFile.fromFileSync(_thumbnailFile!.path);
+      dataMap['thumbnail'] = dio.MultipartFile.fromFileSync(
+        _thumbnailFile!.path,
+      );
     }
 
     // new photos only (existing ones are already stored on server)
@@ -177,13 +174,15 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
     // ✅ PDFs: only send if user picked a new one
     if (_methodStatementFile != null) {
-      dataMap['methodStatement'] =
-          dio.MultipartFile.fromFileSync(_methodStatementFile!.path);
+      dataMap['methodStatement'] = dio.MultipartFile.fromFileSync(
+        _methodStatementFile!.path,
+      );
     }
 
     if (_riskAssessmentFile != null) {
-      dataMap['riskAssessment'] =
-          dio.MultipartFile.fromFileSync(_riskAssessmentFile!.path);
+      dataMap['riskAssessment'] = dio.MultipartFile.fromFileSync(
+        _riskAssessmentFile!.path,
+      );
     }
 
     // If backend needs to know which existing photos were removed,
@@ -206,7 +205,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         msg = data['message'].toString();
       } else {
         msg =
-        'Failed to update job (status: ${e.response?.statusCode ?? 'unknown'})';
+            'Failed to update job (status: ${e.response?.statusCode ?? 'unknown'})';
       }
       Get.snackbar(
         'Error',
@@ -228,8 +227,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
   // --------------------------- UI helpers ---------------------------
 
-  static const TextStyle _fieldTextStyle =
-  TextStyle(color: Colors.white, fontSize: 14);
+  static const TextStyle _fieldTextStyle = TextStyle(
+    color: Colors.white,
+    fontSize: 14,
+  );
 
   static String? _requiredValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -298,11 +299,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   color: Colors.black54,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.close,
-                  size: 14,
-                  color: Colors.white,
-                ),
+                child: const Icon(Icons.close, size: 14, color: Colors.white),
               ),
             ),
           ),
@@ -412,10 +409,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
               Center(
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 45,
-                      backgroundImage: avatarImage,
-                    ),
+                    CircleAvatar(radius: 45, backgroundImage: avatarImage),
                     const SizedBox(height: 10),
                     TextButton(
                       onPressed: _pickThumbnail,
@@ -440,8 +434,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 style: _fieldTextStyle,
                 decoration: _inputDecoration().copyWith(
                   hintText: 'Modern Homes Co.',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
                 validator: _requiredValidator,
               ),
@@ -454,8 +450,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 style: _fieldTextStyle,
                 decoration: _inputDecoration().copyWith(
                   hintText: 'Real estate agent needed',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
                 validator: _requiredValidator,
               ),
@@ -468,8 +466,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 style: _fieldTextStyle,
                 decoration: _inputDecoration().copyWith(
                   hintText: '789 Park Lane, Birmingham, B',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
                 validator: _requiredValidator,
               ),
@@ -483,8 +483,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 keyboardType: TextInputType.number,
                 decoration: _inputDecoration().copyWith(
                   hintText: '\$ 199',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -520,8 +522,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 keyboardType: TextInputType.multiline,
                 decoration: _inputDecoration(isBig: true).copyWith(
                   hintText: 'Write something...',
-                  hintStyle:
-                  const TextStyle(color: Colors.white70, fontSize: 14),
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
                 validator: _requiredValidator,
               ),
@@ -542,8 +546,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       _methodStatementFile != null
                           ? _methodStatementFile!.path.split('/').last
                           : (_existingMethodStatementUrl != null
-                          ? _fileNameFromUrl(_existingMethodStatementUrl!)
-                          : 'No file selected'),
+                                ? _fileNameFromUrl(_existingMethodStatementUrl!)
+                                : 'No file selected'),
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -569,8 +573,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       _riskAssessmentFile != null
                           ? _riskAssessmentFile!.path.split('/').last
                           : (_existingRiskAssessmentUrl != null
-                          ? _fileNameFromUrl(_existingRiskAssessmentUrl!)
-                          : 'No file selected'),
+                                ? _fileNameFromUrl(_existingRiskAssessmentUrl!)
+                                : 'No file selected'),
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -619,10 +623,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                     }),
 
                     // add-photo button
-                    GestureDetector(
-                      onTap: _addPhoto,
-                      child: _addPhotoButton(),
-                    ),
+                    GestureDetector(onTap: _addPhoto, child: _addPhotoButton()),
                   ],
                 ),
               ),
@@ -642,17 +643,17 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   onPressed: _isSaving ? null : _save,
                   child: _isSaving
                       ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text(
-                    'Save',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                          'Save',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
             ],

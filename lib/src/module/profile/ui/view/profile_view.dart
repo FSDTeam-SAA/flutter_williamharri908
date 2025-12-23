@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/core/component/image_cache/smart_network_image.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import '../../../../core/constants/assets.dart';
 import '../../../account/ui/terms_condition_view.dart';
 import '../../../auth/ui/view/change_password_view.dart';
@@ -13,7 +13,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ProfileController>();
+    final controller = Get.find<ProfileDataController>();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -92,7 +92,8 @@ class ProfileView extends StatelessWidget {
                 onTap: () {
                   //Get.snackbar("Logout", "Successfully Logout")
                   showLogoutDialog(
-                    onConfirm: () => Get.find<ProfileController>().logoutUser(),
+                    onConfirm: () =>
+                        Get.find<ProfileDataController>().logoutUser(),
                   );
                 },
                 child: Container(

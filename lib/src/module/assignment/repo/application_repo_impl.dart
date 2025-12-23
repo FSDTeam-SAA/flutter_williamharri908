@@ -18,7 +18,7 @@ base class ApplicationRepoImpl extends ApplicationRepo {
       tryFunc: () async {
         final response = await appPigeon.post(
           ApiEndpoints.submitScaffold,
-          data: param.toJson(),
+          data: await param.toFormData(),
         );
         return Success(message: extractSuccessMessage(response));
       },
@@ -66,6 +66,21 @@ base class ApplicationRepoImpl extends ApplicationRepo {
           data: await param.toFormData(),
         );
         return Success(message: extractSuccessMessage(response));
+      },
+    );
+  }
+
+  @override
+  FutureRequest<String> completeScaffold(JobModelManager param) async {
+    return await asyncTryCatch(
+      tryFunc: () async {
+        final response = await appPigeon.patch(
+          ApiEndpoints.completeScaffold(param.latestScaffold!.id),
+          data: {"scaffoldId": param.latestScaffold!.id},
+        );
+        final body = response.data;
+        final status = body["data"]["scaffoldStatus"] ?? "";
+        return status;
       },
     );
   }

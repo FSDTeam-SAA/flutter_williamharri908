@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/model/profile_model.dart';
@@ -25,7 +26,7 @@ class StaffController extends GetxController {
     result.fold(
       (failure) {
         isLoading.value = false;
-        print("Error loading staff list: $failure");
+        debugPrint("Error loading staff list: $failure");
       },
       (success) {
         staffList.assignAll(success.data ?? []);

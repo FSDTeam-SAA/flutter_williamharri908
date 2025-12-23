@@ -9,7 +9,7 @@ import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/controller/staff_all_jobs.controller.dart';
 import 'package:williamharri/src/module/home/repo/job_repo.dart';
 import 'package:williamharri/src/module/home/repo/job_repo_impl.dart';
-import 'package:williamharri/src/module/profile/controller/get_profile_controller.dart';
+import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo_impl.dart';
@@ -22,12 +22,15 @@ void initInterfaces() {
     () => ProfileRepoImpl(appPigeon: Get.find()),
     fenix: true,
   );
-  Get.lazyPut<ProfileController>(
-    () => ProfileController(repo: Get.find()),
+  Get.lazyPut<ProfileDataController>(
+    () => ProfileDataController(repo: Get.find()),
     fenix: true,
   );
 
-  Get.lazyPut<SnackbarNotifier>(() => SnackbarNotifier(context: Get.context!), fenix: true);
+  Get.lazyPut<SnackbarNotifier>(
+    () => SnackbarNotifier(context: Get.context!),
+    fenix: true,
+  );
   Get.put<AppManager>(AppManager(), permanent: true);
 
   Get.lazyPut<JobRepo>(() => JobRepoImpl(appPigeon: Get.find()), fenix: true);

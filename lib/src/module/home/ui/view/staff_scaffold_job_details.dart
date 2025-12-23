@@ -46,7 +46,7 @@ class StaffScaffoldJobDetails extends StatelessWidget {
             children: [
               // Title & Company
               Text(
-                job.job.title,
+                job.job.companyName,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -57,12 +57,10 @@ class StaffScaffoldJobDetails extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                job.job.companyName,
+                job.job.title,
                 style: const TextStyle(color: Colors.white70),
               ),
-
               const SizedBox(height: 20),
-
               // Description
               const Text(
                 "Description",
