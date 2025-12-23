@@ -186,6 +186,20 @@ class JobDetailsUi extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(height: 8),
+                      Text(
+                        job.client.clientEmail,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        job.client.clientPhoneNo,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Text(job.title, style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 8),

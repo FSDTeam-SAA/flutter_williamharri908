@@ -14,6 +14,7 @@ class JobModel {
   final bool isDeleted;
   final ProfileModel postedBy;
   final List<ProfileModel> assignedTo;
+  final Client client;
   final String scaffoldStatus;
   final String targetDate;
   final String createdAt;
@@ -47,6 +48,7 @@ class JobModel {
     this.thumbnail,
     this.methodStatement,
     this.riskAssessment,
+    required this.client,
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -84,6 +86,48 @@ class JobModel {
       thumbnail: json['thumbnail']?.toString(),
       methodStatement: json['methodStatement'],
       riskAssessment: json['riskAssessment'],
+      client: Client.fromJson(json['client'] ?? {}),
     );
+  }
+}
+
+class Client {
+  final String clientName;
+  final String clientEmail;
+  final String clientPhoneNo;
+  final bool isDeleted;
+  final String id;
+
+  Client({
+    required this.clientName,
+    required this.clientEmail,
+    required this.clientPhoneNo,
+    required this.isDeleted,
+    required this.id,
+  });
+
+  factory Client.fromJson(Map<String, dynamic> json) {
+    return Client(
+      clientName: json['clientName'] ?? "",
+      clientEmail: json['clientEmail'] ?? "",
+      clientPhoneNo: json['clientPhoneNo'] ?? "",
+      isDeleted: json['isDeleted'] ?? false,
+      id: json['id'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'clientName': clientName,
+      'clientEmail': clientEmail,
+      'clientPhoneNo': clientPhoneNo,
+      'isDeleted': isDeleted,
+      'id': id,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Client{clientName: $clientName, clientEmail: $clientEmail, clientPhoneNo: $clientPhoneNo, isDeleted: $isDeleted, id: $id}';
   }
 }

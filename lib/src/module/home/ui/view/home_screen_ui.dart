@@ -81,7 +81,6 @@ class _HomeScreenViewState extends State<HomeScreenView>
           child: Image.network(url, width: 70, height: 70, fit: BoxFit.cover),
         ),
         const SizedBox(height: 4),
-        const Text("data"),
       ],
     );
   }
@@ -230,16 +229,8 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                       ),
                                     ),
                                   ),
-                                  // Text(
-                                  //   staffjob.status.capitalize ?? "",
-                                  //   style: TextStyle(
-                                  //     fontSize: 16,
-                                  //     fontWeight: FontWeight.w600,
-                                  //     color: getStatusColor(staffjob.status),
-                                  //   ),
-                                  // ),
                                   Text(
-                                    staffjob.status == "Assignmenttostaff"
+                                    staffjob.status == "assignedToStaffs"
                                         ? "Assigned"
                                         : staffjob.status.capitalize ?? "",
                                     style: TextStyle(
@@ -297,6 +288,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
             jobs: jobController.jobs,
             itemBuilder: (context, index) {
               final job = jobController.jobs[index];
+              debugPrint(job.status);
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: InkWell(
@@ -338,8 +330,8 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                   //   ),
                                   // ),
                                   Text(
-                                    job.status == "Assignmenttostaff"
-                                        ? "Assigned to"
+                                    job.status == "assignedToStaffs"
+                                        ? "Assigned"
                                         : job.status.capitalize ?? "",
                                     style: TextStyle(
                                       fontSize: 16,
