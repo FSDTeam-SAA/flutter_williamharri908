@@ -161,10 +161,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
   void initState() {
     super.initState();
 
-    _titleCtrl = TextEditingController(text: (widget.job.title ?? '').toString());
-    _locationCtrl = TextEditingController(text: (widget.job.location ?? '').toString());
-    _descriptionCtrl = TextEditingController(text: (widget.job.description ?? '').toString());
-    _priceCtrl = TextEditingController(text: (widget.job.price ?? '').toString());
+    _titleCtrl = TextEditingController(text: (widget.job.title).toString());
+    _locationCtrl = TextEditingController(text: (widget.job.location).toString());
+    _descriptionCtrl = TextEditingController(text: (widget.job.description).toString());
+    _priceCtrl = TextEditingController(text: (widget.job.price).toString());
 
     // ✅ NEW: prefill quotation + coords if exist
     _quotationCtrl = TextEditingController(text: _readQuotationNo(widget.job) ?? '');
@@ -331,7 +331,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         res = await appPigeon.get(ApiEndpoints.allClient);
       } catch (_) {
         // fallback
-        res = await appPigeon.get(ApiEndpoints.clients);
+        res = await appPigeon.get(ApiEndpoints.allClient);
       }
 
       final data = res.data;

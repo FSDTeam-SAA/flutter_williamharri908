@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 base class ApiEndpoints {
   static const String socketUrl = _HostedClientServer.socketUrl;
-  static const String clients= _HostedClientServer.baseUrl;
+  // static const String clients= _HostedClientServer.baseUrl;
 
   static const String baseUrl = _HostedClientServer.baseUrl;
 
@@ -108,7 +108,6 @@ class _User {
   static const String uploadProfileImage = '$_userRoute/me/avatar';
   static const String staffList = '$_userRoute/staff';
 }
-
 // ---------------------- Notification -----------------------------
 
 // ---------------------- jobs -------------------------------------

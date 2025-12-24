@@ -283,7 +283,6 @@ class JobDetailsUi extends StatelessWidget {
                     ),
             ),
             const SizedBox(height: 60),
-            if (profileController.profile.value?.role == "staff")
               Column(
                 children: [
                   RSaveButton(
