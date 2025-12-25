@@ -189,21 +189,30 @@ class JobDetailsUi extends StatelessWidget {
                       SizedBox(height: 8),
                       Text(
                         job.client.clientEmail,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
+                        style: const TextStyle(fontSize: 18),
                       ),
                       SizedBox(height: 8),
                       Text(
-                        job.client.clientPhoneNo,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
+                        'Phone:${job.client.clientPhoneNo}',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      // const SizedBox(height: 8),
+                      // Text(job.title, style: const TextStyle(fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Address: ${job.location}',
+                        style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 8),
-                      Text(job.title, style: const TextStyle(fontSize: 16)),
-                      const SizedBox(height: 8),
-                      Text(job.location, style: const TextStyle(fontSize: 14)),
+                      Text(
+                        'Longitude: ${job.coordinates.lang ?? '-'}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+
+                      Text(
+                        'Latitude: ${job.coordinates.lat ?? '-'}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
@@ -283,36 +292,36 @@ class JobDetailsUi extends StatelessWidget {
                     ),
             ),
             const SizedBox(height: 60),
-              Column(
-                children: [
-                  RSaveButton(
-                    height: 52,
-                    key: UniqueKey(),
-                    buttonStatusNotifier: ProcessStatusNotifier(
-                      initialStatus: EnabledStatus(),
-                    ),
-                    saveText: "Accept",
-                    doneText: "Accepted",
-                    loadingText: "Accepting...",
-                    onDone: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RamsDocumentScreen(job: job),
-                        ),
-                      );
-                    },
-                    onSave: (ProcessStatusNotifier processNotifier) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RamsDocumentScreen(job: job),
-                        ),
-                      );
-                    },
+            Column(
+              children: [
+                RSaveButton(
+                  height: 52,
+                  key: UniqueKey(),
+                  buttonStatusNotifier: ProcessStatusNotifier(
+                    initialStatus: EnabledStatus(),
                   ),
-                ],
-              ),
+                  saveText: "Accept",
+                  doneText: "Accepted",
+                  loadingText: "Accepting...",
+                  onDone: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RamsDocumentScreen(job: job),
+                      ),
+                    );
+                  },
+                  onSave: (ProcessStatusNotifier processNotifier) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RamsDocumentScreen(job: job),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -15,6 +15,7 @@ class JobModel {
   final ProfileModel postedBy;
   final List<ProfileModel> assignedTo;
   final Client client;
+  final Coordinates coordinates;
   final String scaffoldStatus;
   final String targetDate;
   final String createdAt;
@@ -49,6 +50,7 @@ class JobModel {
     this.methodStatement,
     this.riskAssessment,
     required this.client,
+    required this.coordinates,
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -87,6 +89,9 @@ class JobModel {
       methodStatement: json['methodStatement'],
       riskAssessment: json['riskAssessment'],
       client: Client.fromJson(json['client'] ?? {}),
+      coordinates: Coordinates.fromJson(
+        json['coordinates'] as Map<String, dynamic>? ?? {},
+      ),
     );
   }
 }
@@ -129,5 +134,59 @@ class Client {
   @override
   String toString() {
     return 'Client{clientName: $clientName, clientEmail: $clientEmail, clientPhoneNo: $clientPhoneNo, isDeleted: $isDeleted, id: $id}';
+  }
+}
+
+// class Coordinates {
+//   double? lat;
+//   double? lang;
+
+//   Coordinates({this.lat, this.lang});
+
+//   Coordinates.fromJson(Map<String, dynamic> json) {
+//     lat = json['lat'];
+//     lang = json['lang'];
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['lat'] = lat;
+//     data['lang'] = lang;
+//     return data;
+//   }
+
+//   @override
+//   String toString() {
+//     return 'Coordinates{lat: $lat, lang: $lang}';
+//   }
+
+//   //tomap
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'lat': lat,
+//       'lang': lang,
+//     };
+//   }
+// }
+class Coordinates {
+  double? lat;
+  double? lang;
+
+  Coordinates({this.lat, this.lang});
+
+  factory Coordinates.fromJson(Map<String, dynamic> json) {
+    return Coordinates(
+      lat: (json['lat'] as num?)?.toDouble(),
+      lang: (json['lang'] as num?)?.toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'lat': lat, 'lang': lang};
+  }
+
+  @override
+  String toString() {
+    return 'Coordinates{lat: $lat, lang: $lang}';
   }
 }
