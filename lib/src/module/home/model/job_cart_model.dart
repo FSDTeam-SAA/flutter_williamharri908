@@ -21,6 +21,7 @@ class JobModel {
   final String createdAt;
   final String updatedAt;
   final String signatureUrl;
+  final String? quotationNo;
 
   /// URL of the main thumbnail image
   final String? thumbnail;
@@ -51,6 +52,7 @@ class JobModel {
     this.riskAssessment,
     required this.client,
     required this.coordinates,
+    this.quotationNo,
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -92,6 +94,7 @@ class JobModel {
       coordinates: Coordinates.fromJson(
         json['coordinates'] as Map<String, dynamic>? ?? {},
       ),
+      quotationNo: json['quotationNo'] ?? "",
     );
   }
 }

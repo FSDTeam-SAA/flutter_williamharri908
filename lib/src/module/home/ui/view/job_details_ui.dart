@@ -200,29 +200,91 @@ class JobDetailsUi extends StatelessWidget {
                       // Text(job.title, style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 8),
                       Text(
+                        maxLines: 5,
                         'Address: ${job.location}',
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Longitude: ${job.coordinates.lang ?? '-'}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-
-                      Text(
-                        'Latitude: ${job.coordinates.lat ?? '-'}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Longitude: ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  TextSpan(
+                    text: job.coordinates.lang?.toString() ?? '-',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Latitude: ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  TextSpan(
+                    text: job.coordinates.lat?.toString() ?? '-',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'QuotationNo: ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  TextSpan(
+                    
+                    text: job.quotationNo ?? 'No Quotation',
+                    style:  TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              maxLines: 5,
+            ),
+            const SizedBox(height: 20),
 
             const Text(
               "Description",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
