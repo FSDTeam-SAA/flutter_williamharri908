@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:williamharri/src/core/constants/app_colors.dart';
 import 'package:williamharri/src/module/home/ui/view/home_screen_ui.dart';
 import 'package:williamharri/src/module/home/ui/view/my_jobs.dart';
-import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import 'package:williamharri/src/module/profile/ui/view/profile_view.dart';
 
 class AppGround extends StatefulWidget {

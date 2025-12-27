@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
+import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
 import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
 class JobDetailsScreen extends StatelessWidget {
@@ -137,25 +140,6 @@ class JobDetailsScreen extends StatelessWidget {
               SizedBox(height: 32),
               Row(
                 children: [
-                  // Expanded(
-                  //   child: ElevatedButton(
-                  //     onPressed: () => Get.back(),
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: Color(0xFFF99B07),
-                  //       shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(12),
-                  //       ),
-                  //     ),
-                  //     child: const Text(
-                  //       'Complete',
-                  //       style: TextStyle(
-                  //         color: Colors.white,
-                  //         fontSize: 18,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => controller.markComplete(job),
@@ -201,6 +185,37 @@ class JobDetailsScreen extends StatelessWidget {
             ],
 
             const SizedBox(height: 32),
+
+            Column(
+              children: [
+                RSaveButton(
+                  height: 52,
+                  key: UniqueKey(),
+                  buttonStatusNotifier: ProcessStatusNotifier(
+                    initialStatus: EnabledStatus(),
+                  ),
+                  saveText: "Accept",
+                  doneText: "Accepted",
+                  loadingText: "Accepting...",
+                  onDone: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ManagerRamsDocumentScreen(job: job),
+                      ),
+                    );
+                  },
+                  onSave: (ProcessStatusNotifier processNotifier) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ManagerRamsDocumentScreen(job: job),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -11,10 +11,9 @@ class CreateJobModel {
   final String? methodStatement;
   final String? riskAssessment;
 
-  // ✅ NEW
   final String? quotationNo;
   final double? lat;
-  final double? lang; // backend uses "lang"
+  final double? lang;
 
   const CreateJobModel({
     this.companyName,
@@ -27,7 +26,6 @@ class CreateJobModel {
     this.methodStatement,
     this.riskAssessment,
 
-    // ✅ NEW
     this.quotationNo,
     this.lat,
     this.lang,
