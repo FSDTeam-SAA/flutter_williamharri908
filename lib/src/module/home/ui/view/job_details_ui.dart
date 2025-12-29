@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
@@ -43,7 +41,7 @@ class FullImageViewScreen extends StatelessWidget {
 }
 
 /// ---------------------------------------------------------------------------
-/// PDF VIEWER (NETWORK PDF -> LOCAL FILE -> flutter_pdfview)
+/// PDF VIEWER (NETWORK PDF -> SYNCFUSION VIEWER)
 /// ---------------------------------------------------------------------------
 class JobPdfViewerScreen extends StatefulWidget {
   final String url;
@@ -60,48 +58,7 @@ class JobPdfViewerScreen extends StatefulWidget {
 }
 
 class _JobPdfViewerScreenState extends State<JobPdfViewerScreen> {
-  String? _localPath;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _downloadPdf();
-  }
-
-  Future<void> _downloadPdf() async {
-    try {
-      final tempDir = await getTemporaryDirectory();
-      final filePath =
-          '${tempDir.path}/job_${DateTime.now().millisecondsSinceEpoch}.pdf';
-
-      final client = dio.Dio();
-      final response = await client.get<List<int>>(
-        widget.url,
-        options: dio.Options(
-          responseType: dio.ResponseType.bytes,
-          followRedirects: true,
-          validateStatus: (status) => status != null && status < 500,
-        ),
-      );
-
-      final file = File(filePath);
-      await file.writeAsBytes(response.data ?? <int>[], flush: true);
-
-      if (!mounted) return;
-      setState(() {
-        _localPath = filePath;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -112,32 +69,31 @@ class _JobPdfViewerScreenState extends State<JobPdfViewerScreen> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
-      body: _isLoading
-          ? const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      )
-          : (_error != null)
-          ? Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Failed to load PDF:\n$_error',
-            style: const TextStyle(color: Colors.white),
-            textAlign: TextAlign.center,
+      body: Stack(
+        children: [
+          SfPdfViewer.network(
+            widget.url,
+            canShowScrollStatus: true,
+            canShowPaginationDialog: true,
+            onDocumentLoadFailed: (details) {
+              setState(() {
+                _errorMessage =
+                'Error: ${details.error}\nDescription: ${details.description}';
+              });
+            },
           ),
-        ),
-      )
-          : PDFView(
-        filePath: _localPath!,
-        enableSwipe: true,
-        swipeHorizontal: true,
-        autoSpacing: true,
-        pageFling: true,
-        onError: (err) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('PDF error: $err')),
-          );
-        },
+          if (_errorMessage != null)
+            Container(
+              color: Colors.black,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Failed to load PDF:\n$_errorMessage',
+                style: const TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+        ],
       ),
     );
   }
