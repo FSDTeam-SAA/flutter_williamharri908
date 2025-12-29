@@ -5,6 +5,7 @@ import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dar
 import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 import 'package:williamharri/src/module/assignment/controller/my_job_maneger_controller.dart';
 import 'package:williamharri/src/module/assignment/model/my_jobs_manager_model.dart';
+import 'package:williamharri/src/module/home/ui/view/manager_edit_scaffold_screen.dart';
 import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
 import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
@@ -186,40 +187,9 @@ class JobDetailsScreen extends StatelessWidget {
             ],
 
             const SizedBox(height: 32),
-
-            // Column(
-            //   children: [
-            //     RSaveButton(
-            //       height: 52,
-            //       key: UniqueKey(),
-            //       buttonStatusNotifier: ProcessStatusNotifier(
-            //         initialStatus: EnabledStatus(),
-            //       ),
-            //       saveText: "Accept",
-            //       doneText: "Accepted",
-            //       loadingText: "Accepting...",
-            //       onDone: () {
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => ManagerRamsDocumentScreen(job: job),
-            //           ),
-            //         );
-            //       },
-            //       onSave: (ProcessStatusNotifier processNotifier) {
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => ManagerRamsDocumentScreen(job: job),
-            //           ),
-            //         );
-            //       },
-            //     ),
-            //   ],
-            // ),
-            Column(
-              children: [
-                if (job.latestScaffold == null)
+            if (job.latestScaffold == null)
+              Column(
+                children: [
                   RSaveButton(
                     height: 52,
                     key: UniqueKey(),
@@ -247,39 +217,31 @@ class JobDetailsScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  )
-                else
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // you can pass an `isEdit` flag if your screen needs it
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ManagerRamsDocumentScreen(job: job),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF99B07),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Edit Scaffold',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ),
-              ],
-            ),
+                ],
+              ),
+
+              if (job.latestScaffold != null)
+              Column(
+                children: [
+                  RSaveButton(
+                    height: 52,
+                    key: UniqueKey(),
+                    buttonStatusNotifier: ProcessStatusNotifier(
+                      initialStatus: EnabledStatus(),
+                    ),
+                    saveText: "Edit",
+                    doneText: "Edited",
+                    loadingText: "Editing...",
+                    onDone: () {
+                      Get.to(() => EditScaffoldScreen(job: job));
+                    },
+                    onSave: (ProcessStatusNotifier processNotifier) {
+                      Get.to(() => EditScaffoldScreen(job: job));
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -349,3 +311,147 @@ class JobDetailsScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+// class EditScaffoldScreen extends StatefulWidget {
+//   final JobModelManager job;
+
+//   const EditScaffoldScreen({super.key, required this.job});
+
+//   @override
+//   State<EditScaffoldScreen> createState() => _EditScaffoldScreenState();
+// }
+
+// class _EditScaffoldScreenState extends State<EditScaffoldScreen> {
+//   late TextEditingController descriptionController;
+//   List<String> photos = [];
+//   String signatureUrl = '';
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     descriptionController =
+//         TextEditingController(text: widget.job.latestScaffold?.description ?? '');
+//     photos = List.from(widget.job.latestScaffold?.photos ?? []);
+//     signatureUrl = widget.job.latestScaffold?.signatureUrl ?? '';
+//   }
+
+//   void saveChanges() {
+//     // Here you can call your controller API to save changes
+//     final controller = Get.find<MyJobManagerController>();
+//     // controller.updateScaffold(
+//     //   jobId: widget.job.id,
+//     //   description: descriptionController.text,
+//     //   photos: photos,
+//     //   signatureUrl: signatureUrl,
+//     // );
+
+//     Get.back(); // go back to previous screen
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Edit Scaffold'),
+//         backgroundColor: Colors.black,
+//       ),
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.all(20),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             const Text(
+//               'Description',
+//               style: TextStyle(color: Colors.white, fontSize: 18),
+//             ),
+//             const SizedBox(height: 8),
+//             TextField(
+//               controller: descriptionController,
+//               maxLines: 5,
+//               style: const TextStyle(color: Colors.white),
+//               decoration: InputDecoration(
+//                 filled: true,
+//                 fillColor: Colors.white12,
+//                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//               ),
+//             ),
+//             const SizedBox(height: 20),
+
+//             const Text('Photos', style: TextStyle(color: Colors.white, fontSize: 18)),
+//             const SizedBox(height: 8),
+//             Wrap(
+//               spacing: 8,
+//               runSpacing: 8,
+//               children: photos
+//                   .map((photo) => Stack(
+//                         children: [
+//                           Image(
+//                             image: File(photo).existsSync()
+//                                 ? FileImage(File(photo))
+//                                 : NetworkImage(photo) as ImageProvider,
+//                             width: 100,
+//                             height: 100,
+//                             fit: BoxFit.cover,
+//                           ),
+//                           Positioned(
+//                             right: 0,
+//                             top: 0,
+//                             child: GestureDetector(
+//                               onTap: () {
+//                                 setState(() {
+//                                   photos.remove(photo);
+//                                 });
+//                               },
+//                               child: const Icon(Icons.close, color: Colors.red),
+//                             ),
+//                           ),
+//                         ],
+//                       ))
+//                   .toList(),
+//             ),
+//             const SizedBox(height: 20),
+
+//             const Text('Signature', style: TextStyle(color: Colors.white, fontSize: 18)),
+//             const SizedBox(height: 8),
+//             signatureUrl.isNotEmpty
+//                 ? Stack(
+//                     children: [
+//                       Image(
+//                         image: signatureUrl.startsWith('http')
+//                             ? NetworkImage(signatureUrl)
+//                             : FileImage(File(signatureUrl)) as ImageProvider,
+//                         width: double.infinity,
+//                         height: 180,
+//                         fit: BoxFit.cover,
+//                       ),
+//                       Positioned(
+//                         right: 0,
+//                         top: 0,
+//                         child: GestureDetector(
+//                           onTap: () => setState(() => signatureUrl = ''),
+//                           child: const Icon(Icons.close, color: Colors.red),
+//                         ),
+//                       ),
+//                     ],
+//                   )
+//                 : const Text('No signature', style: TextStyle(color: Colors.white54)),
+//             const SizedBox(height: 32),
+
+//             ElevatedButton(
+//               onPressed: saveChanges,
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: const Color(0xFFF99B07),
+//                 minimumSize: const Size.fromHeight(52),
+//                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//               ),
+//               child: const Text('Save', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//             ),
+//           ],
+//         ),
+//       ),
+//       backgroundColor: Colors.black,
+//     );
+//   }
+// }
