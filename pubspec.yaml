@@ -52,9 +52,12 @@ dependencies:
   open_filex: ^4.4.0
   flutter_cached_pdfview: ^0.4.3
   flutter_pdfview: ^1.4.3
-  webview_flutter: ^4.7.0
+  webview_flutter: ^4.13.0
   flutter_inappwebview: ^6.0.0
   url_launcher: ^6.3.0
+  pdf: ^3.11.3
+  syncfusion_flutter_pdfviewer: ^32.1.20
+
 
 
 dev_dependencies:

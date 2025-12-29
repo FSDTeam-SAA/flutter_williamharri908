@@ -907,6 +907,37 @@ class JobDetailsUi extends StatelessWidget {
 
             const SizedBox(height: 80),
 
+            // Accept Button
+            // Center(
+            //   child: RSaveButton(
+            //     height: 56,
+            //     width: double.infinity,
+            //     key: UniqueKey(),
+            //     buttonStatusNotifier: ProcessStatusNotifier(
+            //       initialStatus: EnabledStatus(),
+            //     ),
+            //     saveText: "Accept Job",
+            //     doneText: "Accepted",
+            //     loadingText: "Accepting...",
+            //     onDone: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (_) => RamsDocumentScreen(job: job),
+            //         ),
+            //       );
+            //     },
+            //     onSave: (_) {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (_) => RamsDocumentScreen(job: job),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
+            // const SizedBox(height: 40),
 
 
           ],
