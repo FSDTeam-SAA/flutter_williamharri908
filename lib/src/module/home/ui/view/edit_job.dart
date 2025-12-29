@@ -237,44 +237,37 @@ class _EditJobScreenState extends State<EditJobScreen> {
   // ----------------------------------------------------------------------------
   // ✅ Read initial client info from job (same as your code, kept + safer)
   // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+// ✅ Only change this: read initial client info from JobModel
+// ----------------------------------------------------------------------------
   void _readInitialClientFromJob(JobModel job) {
-    try {
-      final dynamic j = job;
+    final dynamic j = job;
 
+    // client id
+    try {
       final dynamic cid = j.clientId;
       if (cid != null && cid.toString().trim().isNotEmpty) {
         _initialClientId = cid.toString().trim();
       }
+    } catch (_) {}
 
-      final dynamic client = j.client;
-
-      if (_initialClientId == null) {
-        if (client is String && client.trim().isNotEmpty) _initialClientId = client.trim();
+    // client name: prefer companyName (what you show in UI)
+    try {
+      final dynamic name = j.companyName; // or j.clientName if your model has it
+      if (name != null && name.toString().trim().isNotEmpty) {
+        _initialClientName = name.toString().trim();
       }
+    } catch (_) {}
 
-      if (client is Map) {
-        final dynamic id = client['id'] ?? client['_id'];
-        final dynamic name = client['clientName'] ?? client['name'];
-        final dynamic email = client['clientEmail'] ?? client['email'];
-
-        if (_initialClientId == null && id != null) _initialClientId = id.toString().trim();
-        if (name != null && name.toString().trim().isNotEmpty) _initialClientName = name.toString().trim();
-        if (email != null && email.toString().trim().isNotEmpty) _initialClientEmail = email.toString().trim();
-      } else {
-        // old backend stores clientName in companyName
-        final dynamic companyName = j.companyName;
-        if (companyName != null && companyName.toString().trim().isNotEmpty) {
-          _initialClientName ??= companyName.toString().trim();
-        }
-        try {
-          final dynamic ce = j.clientEmail;
-          if (ce != null && ce.toString().trim().isNotEmpty) {
-            _initialClientEmail ??= ce.toString().trim();
-          }
-        } catch (_) {}
+    // client email
+    try {
+      final dynamic email = j.clientEmail;
+      if (email != null && email.toString().trim().isNotEmpty) {
+        _initialClientEmail = email.toString().trim();
       }
     } catch (_) {}
   }
+
 
   // ----------------------------------------------------------------------------
   // ✅ Auto select staff from job

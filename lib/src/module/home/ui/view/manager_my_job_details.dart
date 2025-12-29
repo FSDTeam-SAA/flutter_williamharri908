@@ -12,6 +12,7 @@ class JobDetailsScreen extends StatelessWidget {
   final JobModelManager job;
 
   JobDetailsScreen({super.key, required this.job});
+
   final controller = Get.find<MyJobManagerController>();
 
   @override
@@ -56,7 +57,7 @@ class JobDetailsScreen extends StatelessWidget {
 
             // Description
             const Text(
-              'Description',
+              'Scaffold Description',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -94,7 +95,7 @@ class JobDetailsScreen extends StatelessWidget {
             if (job.latestScaffold != null) ...[
               // Description
               const Text(
-                'Description',
+                'Scaffold Description',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -114,7 +115,7 @@ class JobDetailsScreen extends StatelessWidget {
               const SizedBox(height: 12),
 
               const Text(
-                'Submitted Photos',
+                'Scaffold Photos',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -171,7 +172,7 @@ class JobDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Cancle',
+                        'Cancel',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -186,34 +187,97 @@ class JobDetailsScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
+            // Column(
+            //   children: [
+            //     RSaveButton(
+            //       height: 52,
+            //       key: UniqueKey(),
+            //       buttonStatusNotifier: ProcessStatusNotifier(
+            //         initialStatus: EnabledStatus(),
+            //       ),
+            //       saveText: "Accept",
+            //       doneText: "Accepted",
+            //       loadingText: "Accepting...",
+            //       onDone: () {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => ManagerRamsDocumentScreen(job: job),
+            //           ),
+            //         );
+            //       },
+            //       onSave: (ProcessStatusNotifier processNotifier) {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => ManagerRamsDocumentScreen(job: job),
+            //           ),
+            //         );
+            //       },
+            //     ),
+            //   ],
+            // ),
             Column(
               children: [
-                RSaveButton(
-                  height: 52,
-                  key: UniqueKey(),
-                  buttonStatusNotifier: ProcessStatusNotifier(
-                    initialStatus: EnabledStatus(),
+                if (job.latestScaffold == null)
+                  RSaveButton(
+                    height: 52,
+                    key: UniqueKey(),
+                    buttonStatusNotifier: ProcessStatusNotifier(
+                      initialStatus: EnabledStatus(),
+                    ),
+                    saveText: "Accept",
+                    doneText: "Accepted",
+                    loadingText: "Accepting...",
+                    onDone: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ManagerRamsDocumentScreen(job: job),
+                        ),
+                      );
+                    },
+                    onSave: (ProcessStatusNotifier processNotifier) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ManagerRamsDocumentScreen(job: job),
+                        ),
+                      );
+                    },
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // you can pass an `isEdit` flag if your screen needs it
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ManagerRamsDocumentScreen(job: job),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF99B07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Edit Scaffold',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
-                  saveText: "Accept",
-                  doneText: "Accepted",
-                  loadingText: "Accepting...",
-                  onDone: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ManagerRamsDocumentScreen(job: job),
-                      ),
-                    );
-                  },
-                  onSave: (ProcessStatusNotifier processNotifier) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ManagerRamsDocumentScreen(job: job),
-                      ),
-                    );
-                  },
-                ),
               ],
             ),
           ],
