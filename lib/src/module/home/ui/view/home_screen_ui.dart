@@ -31,6 +31,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
     if (profileController.profile.value?.role == "staff") {
       staffJobController.fetchJobs();
     }
+    
   }
 
   @override

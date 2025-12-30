@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:williamharri/src/core/component/reactive_ui/process_notifier.dart';
+import 'package:williamharri/src/core/component/reactive_ui/widget/save_button.dart';
 
 import 'package:williamharri/src/module/home/controller/job_controller.dart';
 import 'package:williamharri/src/module/home/ui/view/edit_job.dart';
+import 'package:williamharri/src/module/home/ui/view/rams_documents.dart';
+import 'package:williamharri/src/module/home/ui/view/staff_scaffold_job_details.dart';
 import 'package:williamharri/src/module/profile/controller/profile_data_controller.dart';
 import 'package:williamharri/src/module/profile/controller/staff_list_controller.dart';
 import 'package:williamharri/src/module/profile/repo/profile_repo.dart';
@@ -33,9 +37,7 @@ class FullImageViewScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: InteractiveViewer(maxScale: 5, child: image),
-      ),
+      body: Center(child: InteractiveViewer(maxScale: 5, child: image)),
     );
   }
 }
@@ -47,11 +49,7 @@ class JobPdfViewerScreen extends StatefulWidget {
   final String url;
   final String title;
 
-  const JobPdfViewerScreen({
-    super.key,
-    required this.url,
-    required this.title,
-  });
+  const JobPdfViewerScreen({super.key, required this.url, required this.title});
 
   @override
   State<JobPdfViewerScreen> createState() => _JobPdfViewerScreenState();
@@ -78,7 +76,7 @@ class _JobPdfViewerScreenState extends State<JobPdfViewerScreen> {
             onDocumentLoadFailed: (details) {
               setState(() {
                 _errorMessage =
-                'Error: ${details.error}\nDescription: ${details.description}';
+                    'Error: ${details.error}\nDescription: ${details.description}';
               });
             },
           ),
@@ -109,15 +107,15 @@ class JobDetailsUi extends StatelessWidget {
   bool isPdf(String url) => url.toLowerCase().endsWith('.pdf');
   bool isImage(String url) =>
       url.toLowerCase().endsWith('.png') ||
-          url.toLowerCase().endsWith('.jpg') ||
-          url.toLowerCase().endsWith('.jpeg') ||
-          url.toLowerCase().endsWith('.webp');
+      url.toLowerCase().endsWith('.jpg') ||
+      url.toLowerCase().endsWith('.jpeg') ||
+      url.toLowerCase().endsWith('.webp');
 
   void openAttachment(
-      BuildContext context, {
-        required String url,
-        required String title,
-      }) {
+    BuildContext context, {
+    required String url,
+    required String title,
+  }) {
     if (isPdf(url)) {
       Get.to(() => JobPdfViewerScreen(url: url, title: title));
     } else if (isImage(url)) {
@@ -168,7 +166,7 @@ class JobDetailsUi extends StatelessWidget {
                 }
 
                 final updated = await Get.to<bool>(
-                      () => EditJobScreen(job: job),
+                  () => EditJobScreen(job: job),
                 );
                 if (updated == true) {
                   Get.snackbar(
@@ -242,8 +240,9 @@ class JobDetailsUi extends StatelessWidget {
                     CircleAvatar(
                       radius: 40,
                       backgroundImage: avatarImage,
-                      backgroundColor:
-                      avatarImage == null ? Colors.blueGrey : null,
+                      backgroundColor: avatarImage == null
+                          ? Colors.blueGrey
+                          : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -324,14 +323,9 @@ class JobDetailsUi extends StatelessWidget {
                   multiLine: true,
                   onCopy: job.location.trim().isNotEmpty
                       ? () {
-                    Clipboard.setData(
-                      ClipboardData(text: job.location),
-                    );
-                    Get.snackbar(
-                      'Copied',
-                      'Address copied to clipboard',
-                    );
-                  }
+                          Clipboard.setData(ClipboardData(text: job.location));
+                          Get.snackbar('Copied', 'Address copied to clipboard');
+                        }
                       : null,
                 ),
               ],
@@ -390,7 +384,7 @@ class JobDetailsUi extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ...attachments.map(
-                    (map) => _pdfTile(
+                (map) => _pdfTile(
                   label: map.keys.first,
                   enabled: map.values.first.isNotEmpty,
                   onTap: () => openAttachment(
@@ -416,47 +410,74 @@ class JobDetailsUi extends StatelessWidget {
 
             job.photos.isEmpty
                 ? const Text(
-              "No photos available",
-              style: TextStyle(color: Colors.white54),
-            )
+                    "No photos available",
+                    style: TextStyle(color: Colors.white54),
+                  )
                 : SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: job.photos.length,
-                itemBuilder: (context, index) {
-                  final url = job.photos[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: GestureDetector(
-                      onTap: () => openAttachment(
-                        context,
-                        url: url,
-                        title: "Photo ${index + 1}",
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          url,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: Colors.grey[900],
-                            child: const Icon(
-                              Icons.broken_image,
-                              color: Colors.white54,
+                    height: 120,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: job.photos.length,
+                      itemBuilder: (context, index) {
+                        final url = job.photos[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: GestureDetector(
+                            onTap: () => openAttachment(
+                              context,
+                              url: url,
+                              title: "Photo ${index + 1}",
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                url,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey[900],
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
 
             const SizedBox(height: 80),
+
+            RSaveButton(
+              height: 52,
+              key: UniqueKey(),
+              buttonStatusNotifier: ProcessStatusNotifier(
+                initialStatus: EnabledStatus(),
+              ),
+              saveText: "Accept",
+              doneText: "Accepted",
+              loadingText: "Accepting...",
+              onDone: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RamsDocumentScreen(job: job),
+                  ),
+                );
+              },
+              onSave: (ProcessStatusNotifier processNotifier) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RamsDocumentScreen(job: job),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

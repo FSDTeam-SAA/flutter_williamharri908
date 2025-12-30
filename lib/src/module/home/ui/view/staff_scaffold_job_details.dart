@@ -7,6 +7,7 @@ import 'package:williamharri/src/module/home/ui/widget/image_view_screen.dart';
 
 class StaffScaffoldJobDetails extends StatelessWidget {
   final GetMyScaffoldModel job;
+  
 
   const StaffScaffoldJobDetails({super.key, required this.job});
 
